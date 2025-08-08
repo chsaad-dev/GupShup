@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <!-- 🔙 Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/profileToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="Profile"
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="@drawable/ic_back" />
+
+    <!-- 📜 Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        android:fillViewport="true">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="10dp"
+            android:backgroundTint="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:padding="24dp">
+
+                <!-- 👤 Profile Image -->
+                <FrameLayout
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_marginBottom="16dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/profileImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_profile_placeholder"
+                        app:shapeAppearanceOverlay="@style/CircleImage" />
+
+                    <ImageView
+                        android:id="@+id/editProfilePicBtn"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="6dp"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_edit"
+                        android:background="@drawable/edit_button_background"
+                        android:contentDescription="Edit" />
+                </FrameLayout>
+
+                <!-- 📝 Fields -->
+                <TextView android:text="Name" style="@style/ProfileLabel" />
+                <EditText
+                    android:id="@+id/nameEditText"
+                    style="@style/ProfileField"
+                    android:hint="Your Name"
+                    android:enabled="false" />
+
+                <TextView android:text="Email" style="@style/ProfileLabel" />
+                <EditText
+                    android:id="@+id/emailEditText"
+                    style="@style/ProfileField"
+                    android:enabled="false"
+                    android:inputType="textEmailAddress" />
+
+                <TextView android:text="User ID" style="@style/ProfileLabel" />
+                <EditText
+                    android:id="@+id/userIdEditText"
+                    style="@style/ProfileField"
+                    android:enabled="false" />
+
+                <TextView android:text="Bio (optional)" style="@style/ProfileLabel" />
+                <EditText
+                    android:id="@+id/bioEditText"
+                    style="@style/ProfileField"
+                    android:hint="Write a short bio"
+                    android:enabled="false"
+                    android:maxLines="3" />
+
+                <!-- 🔁 Buttons -->
+                <Button
+                    android:id="@+id/editSaveButton"
+                    android:text="Edit"
+                    android:layout_marginTop="24dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:id="@+id/logoutBtn"
+                    android:text="Logout"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/holo_red_light" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </ScrollView>
+</LinearLayout>

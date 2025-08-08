@@ -10,5 +10,8 @@ data class User(
     var bio: String? = null,
     var isOnline: Boolean = false,
     var lastSeen: Timestamp? = null,
-    var typingTo: String? = null
+    var typingTo: String? = null,
+    val isEmailVerified: Boolean = false,
+    val createdAt: Long = System.currentTimeMillis(),
+    val fcmToken: String = ""
 )

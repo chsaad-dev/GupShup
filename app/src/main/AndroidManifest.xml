@@ -24,6 +24,7 @@
         <!-- ✅ Authentication -->
         <activity android:name=".ui.auth.RegisterActivity" />
         <activity android:name=".ui.auth.LoginActivity" />
+        <activity android:name=".ui.auth.EmailVerificationActivity"/>
 
         <!-- ✅ Chat Screens -->
         <activity android:name=".ui.chat.ChatActivity" />

@@ -11,6 +11,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.widget.SearchView
 import com.example.gupshup.R
 import com.example.gupshup.adapter.ChatAdapter
 import com.example.gupshup.databinding.ActivityChatBinding
@@ -37,6 +40,10 @@ class ChatActivity : AppCompatActivity() {
     private var typingTimer: Timer? = null
     private var userStatusListener: ListenerRegistration? = null
     private var newMessagesListener: ListenerRegistration? = null
+    
+    // Search
+    private var originalMessages = mutableListOf<Message>()
+    private var isSearching = false
 
     // Pagination variables
     private var isLoading = false
@@ -70,6 +77,50 @@ class ChatActivity : AppCompatActivity() {
                 updateTypingStatus(false)
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.chat_menu, menu)
+        val searchItem = menu?.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as? SearchView
+
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterMessages(newText)
+                return true
+            }
+        })
+        
+        searchItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                isSearching = true
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                isSearching = false
+                adapter.updateMessages(messages) // Restore original
+                return true
+            }
+        })
+
+        return true
+    }
+
+    private fun filterMessages(query: String?) {
+        if (query.isNullOrEmpty()) {
+            adapter.updateMessages(messages)
+            return
+        }
+        val lowerCaseQuery = query.lowercase()
+        val filteredList = messages.filter { 
+            it.text?.lowercase()?.contains(lowerCaseQuery) == true 
+        }
+        adapter.updateMessages(filteredList)
     }
 
     private fun setupToolbar() {
@@ -153,7 +204,7 @@ class ChatActivity : AppCompatActivity() {
                 super.onScrolled(recyclerView, dx, dy)
                 
                 // If scrolled to top (dy < 0 means scrolling up) and not loading
-                if (dy < 0 && !isLoading) {
+                if (dy < 0 && !isLoading && !isSearching) {
                     val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
                     if (firstVisibleItemPosition == 0 && oldestMessageSnapshot != null) {
                         loadMoreMessages()
@@ -277,8 +328,11 @@ class ChatActivity : AppCompatActivity() {
                         // Avoid duplicates if any race condition
                         if (messages.none { it.id == msg.id }) {
                             messages.add(msg)
-                            adapter.notifyItemInserted(messages.size - 1)
-                            binding.recyclerView.smoothScrollToPosition(messages.size - 1)
+                            
+                            if (!isSearching) {
+                                adapter.notifyItemInserted(messages.size - 1)
+                                binding.recyclerView.smoothScrollToPosition(messages.size - 1)
+                            }
                             
                             if (msg.receiverId == currentUid && !msg.seen) {
                                 markAsSeen(msg.id!!)
@@ -293,7 +347,9 @@ class ChatActivity : AppCompatActivity() {
                         val index = messages.indexOfFirst { it.id == msg.id }
                         if (index != -1) {
                             messages[index] = msg
-                            adapter.notifyItemChanged(index)
+                            if (!isSearching) {
+                                adapter.notifyItemChanged(index)
+                            }
                         }
                     }
                 }

@@ -12,10 +12,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ChatAdapter(
-    private val messages: List<Message>,
+    private var messages: List<Message>,
     private val currentUserId: String,
     private val onReactionClick: (Message) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    fun updateMessages(newMessages: List<Message>) {
+        messages = newMessages
+        notifyDataSetChanged()
+    }
 
     private val TYPE_SENT = 1
     private val TYPE_RECEIVED = 2
@@ -44,7 +49,16 @@ class ChatAdapter(
 
         if (holder is SentViewHolder) {
             holder.binding.messageText.text = message.text
-            holder.binding.messageStatus.text = "$timeFormatted ${if (message.seen) "✓✓ Seen" else "✓ Sent"}"
+            holder.binding.messageStatus.text = timeFormatted
+            
+            val statusIcon = if (message.seen) {
+                holder.itemView.context.getDrawable(com.example.gupshup.R.drawable.ic_check_double)
+            } else {
+                holder.itemView.context.getDrawable(com.example.gupshup.R.drawable.ic_check_single)
+            }
+            
+            holder.binding.messageStatus.setCompoundDrawablesWithIntrinsicBounds(null, null, statusIcon, null)
+            holder.binding.messageStatus.compoundDrawablePadding = 8
             holder.binding.reactionView.text = reactionsSummary
             holder.binding.reactionView.visibility = if (reactionsSummary.isNotEmpty()) View.VISIBLE else View.GONE
             holder.itemView.setOnLongClickListener {

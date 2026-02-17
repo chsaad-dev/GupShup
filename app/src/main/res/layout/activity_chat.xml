@@ -2,82 +2,120 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/backgroundLight"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/chatBackground">
 
-    <!-- 🧠 Custom Toolbar with Name + Status -->
-    <androidx.appcompat.widget.Toolbar
+    <!-- Material 3 Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/chatToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="?attr/colorOnPrimary">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:paddingStart="72dp"
-            android:paddingEnd="16dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/userNameText"
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/toolbarAvatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_profile_placeholder"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                android:padding="2dp"
+                android:visibility="visible"/>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Username"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
 
-            <TextView
-                android:id="@+id/userStatusText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Online"
-                android:textColor="@android:color/white"
-                android:textSize="13sp"
-                android:maxLines="1" />
+                <TextView
+                    android:id="@+id/userNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Username"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/userStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Online"
+                    android:textColor="#E0E0E0"
+                    android:textSize="12sp"
+                    android:maxLines="1" />
+            </LinearLayout>
         </LinearLayout>
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.MaterialToolbar>
 
-    <!-- 💬 RecyclerView for chat messages -->
+    <!-- RecyclerView for Chat -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="8dp"
-        android:overScrollMode="never" />
+        android:layout_weight="1"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 
-    <!-- 🔤 Message input field -->
+    <!-- Input Area -->
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:orientation="horizontal"
+        android:gravity="bottom"
+        android:padding="8dp"
+        android:background="?attr/colorSurface">
 
-        <EditText
-            android:id="@+id/messageInput"
-            android:layout_weight="1"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Type your message"
-            android:textColorHint="@color/gray"
-            android:background="@drawable/rounded_edittext"
-            android:padding="12dp"
-            android:inputType="text" />
+            android:layout_weight="1"
+            android:hint="Message"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusTopStart="24dp"
+            app:boxCornerRadiusTopEnd="24dp"
+            app:boxCornerRadiusBottomStart="24dp"
+            app:boxCornerRadiusBottomEnd="24dp"
+            app:boxStrokeColor="?attr/colorPrimary"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
 
-        <ImageButton
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/messageInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="4"
+                android:textColor="?attr/colorOnSurface" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/sendButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:background="@drawable/circle_bg_primary"
-            android:padding="10dp"
+            android:layout_marginBottom="4dp"
             android:src="@drawable/ic_send"
-            android:tint="@android:color/white" />
+            app:tint="?attr/colorOnPrimary"
+            app:backgroundTint="?attr/colorPrimary"
+            app:elevation="2dp"
+            app:fabSize="mini" />
+
     </LinearLayout>
+
 </LinearLayout>

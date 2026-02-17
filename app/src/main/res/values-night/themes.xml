@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base Application Theme -->
     <style name="Theme.GupShup" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Color Attributes -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -36,11 +35,11 @@
 
         <!-- Status Bar -->
         <item name="android:statusBarColor">@color/background</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
 
         <!-- Navigation Bar -->
         <item name="android:navigationBarColor">@color/surface</item>
-        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowLightNavigationBar">false</item>
         
         <!-- Typography & Text -->
         <item name="android:textColorPrimary">@color/onSurface</item>
@@ -52,8 +51,7 @@
         <item name="toolbarStyle">@style/Widget.Material3.Toolbar</item>
         <item name="bottomNavigationStyle">@style/Widget.Material3.BottomNavigationView</item>
     </style>
-
-    <!-- Legacy Theme Reference for safety -->
+    
+    <!-- Legacy Theme Reference -->
     <style name="Theme.Gupshup" parent="Theme.GupShup" />
-
 </resources>

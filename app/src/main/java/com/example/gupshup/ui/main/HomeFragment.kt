@@ -90,24 +90,42 @@ class HomeFragment : Fragment() {
                     return@addOnSuccessListener
                 }
 
-                db.collection("users")
-                    .whereIn("uid", friendIds.toList())
-                    .get()
-                    .addOnSuccessListener { result ->
-                        users.clear()
-                        for (doc in result) {
-                            val user = doc.toObject(User::class.java)
-                            if (user.uid != currentUid) {
-                                users.add(user)
-                                observeUnreadMessages(user.uid)
+                // Firestore 'whereIn' supports max 10 values. We must split into chunks.
+                val chunks = friendIds.toList().chunked(10)
+                users.clear() // Clear once before fetching all chunks
+
+                // We need to track when all chunks are loaded to stop refreshing
+                var completedChunks = 0
+
+                chunks.forEach { chunk ->
+                    db.collection("users")
+                        .whereIn("uid", chunk)
+                        .get()
+                        .addOnSuccessListener { result ->
+                            for (doc in result) {
+                                val user = doc.toObject(User::class.java)
+                                if (user.uid != currentUid) {
+                                    users.add(user)
+                                    observeUnreadMessages(user.uid)
+                                }
+                            }
+                            
+                            completedChunks++
+                            // Only notify and stop refreshing when we have at least some data or all done
+                            // Adapting to simple incremental update for responsiveness
+                            adapter.notifyDataSetChanged()
+                            
+                            if (completedChunks == chunks.size) {
+                                _binding?.swipeRefreshLayout?.isRefreshing = false
                             }
                         }
-                        adapter.notifyDataSetChanged()
-                        _binding?.swipeRefreshLayout?.isRefreshing = false
-                    }
-                    .addOnFailureListener {
-                        _binding?.swipeRefreshLayout?.isRefreshing = false
-                    }
+                        .addOnFailureListener {
+                            completedChunks++
+                            if (completedChunks == chunks.size) {
+                                _binding?.swipeRefreshLayout?.isRefreshing = false
+                            }
+                        }
+                }
             }
             .addOnFailureListener {
                 _binding?.swipeRefreshLayout?.isRefreshing = false

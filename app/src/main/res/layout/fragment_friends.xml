@@ -6,30 +6,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/white">
+    android:background="?attr/colorSurface">
 
-    <!-- 🔙 Toolbar -->
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/friendsToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         app:title="Friend Requests"
-        app:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_back" />
+        app:titleTextColor="?attr/colorOnPrimary"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="?attr/colorOnPrimary" />
 
-    <!-- 🔁 Swipe to Refresh (optional, remove if not needed) -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- 👥 Friend Requests List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
             android:clipToPadding="false" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

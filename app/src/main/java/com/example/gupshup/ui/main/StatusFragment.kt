@@ -109,20 +109,20 @@ class StatusFragment : Fragment() {
     }
 
     private fun fetchStatuses() {
-        db.collection("status").addSnapshotListener { snapshot, _ ->
-            statusList.clear()
-            val now = System.currentTimeMillis()
-            snapshot?.documents?.forEach { doc ->
-                val status = doc.toObject(Status::class.java)
-                if (status != null && now - status.timestamp < 24 * 60 * 60 * 1000) {
-                    statusList.add(status)
-                } else if (status != null) {
-                    db.collection("status").document(status.statusId).delete()
+        // Calculate timestamp for 24 hours ago
+        val twentyFourHoursAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000)
+
+        db.collection("status")
+            .whereGreaterThan("timestamp", twentyFourHoursAgo)
+            .addSnapshotListener { snapshot, _ ->
+                statusList.clear()
+                snapshot?.documents?.forEach { doc ->
+                    val status = doc.toObject(Status::class.java)
+                    status?.let { statusList.add(it) }
                 }
+                statusList.sortByDescending { it.timestamp }
+                adapter.notifyDataSetChanged()
             }
-            statusList.sortByDescending { it.timestamp }
-            adapter.notifyDataSetChanged()
-        }
     }
 
     private fun showDeleteDialog(status: Status) {

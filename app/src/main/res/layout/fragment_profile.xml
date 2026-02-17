@@ -4,113 +4,161 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="?attr/colorSurface"
     android:orientation="vertical">
 
-    <!-- 🔙 Toolbar -->
-    <androidx.appcompat.widget.Toolbar
+    <!-- Material 3 Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/profileToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         app:title="Profile"
-        app:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_back" />
+        app:titleCentered="false"
+        app:titleTextColor="?attr/colorOnPrimary"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="?attr/colorOnPrimary" />
 
-    <!-- 📜 Scrollable Content -->
+    <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
+        android:padding="16dp"
         android:fillViewport="true">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="10dp"
-            android:backgroundTint="@android:color/white">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
-            <LinearLayout
+            <!-- Profile Image Container -->
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="32dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/profileImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_profile_placeholder"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                    app:strokeWidth="2dp"
+                    app:strokeColor="?attr/colorPrimary" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/editProfilePicBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:src="@drawable/ic_edit"
+                    app:fabSize="mini"
+                    app:tint="?attr/colorOnSecondary"
+                    app:backgroundTint="?attr/colorSecondary"
+                    android:contentDescription="Edit Profile Picture" />
+            </FrameLayout>
+
+            <!-- Name Input -->
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:padding="24dp">
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:hint="Full Name"
+                android:layout_marginBottom="16dp"
+                app:startIconDrawable="@drawable/ic_person"
+                app:startIconTint="?attr/colorOnSurfaceVariant">
 
-                <!-- 👤 Profile Image -->
-                <FrameLayout
-                    android:layout_width="130dp"
-                    android:layout_height="130dp"
-                    android:layout_marginBottom="16dp">
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/profileImageView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ic_profile_placeholder"
-                        app:shapeAppearanceOverlay="@style/CircleImage" />
-
-                    <ImageView
-                        android:id="@+id/editProfilePicBtn"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="bottom|end"
-                        android:layout_margin="6dp"
-                        android:padding="6dp"
-                        android:src="@drawable/ic_edit"
-                        android:background="@drawable/edit_button_background"
-                        android:contentDescription="Edit" />
-                </FrameLayout>
-
-                <!-- 📝 Fields -->
-                <TextView android:text="Name" style="@style/ProfileLabel" />
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nameEditText"
-                    style="@style/ProfileField"
-                    android:hint="Your Name"
-                    android:enabled="false" />
-
-                <TextView android:text="Email" style="@style/ProfileLabel" />
-                <EditText
-                    android:id="@+id/emailEditText"
-                    style="@style/ProfileField"
-                    android:enabled="false"
-                    android:inputType="textEmailAddress" />
-
-                <TextView android:text="User ID" style="@style/ProfileLabel" />
-                <EditText
-                    android:id="@+id/userIdEditText"
-                    style="@style/ProfileField"
-                    android:enabled="false" />
-
-                <TextView android:text="Bio (optional)" style="@style/ProfileLabel" />
-                <EditText
-                    android:id="@+id/bioEditText"
-                    style="@style/ProfileField"
-                    android:hint="Write a short bio"
-                    android:enabled="false"
-                    android:maxLines="3" />
-
-                <!-- 🔁 Buttons -->
-                <Button
-                    android:id="@+id/editSaveButton"
-                    android:text="Edit"
-                    android:layout_marginTop="24dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <Button
-                    android:id="@+id/logoutBtn"
-                    android:text="Logout"
-                    android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:backgroundTint="@android:color/holo_red_light" />
+                    android:inputType="textPersonName"
+                    android:textColor="?attr/colorOnSurface"
+                    android:enabled="false" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            <!-- Email Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:hint="Email"
+                android:layout_marginBottom="16dp"
+                app:startIconDrawable="@drawable/ic_email"
+                app:startIconTint="?attr/colorOnSurfaceVariant">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/emailEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:textColor="?attr/colorOnSurface"
+                    android:enabled="false" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Bio Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:hint="Bio"
+                android:layout_marginBottom="16dp"
+                app:startIconDrawable="@drawable/ic_info"
+                app:startIconTint="?attr/colorOnSurfaceVariant">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/bioEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:maxLines="3"
+                    android:textColor="?attr/colorOnSurface"
+                    android:enabled="false" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- User ID (Hidden or Read-only) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:hint="User ID"
+                android:layout_marginBottom="24dp"
+                app:startIconDrawable="@drawable/ic_fingerprint"
+                app:startIconTint="?attr/colorOnSurfaceVariant"
+                android:visibility="visible">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/userIdEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:enabled="false" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Action Buttons -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editSaveButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Edit Profile"
+                style="@style/Widget.Material3.Button.TonalButton"
+                app:icon="@drawable/ic_edit"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logoutBtn"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Logout"
+                style="@style/Widget.Material3.Button"
+                android:backgroundTint="?attr/colorError"
+                android:textColor="?attr/colorOnError"
+                app:icon="@drawable/ic_logout"
+                app:iconTint="?attr/colorOnError" />
+
+        </LinearLayout>
     </ScrollView>
 </LinearLayout>

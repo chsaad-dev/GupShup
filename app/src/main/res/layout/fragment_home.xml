@@ -5,18 +5,21 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="?attr/colorSurface">
 
-    <!-- 🧭 Toolbar -->
-    <androidx.appcompat.widget.Toolbar
+    <!-- Material 3 Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/homeToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:title="Home"
-        app:titleTextColor="@android:color/white" />
+        android:elevation="0dp"
+        app:title="GupShup"
+        app:titleTextColor="?attr/colorOnPrimary"
+        app:titleCentered="false"
+        app:menu="@menu/home_menu" />
 
-    <!-- 🔄 Pull to Refresh -->
+    <!-- Pull to Refresh -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
@@ -26,7 +29,8 @@
             android:id="@+id/homeRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="88dp"
             android:clipToPadding="false"
             android:scrollbars="vertical" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface">
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
@@ -15,9 +16,10 @@
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:theme="@style/ThemeOverlay.Material3.BottomNavigationView"
-        app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"
+        android:background="?attr/colorSurface"
+        app:labelVisibilityMode="labeled"
+        app:itemRippleColor="?attr/colorPrimaryContainer"
+        app:itemActiveIndicatorStyle="@style/Widget.Material3.BottomNavigationView.ActiveIndicator"
         app:menu="@menu/bottom_nav_menu" />
+
 </LinearLayout>

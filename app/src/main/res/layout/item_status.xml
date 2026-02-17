@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:elevation="4dp"
-    android:foreground="?attr/selectableItemBackground"
-    android:backgroundTint="@android:color/white"
+    android:layout_marginBottom="12dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
     app:cardCornerRadius="16dp">
 
     <LinearLayout
@@ -15,13 +17,13 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Row: Username + Delete Icon -->
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="4dp">
+            android:layout_marginBottom="8dp">
 
             <TextView
                 android:id="@+id/statusUserName"
@@ -29,66 +31,79 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:text="User Name"
-                android:textColor="#1A237E"
+                android:textColor="?attr/colorOnSurface"
                 android:textStyle="bold"
-                android:textSize="17sp" />
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/deleteStatusIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="8dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:src="@drawable/ic_delete"
-                android:contentDescription="Delete Status"
-                android:visibility="gone"
-                app:tint="#000000" />
+                android:contentDescription="Delete"
+                app:tint="?attr/colorError"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:visibility="gone" />
         </LinearLayout>
 
-        <!-- Status Text -->
+        <!-- Status content -->
         <TextView
             android:id="@+id/statusText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sample status message"
-            android:textColor="#212121"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp" />
+            android:text="Status text..."
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="15sp"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="8dp" />
 
-        <!-- Timestamp -->
-        <TextView
-            android:id="@+id/statusTimestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="10:30 AM, Jul 10"
-            android:textSize="12sp"
-            android:textColor="#757575"
-            android:layout_marginTop="4dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/colorOutlineVariant"
+            android:layout_marginVertical="8dp"/>
 
-        <!-- New: Views count row -->
+        <!-- Footer -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="4dp"
             android:gravity="center_vertical">
-
-            <ImageView
-                android:id="@+id/viewStatusIcon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_eye"
-                android:tint="#757575"
-                android:contentDescription="Views Icon" />
-
+            
             <TextView
-                android:id="@+id/viewStatusCount"
+                android:id="@+id/statusTimestamp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="12 min ago"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOutline" />
+
+            <!-- Views -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
-                android:textSize="12sp"
-                android:textColor="#757575"
-                android:layout_marginStart="4dp"/>
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/viewStatusIcon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_eye"
+                    app:tint="?attr/colorOutline" />
+
+                <TextView
+                    android:id="@+id/viewStatusCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorOutline"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

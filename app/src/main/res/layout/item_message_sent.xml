@@ -1,34 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="end"
-    android:padding="6dp">
+    android:paddingVertical="4dp"
+    android:paddingHorizontal="8dp">
 
-    <TextView
-        android:id="@+id/messageText"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_bubble_sent"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:padding="12dp" />
+        app:cardBackgroundColor="@color/bubbleSent"
+        app:cardElevation="1dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/bubbleStroke"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
+        android:layout_marginEnd="2dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:minWidth="80dp">
+
+            <TextView
+                android:id="@+id/messageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="end"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical">
+                
+                <TextView
+                    android:id="@+id/messageStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="?attr/colorOutline"
+                    android:layout_marginEnd="4dp" />
+
+                <!-- Add checkmark icon here if logic supports it, otherwise status text handles it -->
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/reactionView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FF4081"
-        android:textSize="14sp"
-        android:layout_marginTop="4dp" />
-
-    <TextView
-        android:id="@+id/messageStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:textSize="12sp"
-        android:textColor="@android:color/darker_gray"
-        android:layout_marginTop="2dp"
-        android:gravity="end" />
+        android:layout_marginTop="-8dp"
+        android:layout_marginEnd="8dp"
+        android:elevation="2dp" />
+
 </LinearLayout>

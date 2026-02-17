@@ -1,45 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="24dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:gravity="center"
+    android:background="?attr/colorSurface">
 
     <TextView
         android:id="@+id/userNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="User Name"
-        android:textColor="#1A237E"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"/>
 
     <TextView
         android:id="@+id/timestampTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="10:30 AM, 10 Jul 2025"
-        android:textColor="#757575"
-        android:textSize="12sp"
-        android:layout_marginTop="4dp"/>
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"/>
 
-    <TextView
-        android:id="@+id/statusTextView"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Status message here"
-        android:textSize="18sp"
-        android:textColor="#212121"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:contentPadding="24dp">
+        
+        <TextView
+            android:id="@+id/statusTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Status message here"
+            android:textSize="20sp"
+            android:textColor="?attr/colorOnSurface"
+            android:gravity="center"/>
+    </com.google.android.material.card.MaterialCardView>
 
     <Button
         android:id="@+id/viewersButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Who viewed?"
-        android:layout_marginTop="24dp"/>
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_gravity="center_horizontal"/>
 
     <ProgressBar
         android:id="@+id/progressBar"

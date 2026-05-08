@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     android:background="@color/chatBackground">
 
+    <!-- Offline Banner -->
+    <TextView
+        android:id="@+id/offlineBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#E53935"
+        android:text="No internet connection"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:textAlignment="center"
+        android:paddingVertical="4dp"
+        android:visibility="gone" />
+
     <!-- Material 3 Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/chatToolbar"

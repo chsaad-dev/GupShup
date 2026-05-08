@@ -216,49 +216,77 @@ class ChatActivity : AppCompatActivity() {
 
     private fun loadInitialMessages() {
         isLoading = true
-        db.collection("chats")
+        
+        val query = db.collection("chats")
             .document(chatId)
             .collection("messages")
             .orderBy("timestamp", Query.Direction.ASCENDING)
             .limitToLast(PAGE_SIZE)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                messages.clear()
-                if (!snapshot.isEmpty) {
-                    // Track oldest for pagination
-                    oldestMessageSnapshot = snapshot.documents.firstOrNull()
-                    
-                    // Track newest for realtime listener, if needed. 
-                    // Actually we can just start listener from the last doc's timestamp.
-                    val newestDoc = snapshot.documents.lastOrNull()
-                    
-                    for (doc in snapshot.documents) {
-                        val msg = doc.toObject(Message::class.java)
-                        if (msg != null) {
-                            msg.id = doc.id
-                            messages.add(msg)
-                            
-                            // Mark as seen if receiver
-                            if (msg.receiverId == currentUid && !msg.seen) {
-                                markAsSeen(msg.id!!)
-                            }
-                        }
-                    }
-                    adapter.notifyDataSetChanged()
-                    binding.recyclerView.scrollToPosition(messages.size - 1)
-                    
-                    // Start listening for NEW messages
-                    listenForNewMessages(newestDoc)
-                } else {
-                    // Chat is empty, just listen for new
-                    listenForNewMessages(null)
+
+        // Step 1: Try loading from cache first for instant display
+        query.get(Source.CACHE)
+            .addOnSuccessListener { cacheSnapshot ->
+                if (!cacheSnapshot.isEmpty) {
+                    populateMessages(cacheSnapshot)
                 }
-                isLoading = false
+                // Step 2: Then fetch from server to get fresh data
+                query.get(Source.SERVER)
+                    .addOnSuccessListener { serverSnapshot ->
+                        if (!serverSnapshot.isEmpty) {
+                            populateMessages(serverSnapshot)
+                        } else if (cacheSnapshot.isEmpty) {
+                            // Truly empty chat
+                            listenForNewMessages(null)
+                        }
+                        isLoading = false
+                    }
+                    .addOnFailureListener {
+                        // Server failed but cache was shown, still ok
+                        if (cacheSnapshot.isEmpty) {
+                            listenForNewMessages(null)
+                        }
+                        isLoading = false
+                    }
             }
-            .addOnFailureListener { e ->
-                isLoading = false
-                // Handle error
+            .addOnFailureListener {
+                // No cache, go straight to server
+                query.get(Source.SERVER)
+                    .addOnSuccessListener { serverSnapshot ->
+                        if (!serverSnapshot.isEmpty) {
+                            populateMessages(serverSnapshot)
+                        } else {
+                            listenForNewMessages(null)
+                        }
+                        isLoading = false
+                    }
+                    .addOnFailureListener {
+                        isLoading = false
+                    }
             }
+    }
+
+    private fun populateMessages(snapshot: QuerySnapshot) {
+        messages.clear()
+        oldestMessageSnapshot = snapshot.documents.firstOrNull()
+        val newestDoc = snapshot.documents.lastOrNull()
+
+        for (doc in snapshot.documents) {
+            val msg = doc.toObject(Message::class.java)
+            if (msg != null) {
+                msg.id = doc.id
+                messages.add(msg)
+
+                if (msg.receiverId == currentUid && !msg.seen) {
+                    markAsSeen(msg.id!!)
+                }
+            }
+        }
+        adapter.notifyDataSetChanged()
+        binding.recyclerView.scrollToPosition(messages.size - 1)
+
+        // Remove old listener before setting new one
+        newMessagesListener?.remove()
+        listenForNewMessages(newestDoc)
     }
 
     private fun loadMoreMessages() {

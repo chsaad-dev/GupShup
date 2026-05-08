@@ -2,19 +2,25 @@ package com.example.gupshup.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.gupshup.R
 import com.example.gupshup.databinding.ActivityMainNavigationBinding
 import com.example.gupshup.ui.auth.LoginActivity
+import com.example.gupshup.util.NetworkObserver
+import com.example.gupshup.util.NetworkStatus
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.example.gupshup.ui.main.StatusFragment
+import kotlinx.coroutines.launch
 
 class MainNavigationActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainNavigationBinding
     private val db = FirebaseFirestore.getInstance()
+    private lateinit var networkObserver: NetworkObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +34,10 @@ class MainNavigationActivity : AppCompatActivity() {
 
         binding = ActivityMainNavigationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Network observer
+        networkObserver = NetworkObserver(this)
+        observeNetwork()
 
         loadFragment(HomeFragment())
         checkPendingRequestsBadge()
@@ -44,8 +54,31 @@ class MainNavigationActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeNetwork() {
+        lifecycleScope.launch {
+            networkObserver.networkStatus.collect { status ->
+                when (status) {
+                    NetworkStatus.Lost -> {
+                        binding.offlineBanner.visibility = View.VISIBLE
+                        binding.offlineBanner.alpha = 0f
+                        binding.offlineBanner.animate().alpha(1f).setDuration(300).start()
+                    }
+                    NetworkStatus.Available -> {
+                        binding.offlineBanner.animate().alpha(0f).setDuration(300).withEndAction {
+                            binding.offlineBanner.visibility = View.GONE
+                        }.start()
+                    }
+                }
+            }
+        }
+    }
+
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.fade_in,
+                R.anim.fade_out
+            )
             .replace(R.id.fragmentContainer, fragment)
             .commit()
     }

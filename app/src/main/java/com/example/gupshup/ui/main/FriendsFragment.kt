@@ -6,9 +6,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gupshup.R
 import com.example.gupshup.adapter.UsersAdapter
 import com.example.gupshup.databinding.FragmentFriendsBinding
 import com.example.gupshup.model.User
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -32,15 +34,12 @@ class FriendsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 🧭 Optional: If using toolbar in fragment (for standalone navigation)
         (activity as? AppCompatActivity)?.setSupportActionBar(binding.friendsToolbar)
 
-        // 🔁 Swipe to Refresh
         binding.swipeRefreshLayout.setOnRefreshListener {
             loadFriendRequests()
         }
 
-        // 👥 Set up adapter
         adapter = UsersAdapter(
             context = requireContext(),
             userList = friendRequests,
@@ -52,15 +51,45 @@ class FriendsFragment : Fragment() {
 
         binding.friendsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.friendsRecyclerView.adapter = adapter
+        binding.friendsRecyclerView.layoutAnimation =
+            android.view.animation.AnimationUtils.loadLayoutAnimation(
+                requireContext(), R.anim.layout_animation_fall_down
+            )
 
+        showShimmer()
         loadFriendRequests()
+    }
+
+    private fun showShimmer() {
+        val shimmer = _binding?.root?.findViewById<ShimmerFrameLayout>(R.id.shimmerLayout)
+        shimmer?.startShimmer()
+        _binding?.root?.findViewById<View>(R.id.shimmerPlaceholder)?.visibility = View.VISIBLE
+        _binding?.friendsRecyclerView?.visibility = View.GONE
+        _binding?.emptyStateView?.visibility = View.GONE
+    }
+
+    private fun hideShimmer() {
+        val shimmer = _binding?.root?.findViewById<ShimmerFrameLayout>(R.id.shimmerLayout)
+        shimmer?.stopShimmer()
+        _binding?.root?.findViewById<View>(R.id.shimmerPlaceholder)?.visibility = View.GONE
+    }
+
+    private fun showContent() {
+        hideShimmer()
+        if (friendRequests.isEmpty()) {
+            _binding?.friendsRecyclerView?.visibility = View.GONE
+            _binding?.emptyStateView?.visibility = View.VISIBLE
+            _binding?.emptyStateView?.alpha = 0f
+            _binding?.emptyStateView?.animate()?.alpha(1f)?.setDuration(400)?.start()
+        } else {
+            _binding?.friendsRecyclerView?.visibility = View.VISIBLE
+            _binding?.emptyStateView?.visibility = View.GONE
+            _binding?.friendsRecyclerView?.scheduleLayoutAnimation()
+        }
     }
 
     private fun loadFriendRequests() {
         if (currentUid == null) return
-
-        // Start refresh animation
-        binding.swipeRefreshLayout.isRefreshing = true
 
         val requestsRef = db.collection("friend_requests")
         val usersRef = db.collection("users")
@@ -74,6 +103,7 @@ class FriendsFragment : Fragment() {
                 if (pendingUids.isEmpty()) {
                     friendRequests.clear()
                     adapter.notifyDataSetChanged()
+                    showContent()
                     binding.swipeRefreshLayout.isRefreshing = false
                     return@addOnSuccessListener
                 }
@@ -84,15 +114,18 @@ class FriendsFragment : Fragment() {
                         friendRequests.clear()
                         friendRequests.addAll(userSnapshot.mapNotNull { it.toObject(User::class.java) })
                         adapter.notifyDataSetChanged()
+                        showContent()
                         binding.swipeRefreshLayout.isRefreshing = false
                     }
                     .addOnFailureListener {
                         showToast("Failed to load users")
+                        showContent()
                         binding.swipeRefreshLayout.isRefreshing = false
                     }
             }
             .addOnFailureListener {
                 showToast("Failed to load requests")
+                showContent()
                 binding.swipeRefreshLayout.isRefreshing = false
             }
     }

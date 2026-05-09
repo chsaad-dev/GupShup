@@ -61,6 +61,18 @@
                     android:contentDescription="Edit Profile Picture" />
             </FrameLayout>
 
+            <!-- Section Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Account Info"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary"
+                android:fontFamily="@font/google_sans_medium"
+                android:layout_marginBottom="12dp"
+                android:letterSpacing="0.05" />
+
             <!-- Name Input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"

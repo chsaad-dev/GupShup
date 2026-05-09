@@ -54,9 +54,6 @@ class HomeFragment : Fragment() {
 
         binding.homeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.homeRecyclerView.adapter = adapter
-        binding.homeRecyclerView.addItemDecoration(
-            DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-        )
         binding.homeRecyclerView.layoutAnimation =
             android.view.animation.AnimationUtils.loadLayoutAnimation(
                 requireContext(), R.anim.layout_animation_fall_down

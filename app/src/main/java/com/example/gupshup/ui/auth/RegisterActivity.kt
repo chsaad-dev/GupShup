@@ -5,12 +5,19 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Patterns
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import com.example.gupshup.R
 import com.example.gupshup.databinding.ActivityRegisterBinding
 import com.example.gupshup.model.User
 import com.example.gupshup.ui.main.MainNavigationActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : AppCompatActivity() {
@@ -18,6 +25,20 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            firebaseAuthWithGoogle(account.idToken!!)
+        } catch (e: ApiException) {
+            showLoading(false)
+            showError("Google sign-in failed: ${e.message}")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +55,16 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupGoogleSignIn()
         setupUI()
+    }
+
+    private fun setupGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
     private fun setupUI() {
@@ -50,6 +80,60 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
+
+        binding.googleSignInButton.setOnClickListener {
+            showLoading(true)
+            val signInIntent = googleSignInClient.signInIntent
+            googleSignInLauncher.launch(signInIntent)
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnSuccessListener { authResult ->
+                val user = authResult.user
+                if (user != null) {
+                    db.collection("users").document(user.uid).get()
+                        .addOnSuccessListener { doc ->
+                            if (!doc.exists()) {
+                                val userData = User(
+                                    uid = user.uid,
+                                    name = user.displayName ?: "User",
+                                    email = user.email ?: "",
+                                    isEmailVerified = true,
+                                    profileImageUrl = user.photoUrl?.toString() ?: ""
+                                )
+                                db.collection("users").document(user.uid).set(userData)
+                                    .addOnSuccessListener {
+                                        showLoading(false)
+                                        navigateToMain()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        showLoading(false)
+                                        showError("Failed to save user data: ${e.message}")
+                                    }
+                            } else {
+                                showLoading(false)
+                                navigateToMain()
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            showLoading(false)
+                            showError("Error checking user: ${e.message}")
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                showLoading(false)
+                showError("Authentication failed: ${e.message}")
+            }
+    }
+
+    private fun navigateToMain() {
+        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, MainNavigationActivity::class.java))
+        finish()
     }
 
     private fun registerUser() {
@@ -147,6 +231,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun showLoading(show: Boolean) {
         binding.progressIndicator.isVisible = show
         binding.registerButton.isEnabled = !show
+        binding.googleSignInButton.isEnabled = !show
         binding.nameInput.isEnabled = !show
         binding.emailInput.isEnabled = !show
         binding.passwordInput.isEnabled = !show

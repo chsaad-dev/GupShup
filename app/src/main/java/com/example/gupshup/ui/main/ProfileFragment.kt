@@ -35,10 +35,7 @@ class ProfileFragment : Fragment() {
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             selectedImageUri = uri
-            Glide.with(requireContext())
-                .load(uri)
-                .placeholder(R.drawable.ic_profile_placeholder)
-                .into(binding.profileImageView)
+            com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.profileImageView, uri.toString())
         }
     }
 
@@ -103,9 +100,11 @@ class ProfileFragment : Fragment() {
                     binding.userIdEditText.setText(uid)
                     binding.bioEditText.setText(userEntity.bio)
 
-                    context?.let { ctx ->
-                        ImageUtils.loadProfileImage(ctx, userEntity.photoUrl, binding.profileImageView)
-                    }
+                    com.example.gupshup.util.ImageLoaderUtil.loadAvatar(
+                        binding.profileImageView,
+                        userEntity.photoUrl,
+                        userEntity.updatedAt
+                    )
                 }
             }
         }
@@ -123,6 +122,7 @@ class ProfileFragment : Fragment() {
                 val email = doc.getString("email") ?: ""
                 val bio = doc.getString("bio") ?: ""
                 val profileUrl = doc.getString("profileImageUrl") ?: ""
+                val updatedAt = doc.getLong("updatedAt") ?: System.currentTimeMillis()
 
                 val appContext = context?.applicationContext
                 if (appContext != null) {
@@ -133,7 +133,8 @@ class ProfileFragment : Fragment() {
                                 name = name,
                                 email = email,
                                 photoUrl = profileUrl,
-                                bio = bio
+                                bio = bio,
+                                updatedAt = updatedAt
                             )
                         )
                     }
@@ -145,9 +146,11 @@ class ProfileFragment : Fragment() {
                     binding.userIdEditText.setText(uid)
                     binding.bioEditText.setText(bio)
 
-                    context?.let { ctx ->
-                        ImageUtils.loadProfileImage(ctx, profileUrl, binding.profileImageView)
-                    }
+                    com.example.gupshup.util.ImageLoaderUtil.loadAvatar(
+                        binding.profileImageView,
+                        profileUrl,
+                        updatedAt
+                    )
                 }
             }
     }
@@ -188,9 +191,11 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateFirestoreProfile(uid: String, name: String, bio: String, profileImageUrl: String?) {
+        val now = System.currentTimeMillis()
         val updates = mutableMapOf<String, Any>(
             "name" to name,
-            "bio" to bio
+            "bio" to bio,
+            "updatedAt" to now
         )
 
         profileImageUrl?.let {

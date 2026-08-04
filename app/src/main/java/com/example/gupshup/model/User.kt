@@ -13,5 +13,6 @@ data class User(
     var typingTo: String? = null,
     val isEmailVerified: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
-    val fcmToken: String = ""
+    val fcmToken: String = "",
+    var updatedAt: Long = System.currentTimeMillis()
 )

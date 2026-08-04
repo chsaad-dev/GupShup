@@ -531,9 +531,7 @@ class ChatActivity : AppCompatActivity() {
         val closeButton = dialogView.findViewById<android.view.View>(R.id.closeButton)
 
         if (fullScreenImageView != null) {
-            Glide.with(this)
-                .load(imageUrl)
-                .into(fullScreenImageView)
+            com.example.gupshup.util.ImageLoaderUtil.loadChatImage(fullScreenImageView, imageUrl)
         }
 
         fullScreenImageView?.setOnClickListener {

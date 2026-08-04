@@ -80,9 +80,7 @@ class StatusStoryActivity : AppCompatActivity() {
         val currentStatus = status
         if (currentStatus != null && currentStatus.mediaUrl.isNotBlank()) {
             binding.statusImageView.visibility = android.view.View.VISIBLE
-            com.bumptech.glide.Glide.with(this)
-                .load(currentStatus.mediaUrl)
-                .into(binding.statusImageView)
+            com.example.gupshup.util.ImageLoaderUtil.loadStatusMedia(binding.statusImageView, currentStatus.mediaUrl)
         } else {
             binding.statusImageView.visibility = android.view.View.GONE
         }

@@ -35,7 +35,7 @@ class UsersAdapter(
             binding.userEmail.text = user.email
 
             // Load profile image
-            com.example.gupshup.util.ImageUtils.loadProfileImage(context, user.profileImageUrl, binding.userImage)
+            com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.userImage, user.profileImageUrl, user.updatedAt)
 
             // Online presence indicator
             binding.onlineIndicator.visibility = if (user.isOnline) View.VISIBLE else View.GONE

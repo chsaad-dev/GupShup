@@ -30,7 +30,7 @@ class StatusBubbleAdapter(
         val status = statusList[position]
         holder.userName.text = status.userName
 
-        com.example.gupshup.util.ImageUtils.loadProfileImage(holder.itemView.context, status.userProfileUrl, holder.profileImage)
+        com.example.gupshup.util.ImageLoaderUtil.loadAvatar(holder.profileImage, status.userProfileUrl)
 
         holder.itemView.setOnClickListener {
             onStatusClick(status)

@@ -65,10 +65,7 @@ class ChatAdapter(
     ) {
         if (!message.imageUrl.isNullOrBlank()) {
             holder.binding.messageImage.visibility = View.VISIBLE
-            Glide.with(holder.itemView.context)
-                .load(message.imageUrl)
-                .placeholder(R.drawable.ic_profile_placeholder)
-                .into(holder.binding.messageImage)
+            com.example.gupshup.util.ImageLoaderUtil.loadChatImage(holder.binding.messageImage, message.imageUrl)
 
             holder.binding.messageImage.setOnClickListener {
                 onImageClick?.invoke(message.imageUrl)
@@ -109,10 +106,7 @@ class ChatAdapter(
     ) {
         if (!message.imageUrl.isNullOrBlank()) {
             holder.binding.messageImage.visibility = View.VISIBLE
-            Glide.with(holder.itemView.context)
-                .load(message.imageUrl)
-                .placeholder(R.drawable.ic_profile_placeholder)
-                .into(holder.binding.messageImage)
+            com.example.gupshup.util.ImageLoaderUtil.loadChatImage(holder.binding.messageImage, message.imageUrl)
 
             holder.binding.messageImage.setOnClickListener {
                 onImageClick?.invoke(message.imageUrl)

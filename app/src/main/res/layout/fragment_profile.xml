@@ -1,176 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/colorSurface">
 
-    <!-- Material 3 Toolbar -->
+    <!-- Material 3 Toolbar (Surface-toned) -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/profileToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
         app:title="Profile"
-        app:titleCentered="false"
+        app:titleTextAppearance="@style/TextAppearance.GupShup.Headline"
         app:titleTextColor="?attr/colorOnSurface"
-        app:navigationIcon="@drawable/ic_back"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="?attr/colorOnSurface" />
 
-    <!-- Scrollable Content -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:orientation="vertical">
 
-            <!-- Profile Image Container -->
-            <FrameLayout
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="32dp">
+            <!-- Header Stack: 140dp Primary Container background block with overlapping 100dp Avatar -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="190dp">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/profileImageView"
+                <!-- 140dp Primary Container Visual Anchor Block -->
+                <View
+                    android:id="@+id/headerBlock"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_profile_placeholder"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                    app:strokeWidth="2dp"
-                    app:strokeColor="?attr/colorPrimary" />
+                    android:layout_height="140dp"
+                    android:background="@color/colorPrimaryContainer" />
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/editProfilePicBtn"
+                <!-- Avatar Stack (100dp circular, 4dp Surface ring, centered on 140dp boundary at top 90dp) -->
+                <FrameLayout
+                    android:id="@+id/avatarContainer"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="90dp">
+
+                    <!-- 100dp Avatar with 4dp Surface ring -->
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/profileImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_profile_placeholder"
+                        app:shapeAppearanceOverlay="@style/CircleImage"
+                        app:strokeWidth="4dp"
+                        app:strokeColor="?attr/colorSurface" />
+
+                    <!-- Camera Overlay Badge: 32dp circular Primary badge bottom-right, white pencil icon, level 2 elevation -->
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/editProfilePicBtn"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="bottom|end"
+                        android:src="@drawable/ic_edit"
+                        app:fabCustomSize="32dp"
+                        app:fabSize="normal"
+                        app:tint="@color/white"
+                        app:backgroundTint="@color/colorPrimary"
+                        app:elevation="@dimen/elevation_level_2"
+                        android:contentDescription="Edit Profile Picture" />
+                </FrameLayout>
+            </RelativeLayout>
+
+            <!-- Content Area -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/spacing_2xl"
+                android:paddingBottom="@dimen/spacing_3xl">
+
+                <!-- Section Label: Label style, brand color, uppercase, left-aligned, 24dp top margin -->
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|end"
-                    android:src="@drawable/ic_edit"
-                    app:fabSize="mini"
-                    app:tint="?attr/colorOnSecondary"
-                    app:backgroundTint="?attr/colorSecondary"
-                    android:contentDescription="Edit Profile Picture" />
-            </FrameLayout>
+                    android:text="ACCOUNT INFO"
+                    style="@style/TextAppearance.GupShup.Label"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:layout_marginBottom="@dimen/spacing_md" />
 
-            <!-- Section Header -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Account Info"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorPrimary"
-                android:fontFamily="@font/google_sans_medium"
-                android:layout_marginBottom="12dp"
-                android:letterSpacing="0.05" />
-
-            <!-- Name Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:hint="Full Name"
-                android:layout_marginBottom="16dp"
-                app:startIconDrawable="@drawable/ic_person"
-                app:startIconTint="?attr/colorOnSurfaceVariant">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/nameEditText"
+                <!-- Full Name Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/nameLayout"
+                    style="@style/Widget.GupShup.TextField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:textColor="?attr/colorOnSurface"
-                    android:enabled="false" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:hint="Full Name"
+                    app:startIconDrawable="@drawable/ic_person"
+                    app:startIconTint="@color/onSurfaceVariant">
 
-            <!-- Email Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:hint="Email"
-                android:layout_marginBottom="16dp"
-                app:startIconDrawable="@drawable/ic_email"
-                app:startIconTint="?attr/colorOnSurfaceVariant">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/nameEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        style="@style/TextAppearance.GupShup.Body"
+                        android:enabled="false" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/emailEditText"
+                <!-- Email Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/emailLayout"
+                    style="@style/Widget.GupShup.TextField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:textColor="?attr/colorOnSurface"
-                    android:enabled="false" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:hint="Email"
+                    app:startIconDrawable="@drawable/ic_email"
+                    app:startIconTint="@color/onSurfaceVariant">
 
-            <!-- Bio Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:hint="Bio"
-                android:layout_marginBottom="16dp"
-                app:startIconDrawable="@drawable/ic_info"
-                app:startIconTint="?attr/colorOnSurfaceVariant">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/emailEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        style="@style/TextAppearance.GupShup.Body"
+                        android:enabled="false" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/bioEditText"
+                <!-- Bio Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/bioLayout"
+                    style="@style/Widget.GupShup.TextField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:maxLines="3"
-                    android:textColor="?attr/colorOnSurface"
-                    android:enabled="false" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:hint="Bio"
+                    app:startIconDrawable="@drawable/ic_info"
+                    app:startIconTint="@color/onSurfaceVariant">
 
-            <!-- User ID (Hidden or Read-only) -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:hint="User ID"
-                android:layout_marginBottom="24dp"
-                app:startIconDrawable="@drawable/ic_fingerprint"
-                app:startIconTint="?attr/colorOnSurfaceVariant"
-                android:visibility="visible">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/bioEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine"
+                        android:maxLines="3"
+                        style="@style/TextAppearance.GupShup.Body"
+                        android:enabled="false" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/userIdEditText"
+                <!-- User ID Field -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/userIdLayout"
+                    style="@style/Widget.GupShup.TextField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:enabled="false" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:hint="User ID"
+                    app:startIconDrawable="@drawable/ic_fingerprint"
+                    app:startIconTint="@color/onSurfaceVariant">
 
-            <!-- Action Buttons -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/editSaveButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Edit Profile"
-                style="@style/Widget.Material3.Button.TonalButton"
-                app:icon="@drawable/ic_edit"
-                android:layout_marginBottom="12dp" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/userIdEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.GupShup.Body"
+                        android:textColor="@color/onSurfaceVariant"
+                        android:enabled="false" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/logoutBtn"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Logout"
-                style="@style/Widget.Material3.Button"
-                android:backgroundTint="?attr/colorError"
-                android:textColor="?attr/colorOnError"
-                app:icon="@drawable/ic_logout"
-                app:iconTint="?attr/colorOnError" />
+                <!-- Edit Profile Button: Widget.GupShup.Button.Filled, full width, 24dp top margin -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/editSaveButton"
+                    style="@style/Widget.GupShup.Button.Filled"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_2xl"
+                    android:text="Edit Profile"
+                    app:icon="@drawable/ic_edit"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/white" />
+
+                <!-- Logout Button: Outlined error-colored variant (1dp error border, transparent fill, error text/icon), 12dp below Edit Profile -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/logoutBtn"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    android:text="Logout"
+                    android:textAppearance="@style/TextAppearance.GupShup.Label"
+                    android:textColor="@color/error"
+                    android:backgroundTint="@android:color/transparent"
+                    app:icon="@drawable/ic_logout"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/error"
+                    app:strokeColor="@color/error"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="@dimen/radius_medium" />
+
+            </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
+
 </LinearLayout>

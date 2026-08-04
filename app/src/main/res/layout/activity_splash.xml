@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_splash_gradient"
+    android:fitsSystemWindows="true">
+
+    <!-- Center Content -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- App Logo Circle -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/splashLogo"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            app:cardCornerRadius="48dp"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="G"
+                android:textSize="44sp"
+                android:textStyle="bold"
+                android:textColor="@color/splashStart"
+                android:gravity="center"
+                android:fontFamily="@font/google_sans_medium" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- App Name -->
+        <TextView
+            android:id="@+id/splashAppName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GupShup"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/google_sans_medium"
+            android:layout_marginTop="20dp"
+            android:alpha="0" />
+
+        <!-- Tagline -->
+        <TextView
+            android:id="@+id/splashTagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connect. Chat. Share."
+            android:textSize="16sp"
+            android:textColor="#B2FFFFFF"
+            android:fontFamily="@font/google_sans"
+            android:layout_marginTop="8dp"
+            android:alpha="0" />
+
+    </LinearLayout>
+
+    <!-- Bottom Loading Indicator -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/splashProgress"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="80dp"
+        android:indeterminate="true"
+        app:indicatorColor="#FFFFFF"
+        app:trackColor="#33FFFFFF"
+        app:indicatorSize="32dp"
+        app:trackThickness="3dp"
+        android:alpha="0" />
+
+</FrameLayout>

@@ -26,6 +26,17 @@
         <!-- ✅ Authentication -->
         <activity android:name=".ui.auth.RegisterActivity" />
         <activity android:name=".ui.auth.LoginActivity" />
+
+        <!-- ✅ Splash Screen -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.GupShup.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ui.auth.EmailVerificationActivity"/>
 
         <!-- ✅ Chat Screens -->
@@ -40,13 +51,8 @@
         <activity
             android:name=".ui.main.MainNavigationActivity"
             android:windowSoftInputMode="adjustPan"
-            android:exported="true"
-            android:theme="@style/Theme.GupShup">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false"
+            android:theme="@style/Theme.GupShup" />
 
     </application>
 

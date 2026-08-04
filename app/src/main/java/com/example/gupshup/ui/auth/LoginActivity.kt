@@ -36,7 +36,12 @@ class LoginActivity : AppCompatActivity() {
             firebaseAuthWithGoogle(account.idToken!!)
         } catch (e: ApiException) {
             showLoading(false)
-            showError("Google sign-in failed: ${e.message}")
+            val msg = if (e.statusCode == 10) {
+                "Developer error (10): SHA-1 fingerprint missing in Firebase Console."
+            } else {
+                "Google sign-in failed (${e.statusCode}): ${e.message}"
+            }
+            showError(msg)
         }
     }
 

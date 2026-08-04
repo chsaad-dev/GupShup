@@ -7,7 +7,9 @@ data class Message(
     val senderId: String? = null,
     val receiverId: String? = null,
     val text: String? = null,
-    val timestamp: Timestamp? = null,  // ✅ Correct type
+    val imageUrl: String? = null,
+    val type: String = "text", // "text" or "image"
+    val timestamp: Timestamp? = null,
     val seen: Boolean = false,
     val reactions: Map<String, String> = emptyMap()
 )

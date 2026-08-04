@@ -96,10 +96,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="bottom"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="10dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="8dp"
         android:background="?attr/colorSurface">
+
+        <ImageButton
+            android:id="@+id/attachButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_add_status"
+            app:tint="?attr/colorPrimary"
+            android:contentDescription="Attach Media"
+            android:padding="8dp"
+            android:layout_marginEnd="4dp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayout"

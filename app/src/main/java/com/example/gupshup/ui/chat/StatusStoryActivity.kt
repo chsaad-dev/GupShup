@@ -44,6 +44,9 @@ class StatusStoryActivity : AppCompatActivity() {
             return
         }
 
+        val mediaUrl = intent.getStringExtra("STATUS_MEDIA_URL") ?: ""
+        val type = intent.getStringExtra("STATUS_TYPE") ?: "text"
+
         // Build status object
         status = Status(
             statusId = statusId,
@@ -51,6 +54,8 @@ class StatusStoryActivity : AppCompatActivity() {
             userName = userName ?: "Unknown",
             userProfileUrl = "",
             text = text ?: "",
+            mediaUrl = mediaUrl,
+            type = type,
             timestamp = timestamp
         )
 
@@ -72,12 +77,28 @@ class StatusStoryActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        binding.statusTextView.text = status?.text ?: ""
-        binding.userNameTextView.text = status?.userName ?: "Unknown"
-        binding.timestampTextView.text = formatTime(status?.timestamp ?: 0L)
+        val currentStatus = status
+        if (currentStatus != null && currentStatus.mediaUrl.isNotBlank()) {
+            binding.statusImageView.visibility = android.view.View.VISIBLE
+            com.bumptech.glide.Glide.with(this)
+                .load(currentStatus.mediaUrl)
+                .into(binding.statusImageView)
+        } else {
+            binding.statusImageView.visibility = android.view.View.GONE
+        }
+
+        if (currentStatus?.text.isNullOrBlank()) {
+            binding.statusTextView.visibility = android.view.View.GONE
+        } else {
+            binding.statusTextView.visibility = android.view.View.VISIBLE
+            binding.statusTextView.text = currentStatus?.text
+        }
+
+        binding.userNameTextView.text = currentStatus?.userName ?: "Unknown"
+        binding.timestampTextView.text = formatTime(currentStatus?.timestamp ?: 0L)
 
         // Show delete button only if this is the current user's status
-        if (status?.userId == auth.currentUser?.uid) {
+        if (currentStatus?.userId == auth.currentUser?.uid) {
             binding.deleteStatusButton.visibility = android.view.View.VISIBLE
         } else {
             binding.deleteStatusButton.visibility = android.view.View.GONE

@@ -37,6 +37,9 @@ class UsersAdapter(
             // Load profile image
             com.example.gupshup.util.ImageUtils.loadProfileImage(context, user.profileImageUrl, binding.userImage)
 
+            // Online presence indicator
+            binding.onlineIndicator.visibility = if (user.isOnline) View.VISIBLE else View.GONE
+
             // Unread message count badge
             val unreadCount = unreadCountMap[user.uid] ?: 0
             if (unreadCount > 0) {

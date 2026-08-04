@@ -25,6 +25,12 @@ import com.google.firebase.firestore.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import com.bumptech.glide.Glide
+import com.example.gupshup.util.CloudinaryManager
+import com.example.gupshup.util.ImageUtils
+
 class ChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatBinding
@@ -49,6 +55,23 @@ class ChatActivity : AppCompatActivity() {
     private var isLoading = false
     private val PAGE_SIZE = 50L
     private var oldestMessageSnapshot: DocumentSnapshot? = null
+
+    private val mediaPickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            Toast.makeText(this, "Uploading image...", Toast.LENGTH_SHORT).show()
+            CloudinaryManager.uploadImage(
+                context = this,
+                imageUri = uri,
+                folder = "gupshup/chat_media",
+                onSuccess = { imageUrl ->
+                    sendImageMessage(imageUrl)
+                },
+                onError = { errorMsg ->
+                    Toast.makeText(this, "Failed to upload photo: $errorMsg", Toast.LENGTH_LONG).show()
+                }
+            )
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +99,10 @@ class ChatActivity : AppCompatActivity() {
                 binding.messageInput.setText("")
                 updateTypingStatus(false)
             }
+        }
+
+        binding.attachButton.setOnClickListener {
+            mediaPickerLauncher.launch("image/*")
         }
     }
 
@@ -189,13 +216,14 @@ class ChatActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         val layoutManager = LinearLayoutManager(this)
-        // stackFromEnd = true usually keeps the list at the bottom, but standard is simpler for pagination logic
-        // Let's stick to standard and scrollToPosition
         
         binding.recyclerView.layoutManager = layoutManager
-        adapter = ChatAdapter(messages, currentUid) { message ->
-            showReactionDialog(message)
-        }
+        adapter = ChatAdapter(
+            messages = messages,
+            currentUserId = currentUid,
+            onReactionClick = { message -> showReactionDialog(message) },
+            onImageClick = { imageUrl -> showImagePreviewDialog(imageUrl) }
+        )
         binding.recyclerView.adapter = adapter
 
         // Pagination Scroll Listener
@@ -398,6 +426,7 @@ class ChatActivity : AppCompatActivity() {
             senderId = currentUid,
             receiverId = receiverId,
             text = text,
+            type = "text",
             timestamp = Timestamp.now(),
             seen = false,
             reactions = emptyMap()
@@ -407,6 +436,50 @@ class ChatActivity : AppCompatActivity() {
             .document(chatId)
             .collection("messages")
             .add(message)
+    }
+
+    private fun sendImageMessage(imageUrl: String) {
+        val message = Message(
+            senderId = currentUid,
+            receiverId = receiverId,
+            text = "",
+            imageUrl = imageUrl,
+            type = "image",
+            timestamp = Timestamp.now(),
+            seen = false,
+            reactions = emptyMap()
+        )
+
+        db.collection("chats")
+            .document(chatId)
+            .collection("messages")
+            .add(message)
+    }
+
+    private fun showImagePreviewDialog(imageUrl: String) {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_full_screen_image, null)
+        val dialog = AlertDialog.Builder(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+            .setView(dialogView)
+            .create()
+
+        val fullScreenImageView = dialogView.findViewById<android.widget.ImageView>(R.id.fullScreenImageView)
+        val closeButton = dialogView.findViewById<android.view.View>(R.id.closeButton)
+
+        if (fullScreenImageView != null) {
+            Glide.with(this)
+                .load(imageUrl)
+                .into(fullScreenImageView)
+        }
+
+        fullScreenImageView?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        closeButton?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showReactionDialog(message: Message) {

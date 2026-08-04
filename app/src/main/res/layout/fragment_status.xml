@@ -65,19 +65,38 @@
         </com.google.android.material.textfield.TextInputLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Post Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/postStatusButton"
+    <!-- Buttons Container -->
+    <LinearLayout
+        android:id="@+id/buttonContainer"
         android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:text="Post Status"
-        android:layout_marginHorizontal="32dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        style="@style/Widget.Material3.Button"
-        app:cornerRadius="28dp"
         app:layout_constraintTop_toBottomOf="@id/statusInputCard"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addPhotoButton"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:text="Add Photo"
+            android:layout_marginEnd="8dp"
+            app:icon="@drawable/ic_add_status"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:cornerRadius="26dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/postStatusButton"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:text="Post Status"
+            style="@style/Widget.Material3.Button"
+            app:cornerRadius="26dp"/>
+    </LinearLayout>
 
     <!-- Status List -->
     <androidx.recyclerview.widget.RecyclerView
@@ -87,7 +106,7 @@
         android:padding="16dp"
         android:clipToPadding="false"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/postStatusButton"
+        app:layout_constraintTop_toBottomOf="@id/buttonContainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

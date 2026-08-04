@@ -1,10 +1,12 @@
 package com.example.gupshup.ui.main
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import com.example.gupshup.adapter.StatusBubbleAdapter
 import com.example.gupshup.databinding.FragmentStatusBinding
 import com.example.gupshup.model.Status
 import com.example.gupshup.ui.chat.StatusStoryActivity
+import com.example.gupshup.util.CloudinaryManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -24,6 +27,12 @@ class StatusFragment : Fragment() {
     private val auth = FirebaseAuth.getInstance()
     private val statusList = ArrayList<Status>()
     private lateinit var adapter: StatusBubbleAdapter
+
+    private val photoPickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            uploadPhotoStatus(uri)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,14 +45,17 @@ class StatusFragment : Fragment() {
         fetchStatuses()
 
         binding.postStatusButton.setOnClickListener {
-            postOrUpdateStatus()
+            postOrUpdateStatus(null, "text")
+        }
+
+        binding.addPhotoButton.setOnClickListener {
+            photoPickerLauncher.launch("image/*")
         }
 
         return binding.root
     }
 
     private fun setupToolbar() {
-        // Set the title programmatically
         val activity = requireActivity() as AppCompatActivity
         activity.setSupportActionBar(binding.statusToolbar)
         activity.supportActionBar?.title = "Status"
@@ -60,6 +72,8 @@ class StatusFragment : Fragment() {
             intent.putExtra("STATUS_ID", status.statusId)
             intent.putExtra("STATUS_USER_NAME", status.userName)
             intent.putExtra("STATUS_TEXT", status.text)
+            intent.putExtra("STATUS_MEDIA_URL", status.mediaUrl)
+            intent.putExtra("STATUS_TYPE", status.type)
             intent.putExtra("STATUS_TIMESTAMP", status.timestamp)
             intent.putExtra("STATUS_USER_ID", status.userId)
             startActivity(intent)
@@ -70,10 +84,27 @@ class StatusFragment : Fragment() {
         binding.statusBubbleRecyclerView.adapter = adapter
     }
 
-    private fun postOrUpdateStatus() {
+    private fun uploadPhotoStatus(uri: Uri) {
+        Toast.makeText(context, "Uploading photo status to Cloudinary...", Toast.LENGTH_SHORT).show()
+        CloudinaryManager.uploadImage(
+            context = requireContext(),
+            imageUri = uri,
+            folder = "gupshup/status_media",
+            onSuccess = { mediaUrl ->
+                postOrUpdateStatus(mediaUrl, "image")
+            },
+            onError = { errorMsg ->
+                if (isAdded) {
+                    Toast.makeText(context, "Failed to upload photo status: $errorMsg", Toast.LENGTH_LONG).show()
+                }
+            }
+        )
+    }
+
+    private fun postOrUpdateStatus(mediaUrl: String?, type: String) {
         val text = binding.statusEditText.text.toString().trim()
-        if (text.isEmpty()) {
-            Toast.makeText(context, "Please enter a status", Toast.LENGTH_SHORT).show()
+        if (text.isEmpty() && mediaUrl.isNullOrBlank()) {
+            Toast.makeText(context, "Please enter status text or pick a photo", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -90,26 +121,33 @@ class StatusFragment : Fragment() {
                 userName = userName,
                 userProfileUrl = userProfileUrl,
                 text = text,
+                mediaUrl = mediaUrl ?: "",
+                type = type,
                 timestamp = System.currentTimeMillis()
             )
 
             db.collection("status").document(statusId)
                 .set(status)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Status posted!", Toast.LENGTH_SHORT).show()
-                    binding.statusEditText.setText("")
-                    fetchStatuses()
+                    if (isAdded) {
+                        Toast.makeText(context, "Status posted!", Toast.LENGTH_SHORT).show()
+                        binding.statusEditText.setText("")
+                        fetchStatuses()
+                    }
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context, "Failed to post status", Toast.LENGTH_SHORT).show()
+                    if (isAdded) {
+                        Toast.makeText(context, "Failed to post status", Toast.LENGTH_SHORT).show()
+                    }
                 }
         }.addOnFailureListener {
-            Toast.makeText(context, "User info fetch failed", Toast.LENGTH_SHORT).show()
+            if (isAdded) {
+                Toast.makeText(context, "User info fetch failed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun fetchStatuses() {
-        // Calculate timestamp for 24 hours ago
         val twentyFourHoursAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000)
 
         db.collection("status")
@@ -123,32 +161,5 @@ class StatusFragment : Fragment() {
                 statusList.sortByDescending { it.timestamp }
                 adapter.notifyDataSetChanged()
             }
-    }
-
-    private fun showDeleteDialog(status: Status) {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_delete_status, null)
-        val dialog = AlertDialog.Builder(requireContext()).create()
-        dialog.setView(dialogView)
-        dialog.setCancelable(true)
-
-        val cancelBtn = dialogView.findViewById<Button>(R.id.cancelButton)
-        val confirmBtn = dialogView.findViewById<Button>(R.id.confirmButton)
-
-        cancelBtn.setOnClickListener { dialog.dismiss() }
-
-        confirmBtn.setOnClickListener {
-            db.collection("status").document(status.statusId)
-                .delete()
-                .addOnSuccessListener {
-                    Toast.makeText(requireContext(), "Status deleted", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(requireContext(), "Failed to delete status", Toast.LENGTH_SHORT).show()
-                }
-            dialog.dismiss()
-        }
-
-        dialog.show()
     }
 }

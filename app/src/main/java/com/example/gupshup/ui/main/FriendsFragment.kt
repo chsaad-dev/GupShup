@@ -98,35 +98,41 @@ class FriendsFragment : Fragment() {
             .whereEqualTo("status", "pending")
             .get()
             .addOnSuccessListener { pendingSnapshot ->
+                if (_binding == null || !isAdded) return@addOnSuccessListener
+
                 val pendingUids = pendingSnapshot.mapNotNull { it.getString("fromUid") }
 
                 if (pendingUids.isEmpty()) {
                     friendRequests.clear()
                     adapter.notifyDataSetChanged()
                     showContent()
-                    binding.swipeRefreshLayout.isRefreshing = false
+                    _binding?.swipeRefreshLayout?.isRefreshing = false
                     return@addOnSuccessListener
                 }
 
                 usersRef.whereIn("uid", pendingUids)
                     .get()
                     .addOnSuccessListener { userSnapshot ->
+                        if (_binding == null || !isAdded) return@addOnSuccessListener
+
                         friendRequests.clear()
                         friendRequests.addAll(userSnapshot.mapNotNull { it.toObject(User::class.java) })
                         adapter.notifyDataSetChanged()
                         showContent()
-                        binding.swipeRefreshLayout.isRefreshing = false
+                        _binding?.swipeRefreshLayout?.isRefreshing = false
                     }
                     .addOnFailureListener {
+                        if (_binding == null || !isAdded) return@addOnFailureListener
                         showToast("Failed to load users")
                         showContent()
-                        binding.swipeRefreshLayout.isRefreshing = false
+                        _binding?.swipeRefreshLayout?.isRefreshing = false
                     }
             }
             .addOnFailureListener {
+                if (_binding == null || !isAdded) return@addOnFailureListener
                 showToast("Failed to load requests")
                 showContent()
-                binding.swipeRefreshLayout.isRefreshing = false
+                _binding?.swipeRefreshLayout?.isRefreshing = false
             }
     }
 
@@ -137,17 +143,21 @@ class FriendsFragment : Fragment() {
             .whereEqualTo("status", "pending")
             .get()
             .addOnSuccessListener { snapshot ->
+                if (_binding == null || !isAdded) return@addOnSuccessListener
+
                 if (!snapshot.isEmpty) {
                     val doc = snapshot.documents[0].reference
                     if (accept) {
                         doc.update("status", "accepted")
                             .addOnSuccessListener {
+                                if (_binding == null || !isAdded) return@addOnSuccessListener
                                 showToast("Friend request accepted")
                                 loadFriendRequests()
                             }
                     } else {
                         doc.delete()
                             .addOnSuccessListener {
+                                if (_binding == null || !isAdded) return@addOnSuccessListener
                                 showToast("Friend request rejected")
                                 loadFriendRequests()
                             }
@@ -157,7 +167,9 @@ class FriendsFragment : Fragment() {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        if (_binding != null && isAdded) {
+            context?.let { Toast.makeText(it, message, Toast.LENGTH_SHORT).show() }
+        }
     }
 
     override fun onDestroyView() {

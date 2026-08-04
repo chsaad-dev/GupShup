@@ -113,6 +113,8 @@ class HomeFragment : Fragment() {
             .whereEqualTo("status", "accepted")
             .get()
             .addOnSuccessListener { requests ->
+                if (_binding == null || !isAdded) return@addOnSuccessListener
+
                 for (doc in requests) {
                     val from = doc.getString("fromUid")
                     val to = doc.getString("toUid")
@@ -141,6 +143,8 @@ class HomeFragment : Fragment() {
                         .whereIn("uid", chunk)
                         .get()
                         .addOnSuccessListener { result ->
+                            if (_binding == null || !isAdded) return@addOnSuccessListener
+
                             for (doc in result) {
                                 val user = doc.toObject(User::class.java)
                                 if (user.uid != currentUid) {
@@ -158,6 +162,7 @@ class HomeFragment : Fragment() {
                             }
                         }
                         .addOnFailureListener {
+                            if (_binding == null || !isAdded) return@addOnFailureListener
                             completedChunks++
                             if (completedChunks == chunks.size) {
                                 showContent()
@@ -167,6 +172,7 @@ class HomeFragment : Fragment() {
                 }
             }
             .addOnFailureListener {
+                if (_binding == null || !isAdded) return@addOnFailureListener
                 showContent()
                 _binding?.swipeRefreshLayout?.isRefreshing = false
             }
@@ -182,6 +188,7 @@ class HomeFragment : Fragment() {
             .whereEqualTo("receiverId", currentUid)
             .whereEqualTo("seen", false)
             .addSnapshotListener { snapshot, _ ->
+                if (_binding == null || !isAdded) return@addSnapshotListener
                 if (snapshot != null) {
                     unreadCountMap[friendUid] = snapshot.size()
                     _binding?.let {
@@ -195,9 +202,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateHomeBadge() {
-        val activity = requireActivity() as? MainNavigationActivity ?: return
+        val navActivity = activity as? MainNavigationActivity ?: return
         val totalUnread = unreadCountMap.values.sum()
-        activity.updateHomeBadge(unreadCountMap, totalUnread)
+        navActivity.updateHomeBadge(unreadCountMap, totalUnread)
     }
 
     override fun onDestroyView() {

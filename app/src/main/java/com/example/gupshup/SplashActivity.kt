@@ -21,7 +21,7 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Edge-to-edge
-        WindowCompat.setDecoratesFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_splash)
 
         val logo = findViewById<View>(R.id.splashLogo)

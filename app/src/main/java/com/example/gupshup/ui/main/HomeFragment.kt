@@ -39,7 +39,11 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as AppCompatActivity).setSupportActionBar(binding.homeToolbar)
-        binding.homeToolbar.title = "Home"
+        binding.homeToolbar.title = "Chats"
+
+        binding.fabNewChat.setOnClickListener {
+            (activity as? MainNavigationActivity)?.selectSearchTab()
+        }
 
         adapter = UsersAdapter(
             requireContext(),

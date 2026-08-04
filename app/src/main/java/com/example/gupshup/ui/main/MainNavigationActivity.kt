@@ -96,11 +96,15 @@ class MainNavigationActivity : AppCompatActivity() {
             }
     }
 
-    // ✅ This is called by HomeFragment live when unread changes
+    // Called by HomeFragment live when unread changes
     fun updateHomeBadge(unreadMap: Map<String, Int>, totalUnread: Int = unreadMap.values.sum()) {
         val badge = binding.bottomNav.getOrCreateBadge(R.id.menu_home)
         badge.isVisible = totalUnread > 0
         badge.number = totalUnread
+    }
+
+    fun selectSearchTab() {
+        binding.bottomNav.selectedItemId = R.id.menu_search
     }
 
     override fun onResume() {

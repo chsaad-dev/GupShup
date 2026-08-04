@@ -1,44 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="12dp"
+    android:layout_height="72dp"
+    android:paddingHorizontal="@dimen/spacing_lg"
     android:gravity="center_vertical">
 
-    <!-- Avatar placeholder -->
+    <!-- Avatar Circle Placeholder (52dp x 52dp) -->
     <View
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:id="@+id/shimmerAvatar"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_centerVertical="true"
         android:background="@drawable/shimmer_circle" />
 
+    <!-- Text Lines Stack -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_toEndOf="@id/shimmerAvatar"
+        android:layout_toStartOf="@id/shimmerTime"
+        android:layout_centerVertical="true"
         android:orientation="vertical"
-        android:layout_marginStart="12dp">
+        android:layout_marginStart="@dimen/spacing_lg"
+        android:layout_marginEnd="@dimen/spacing_sm">
 
-        <!-- Name placeholder -->
+        <!-- Name line placeholder -->
         <View
             android:layout_width="140dp"
             android:layout_height="14dp"
             android:background="@drawable/shimmer_rect" />
 
-        <!-- Message preview placeholder -->
+        <!-- Preview line placeholder -->
         <View
             android:layout_width="200dp"
             android:layout_height="12dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/shimmer_rect" />
 
     </LinearLayout>
 
-    <!-- Time placeholder -->
+    <!-- Timestamp placeholder -->
     <View
+        android:id="@+id/shimmerTime"
         android:layout_width="40dp"
         android:layout_height="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@id/shimmerAvatar"
+        android:layout_marginTop="4dp"
         android:background="@drawable/shimmer_rect" />
 
-</LinearLayout>
+    <!-- Inset Divider placeholder (84dp inset) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="68dp"
+        android:background="@color/outline"
+        android:alpha="0.3" />
+
+</RelativeLayout>

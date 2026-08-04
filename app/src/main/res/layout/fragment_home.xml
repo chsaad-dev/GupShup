@@ -1,30 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- Material 3 Toolbar -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/homeToolbar"
+    <!-- AppBar & Large Prominent Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="?attr/colorSurface"
-        android:elevation="0dp"
-        app:title="GupShup"
-        app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-        app:titleTextColor="?attr/colorOnSurface"
-        app:titleCentered="false"
-        app:menu="@menu/home_menu" />
+        app:elevation="@dimen/elevation_level_0">
 
-    <!-- Pull to Refresh -->
+        <!-- Toolbar with "Chats" Display Title left-aligned and Search icon right side -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/homeToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorSurface"
+            app:title="Chats"
+            app:titleTextAppearance="@style/TextAppearance.GupShup.Display"
+            app:titleTextColor="?attr/colorOnSurface"
+            app:titleCentered="false"
+            app:menu="@menu/home_menu" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content Container with Pull-to-Refresh -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -35,53 +44,70 @@
                 android:id="@+id/shimmerPlaceholder"
                 layout="@layout/shimmer_home_placeholder" />
 
-            <!-- Actual RecyclerView -->
+            <!-- Actual RecyclerView for Chats -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/homeRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="8dp"
                 android:paddingBottom="88dp"
                 android:clipToPadding="false"
                 android:scrollbars="vertical"
                 android:visibility="gone" />
 
-            <!-- Empty State -->
+            <!-- Empty State View (Widget.GupShup.EmptyState style) -->
             <LinearLayout
                 android:id="@+id/emptyStateView"
+                style="@style/Widget.GupShup.EmptyState"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:visibility="gone"
-                android:padding="32dp">
+                android:visibility="gone">
 
+                <!-- 120dp Illustration Placeholder (OnSurfaceVariant at 30% opacity) -->
                 <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="@dimen/empty_state_illustration_size"
+                    android:layout_height="@dimen/empty_state_illustration_size"
                     android:src="@drawable/ic_chat_empty"
-                    android:alpha="0.4" />
+                    android:alpha="0.3"
+                    app:tint="@color/onSurfaceVariant" />
 
+                <!-- Title: Headline Style -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="No conversations yet"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginTop="16dp" />
+                    style="@style/TextAppearance.GupShup.Headline"
+                    android:layout_marginTop="@dimen/spacing_2xl" />
 
+                <!-- Subtitle: Body Style in OnSurfaceVariant -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add friends to start chatting!"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOutline"
-                    android:layout_marginTop="8dp"
+                    android:text="Start chatting with friends"
+                    style="@style/TextAppearance.GupShup.Body"
+                    android:textColor="@color/onSurfaceVariant"
+                    android:layout_marginTop="@dimen/spacing_sm"
                     android:textAlignment="center" />
             </LinearLayout>
 
         </FrameLayout>
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</LinearLayout>
+    <!-- FAB: Bottom-right, 56dp, Primary background, Level 2 elevation, Pencil/Chat icon, 16dp margin -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNewChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/spacing_lg"
+        android:layout_marginBottom="84dp"
+        android:src="@drawable/ic_edit"
+        app:fabSize="normal"
+        app:backgroundTint="@color/colorPrimary"
+        app:tint="@color/white"
+        app:elevation="@dimen/elevation_level_2"
+        android:contentDescription="Start new chat" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

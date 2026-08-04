@@ -167,7 +167,7 @@
                 <ImageView
                     android:layout_width="@dimen/empty_state_illustration_size"
                     android:layout_height="@dimen/empty_state_illustration_size"
-                    android:src="@drawable/status_ring"
+                    android:src="@drawable/ic_status"
                     android:alpha="0.3"
                     app:tint="@color/onSurfaceVariant" />
 

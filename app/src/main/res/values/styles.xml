@@ -12,7 +12,7 @@
     </style>
 
     <!-- Asymmetric Sent Bubble: rounded except bottom-end -->
-    <style name="ShapeAppearance.GupShup.Bubble.Sent" parent="">
+    <style name="ShapeAppearance.GupShup.Bubble.Sent" parent="ShapeAppearance.Material3.Corner.Medium">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopStart">16dp</item>
         <item name="cornerSizeTopEnd">16dp</item>
@@ -21,7 +21,7 @@
     </style>
 
     <!-- Asymmetric Received Bubble: rounded except bottom-start -->
-    <style name="ShapeAppearance.GupShup.Bubble.Received" parent="">
+    <style name="ShapeAppearance.GupShup.Bubble.Received" parent="ShapeAppearance.Material3.Corner.Medium">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopStart">16dp</item>
         <item name="cornerSizeTopEnd">16dp</item>

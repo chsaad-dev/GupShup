@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.gupshup">
 
-    <!-- ✅ Permissions -->
+    <!--  Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -23,11 +23,11 @@
         android:theme="@style/Theme.GupShup"
         tools:targetApi="31">
 
-        <!-- ✅ Authentication -->
+        <!--  Authentication -->
         <activity android:name=".ui.auth.RegisterActivity" />
         <activity android:name=".ui.auth.LoginActivity" />
 
-        <!-- ✅ Splash Screen -->
+        <!--  Splash Screen -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -39,7 +39,7 @@
         </activity>
         <activity android:name=".ui.auth.EmailVerificationActivity"/>
 
-        <!-- ✅ Chat Screens -->
+        <!--  Chat Screens -->
         <activity android:name=".ui.chat.ChatActivity" />
         <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".ui.chat.StatusViewActivity" />
@@ -47,16 +47,22 @@
 
 
 
-        <!-- ✅ Main Navigation Screen -->
+        <!--  Main Navigation Screen -->
         <activity
             android:name=".ui.main.MainNavigationActivity"
             android:windowSoftInputMode="adjustPan"
             android:exported="false"
             android:theme="@style/Theme.GupShup" />
 
-        <!-- ✅ Settings Screen -->
+        <!--  Settings Screen -->
         <activity
             android:name=".ui.main.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GupShup" />
+
+        <!--  Blocked Contacts Screen -->
+        <activity
+            android:name=".ui.main.BlockedContactsActivity"
             android:exported="false"
             android:theme="@style/Theme.GupShup" />
 

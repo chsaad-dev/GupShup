@@ -6,16 +6,19 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.gupshup.R
 import com.example.gupshup.databinding.ActivitySettingsBinding
 import com.example.gupshup.ui.auth.LoginActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
+    private var userListener: ListenerRegistration? = null
 
     private val prefs by lazy {
         getSharedPreferences("gupshup_prefs", Context.MODE_PRIVATE)
@@ -29,6 +32,7 @@ class SettingsActivity : AppCompatActivity() {
         setupToolbar()
         loadPreferences()
         setupListeners()
+        observeUserData()
     }
 
     private fun setupToolbar() {
@@ -56,24 +60,73 @@ class SettingsActivity : AppCompatActivity() {
 
         val enterSendEnabled = prefs.getBoolean("pref_enter_send", false)
         binding.switchEnterSend.isChecked = enterSendEnabled
+
+        updateWallpaperText()
+        updatePrivacyText()
+    }
+
+    private fun updateWallpaperText() {
+        val wallpaperKey = prefs.getString("pref_chat_wallpaper", "default") ?: "default"
+        binding.textWallpaper.text = when (wallpaperKey) {
+            "teal" -> "Teal"
+            "slate" -> "Slate Dark"
+            "cream" -> "Soft Cream"
+            "midnight" -> "Midnight"
+            "sage" -> "Sage Green"
+            else -> "Default"
+        }
+    }
+
+    private fun updatePrivacyText() {
+        val online = prefs.getString("pref_privacy_online", "Everyone") ?: "Everyone"
+        val photo = prefs.getString("pref_privacy_photo", "Everyone") ?: "Everyone"
+        binding.textPrivacySummary.text = "Online: $online · Photo: $photo"
+    }
+
+    private fun observeUserData() {
+        val uid = auth.currentUser?.uid ?: return
+        userListener = db.collection("users").document(uid)
+            .addSnapshotListener { snapshot, _ ->
+                if (snapshot != null && snapshot.exists()) {
+                    @Suppress("UNCHECKED_CAST")
+                    val blockedList = snapshot.get("blockedUsers") as? List<String> ?: emptyList()
+                    binding.textBlockedCount.text = blockedList.size.toString()
+
+                    val fsOnline = snapshot.getString("privacyOnline") ?: "Everyone"
+                    val fsPhoto = snapshot.getString("privacyPhoto") ?: "Everyone"
+                    prefs.edit()
+                        .putString("pref_privacy_online", fsOnline)
+                        .putString("pref_privacy_photo", fsPhoto)
+                        .apply()
+                    updatePrivacyText()
+                }
+            }
     }
 
     private fun setupListeners() {
-
         binding.rowProfile.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-
         binding.rowPrivacy.setOnClickListener {
-            Toast.makeText(this, "Privacy settings", Toast.LENGTH_SHORT).show()
+            val privacySheet = PrivacyBottomSheetFragment()
+            privacySheet.onPrivacyUpdatedListener = {
+                updatePrivacyText()
+            }
+            privacySheet.show(supportFragmentManager, "PrivacySettingsBottomSheet")
         }
-
 
         binding.rowBlocked.setOnClickListener {
-            Toast.makeText(this, "Blocked contacts", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, BlockedContactsActivity::class.java))
         }
 
+        binding.rowWallpaper.setOnClickListener {
+            val wallpaperSheet = WallpaperBottomSheetFragment()
+            wallpaperSheet.onWallpaperSelectedListener = { label ->
+                binding.textWallpaper.text = label
+            }
+            wallpaperSheet.show(supportFragmentManager, "WallpaperBottomSheetFragment")
+        }
 
         binding.switchMessageNotifications.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("pref_notifications", isChecked).apply()
@@ -87,16 +140,13 @@ class SettingsActivity : AppCompatActivity() {
             prefs.edit().putBoolean("pref_enter_send", isChecked).apply()
         }
 
-
         binding.rowTheme.setOnClickListener {
             showThemeSelectionDialog()
         }
 
-
         binding.rowFontSize.setOnClickListener {
             showFontSizeDialog()
         }
-
 
         binding.btnSettingsLogout.setOnClickListener {
             auth.signOut()
@@ -105,7 +155,6 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
 
         binding.textDeleteAccount.setOnClickListener {
             MaterialAlertDialogBuilder(this)
@@ -161,5 +210,11 @@ class SettingsActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        userListener?.remove()
+        userListener = null
     }
 }

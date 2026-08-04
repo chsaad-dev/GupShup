@@ -13,5 +13,8 @@ data class UserEntity(
     val online: Boolean = false,
     val lastSeen: Long = 0L,
     val updatedAt: Long = System.currentTimeMillis(),
-    val cachedAt: Long = System.currentTimeMillis()
+    val cachedAt: Long = System.currentTimeMillis(),
+    val privacyOnline: String = "Everyone",
+    val privacyLastSeen: String = "Everyone",
+    val privacyPhoto: String = "Everyone"
 )

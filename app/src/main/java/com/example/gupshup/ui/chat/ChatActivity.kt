@@ -100,6 +100,7 @@ class ChatActivity : AppCompatActivity() {
         observeReceiverStatus()
         setupTypingWatcher()
         updateTypingStatus(false)
+        applyWallpaper()
 
         binding.sendButton.setOnClickListener {
             val text = binding.messageInput.text.toString().trim()
@@ -147,6 +148,51 @@ class ChatActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val blockItem = menu?.findItem(R.id.action_block)
+        db.collection("users").document(currentUid).get().addOnSuccessListener { doc ->
+            if (doc != null && doc.exists()) {
+                @Suppress("UNCHECKED_CAST")
+                val blockedIds = doc.get("blockedUsers") as? List<String> ?: emptyList()
+                val isBlocked = blockedIds.contains(receiverId)
+                blockItem?.title = if (isBlocked) "Unblock User" else "Block User"
+            }
+        }
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_block -> {
+                toggleBlockUser()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun toggleBlockUser() {
+        val userRef = db.collection("users").document(currentUid)
+        userRef.get().addOnSuccessListener { doc ->
+            val blockedIds = (doc.get("blockedUsers") as? List<String>) ?: emptyList()
+            val isBlocked = blockedIds.contains(receiverId)
+
+            if (isBlocked) {
+                userRef.update("blockedUsers", com.google.firebase.firestore.FieldValue.arrayRemove(receiverId))
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "User unblocked", Toast.LENGTH_SHORT).show()
+                        invalidateOptionsMenu()
+                    }
+            } else {
+                userRef.update("blockedUsers", com.google.firebase.firestore.FieldValue.arrayUnion(receiverId))
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "User blocked", Toast.LENGTH_SHORT).show()
+                        invalidateOptionsMenu()
+                    }
+            }
+        }
+    }
+
     private fun filterMessages(query: String?) {
         if (query.isNullOrEmpty()) {
             adapter.updateMessages(messages)
@@ -176,16 +222,51 @@ class ChatActivity : AppCompatActivity() {
                 val isOnline = snapshot.getBoolean("isOnline") ?: false
                 val typingTo = snapshot.getString("typingTo")
                 val lastSeen = snapshot.getTimestamp("lastSeen")
+                val privacyOnline = snapshot.getString("privacyOnline") ?: "Everyone"
+                val privacyLastSeen = snapshot.getString("privacyLastSeen") ?: "Everyone"
+                val privacyPhoto = snapshot.getString("privacyPhoto") ?: "Everyone"
+                val photoUrl = snapshot.getString("profileImageUrl")
+                val updatedAt = snapshot.getLong("updatedAt") ?: System.currentTimeMillis()
 
                 binding.userNameText.text = name
 
+                val canSeeOnline = (privacyOnline == "Everyone")
+                val canSeeLastSeen = (privacyLastSeen == "Everyone")
+                val canSeePhoto = (privacyPhoto == "Everyone")
+
+                if (canSeePhoto) {
+                    com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.toolbarAvatar, photoUrl, updatedAt)
+                } else {
+                    com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.toolbarAvatar, null, updatedAt)
+                }
+
                 binding.userStatusText.text = when {
                     typingTo == currentUid -> "Typing..."
-                    isOnline -> "Online"
-                    lastSeen != null -> "Last seen: ${formatTimestamp(lastSeen)}"
+                    isOnline && canSeeOnline -> "Online"
+                    canSeeLastSeen && lastSeen != null -> "Last seen: ${formatTimestamp(lastSeen)}"
                     else -> ""
                 }
             }
+        }
+    }
+
+    private fun applyWallpaper() {
+        val prefs = getSharedPreferences("gupshup_prefs", MODE_PRIVATE)
+        val wallpaperKey = prefs.getString("pref_chat_wallpaper", "default") ?: "default"
+        val colorHex = when (wallpaperKey) {
+            "teal" -> "#075E54"
+            "slate" -> "#1F2C34"
+            "cream" -> "#F0EBE3"
+            "midnight" -> "#101D25"
+            "sage" -> "#D5E8D4"
+            else -> null
+        }
+
+        if (colorHex != null) {
+            binding.recyclerView.setBackgroundColor(android.graphics.Color.parseColor(colorHex))
+        } else {
+            val defaultColor = getColor(R.color.colorSurfaceContainerLow)
+            binding.recyclerView.setBackgroundColor(defaultColor)
         }
     }
 

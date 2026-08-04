@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface"
+    android:paddingHorizontal="@dimen/spacing_lg"
+    android:paddingBottom="@dimen/spacing_2xl">
+
+    <!-- Drag Handle -->
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:layout_marginBottom="@dimen/spacing_md"
+        android:background="@drawable/rounded_image_bg"
+        android:backgroundTint="@color/outline" />
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chat Wallpaper"
+        style="@style/TextAppearance.GupShup.Headline"
+        android:textColor="?attr/colorOnSurface" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose a background color for chat conversations"
+        style="@style/TextAppearance.GupShup.Caption"
+        android:textColor="@color/onSurfaceVariant"
+        android:layout_marginBottom="@dimen/spacing_lg" />
+
+    <!-- Wallpaper Options Grid -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/wallpaperRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false" />
+
+</LinearLayout>

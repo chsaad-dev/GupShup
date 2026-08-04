@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="8dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/colorCard"
+        android:layout_width="72dp"
+        android:layout_height="96dp"
+        app:cardCornerRadius="@dimen/radius_medium"
+        app:cardElevation="@dimen/elevation_level_1"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/outline">
+
+        <FrameLayout
+            android:id="@+id/colorSwatch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/checkMark"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_check_single"
+                app:tint="@color/colorPrimary"
+                android:visibility="gone" />
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/presetName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preset"
+        style="@style/TextAppearance.GupShup.Caption"
+        android:textColor="?attr/colorOnSurface"
+        android:layout_marginTop="4dp"
+        android:textAlignment="center" />
+
+</LinearLayout>

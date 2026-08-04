@@ -20,7 +20,7 @@ import com.example.gupshup.data.local.entity.UserEntity
         MessageEntity::class,
         StatusEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

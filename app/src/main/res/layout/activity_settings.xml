@@ -126,6 +126,7 @@
                         style="@style/TextAppearance.GupShup.Body" />
 
                     <TextView
+                        android:id="@+id/textPrivacySummary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Who can see online status &amp; last seen"
@@ -401,6 +402,15 @@
                     android:text="Chat wallpaper"
                     style="@style/TextAppearance.GupShup.Body"
                     android:layout_marginStart="@dimen/spacing_lg" />
+
+                <TextView
+                    android:id="@+id/textWallpaper"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Default"
+                    style="@style/TextAppearance.GupShup.Body"
+                    android:textColor="@color/onSurfaceVariant"
+                    android:layout_marginEnd="@dimen/spacing_xs" />
 
                 <ImageView
                     android:layout_width="24dp"

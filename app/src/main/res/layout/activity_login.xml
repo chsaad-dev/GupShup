@@ -56,8 +56,8 @@
         <!-- Form Container Sheet: Rising from bottom, 24dp top corner radius only, Surface Container Low background -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/loginCard"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_3xl"
             app:cardElevation="@dimen/elevation_level_1"
             app:strokeWidth="0dp"
@@ -65,6 +65,7 @@
             app:shapeAppearanceOverlay="@style/ShapeAppearance.GupShup.TopSheet"
             app:layout_constraintTop_toBottomOf="@id/topHeader"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 

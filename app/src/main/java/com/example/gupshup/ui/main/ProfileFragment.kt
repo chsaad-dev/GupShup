@@ -90,6 +90,8 @@ class ProfileFragment : Fragment() {
     private fun loadUserProfile(uid: String) {
         db.collection("users").document(uid).get()
             .addOnSuccessListener { doc ->
+                if (_binding == null || !isAdded) return@addOnSuccessListener
+
                 val name = doc.getString("name") ?: ""
                 val email = doc.getString("email") ?: ""
                 val bio = doc.getString("bio") ?: ""
@@ -100,12 +102,10 @@ class ProfileFragment : Fragment() {
                 binding.userIdEditText.setText(uid)
                 binding.bioEditText.setText(bio)
 
-                if (_binding != null && isAdded) {
-                    ImageUtils.loadProfileImage(requireContext(), profileUrl, binding.profileImageView)
-                }
+                ImageUtils.loadProfileImage(requireContext(), profileUrl, binding.profileImageView)
             }
             .addOnFailureListener {
-                if (isAdded) {
+                if (_binding != null && isAdded) {
                     Toast.makeText(requireContext(), "❌ Failed to load profile", Toast.LENGTH_SHORT).show()
                 }
             }

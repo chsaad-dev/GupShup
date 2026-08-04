@@ -12,17 +12,17 @@
 
 ## Key Features
 
-### 🎨 Material Design 3 UI & Navigation Architecture
+### Material Design 3 UI & Navigation Architecture
 - **Material Design 3 (Material You)**: Refined design system with curated brand green (`#00A884`), surface-toned toolbars, custom typography, asymmetric chat bubbles, and elevation layers.
 - **State-Preserving Navigation**: Bottom navigation uses a `show()` / `hide()` fragment transaction strategy across `HomeFragment`, `StatusFragment`, `SearchFragment`, `FriendsFragment`, and `ProfileFragment`. Keeps fragment instances, scroll positions, and view states alive without re-creating views on tab switches.
-- **New Settings Screen**: Full-featured settings Hub (`SettingsActivity`) organized into grouped Material 3 card sections:
+- **Settings Screen**: Full-featured settings Hub (`SettingsActivity`) organized into grouped Material 3 card sections:
   - **Account**: Profile management, Privacy toggles (Online status, Last seen, Profile photo), Blocked contacts count.
   - **Notifications**: Message notifications switch, custom notification sound picker, vibration toggle.
   - **Chat**: Theme selector (Light / Dark / System), Chat wallpaper picker, Clear chat history action.
   - **Data & Storage**: Network usage statistics, Auto-download media toggles.
   - **Help & About**: FAQ link, App version details (`v1.0.0`), Terms & Privacy policies.
 
-### ⚡ Offline-First Architecture & Caching
+### Offline-First Architecture & Caching
 - **Room Local Persistence**: Full Room cache layer (`AppDatabase` v1) storing local entities:
   - `UserEntity`: User profiles, bio, photo URL, online status, `updatedAt`, `cachedAt`.
   - `FriendRequestEntity`: Friend request status (`pending`/`accepted`), timestamps, `cachedAt`.
@@ -35,18 +35,18 @@
   - Prunes chat messages older than 7 days via `MessageDao.deleteOlderThanExcludingChat()` (safely preserving messages in any active chat).
   - Deletes expired status stories via `StatusDao.deleteExpired()`.
 
-### 🖼️ Unified Image Loading System
+### Unified Image Loading System
 - **Single `ImageLoaderUtil` Helper**: Consolidated Glide image loading strategy featuring disk caching (`DiskCacheStrategy.ALL`), memory caching, crossfade transitions, and fallback placeholders (`ic_profile_placeholder`, `rounded_image_bg`).
 - **Automatic Cache Busting**: Profile avatars use `ObjectKey("${url}_${updatedAt}")` signatures. When a user updates their profile photo, `updatedAt` is updated in Firestore, immediately invalidating cached avatars across all screens.
 
-### 💬 Real-Time Messaging & Status Stories
+### Real-Time Messaging & Status Stories
 - **1-on-1 Chat**: Low-latency message synchronization using Firestore snapshot listeners backed by Room write-through caching.
 - **Media Sharing**: Asynchronous Cloudinary photo uploads with full-screen lightbox viewing (`showImagePreviewDialog`).
 - **Reactions & Read Receipts**: Interactive emoji reaction dialogs and visual checkmarks (`ic_check_single` / `ic_check_double`).
 - **Presence & Typing**: Real-time typing status (`typingTo`) and online/last-seen tracking (`isOnline` / `lastSeen`).
 - **Status Stories**: Story viewer (`StatusStoryActivity`) with animated progress segments, tap-to-skip navigation, view counters (`viewers` collection), and story replies.
 
-### 👥 Social & Onboarding
+### Social & Onboarding
 - **Authentication**: Email/Password authentication, Google Sign-In (`GoogleSignInClient`), and Email Verification (`EmailVerificationActivity`).
 - **Search & Friends**: Search registered users by name/email; send, accept, or reject friend requests with live unread and pending request badges on bottom navigation items.
 

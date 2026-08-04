@@ -27,9 +27,14 @@ import java.util.*
 
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.gupshup.data.local.AppDatabase
+import com.example.gupshup.data.local.entity.MessageEntity
 import com.example.gupshup.util.CloudinaryManager
 import com.example.gupshup.util.ImageUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ChatActivity : AppCompatActivity() {
 
@@ -82,11 +87,15 @@ class ChatActivity : AppCompatActivity() {
         receiverId = intent.getStringExtra("receiverId") ?: return
 
         chatId = if (currentUid < receiverId) "${currentUid}${receiverId}" else "${receiverId}${currentUid}"
+        com.example.gupshup.data.local.CacheConfig.activeChatId = chatId
 
         setupToolbar()
         setupRecyclerView()
         
-        // Initial Data Load
+        // Load cached messages from Room first for instant display
+        loadCachedMessages()
+        
+        // Initial Data Load from Firestore
         loadInitialMessages()
         observeReceiverStatus()
         setupTypingWatcher()
@@ -293,16 +302,66 @@ class ChatActivity : AppCompatActivity() {
             }
     }
 
+    private fun loadCachedMessages() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val appDb = AppDatabase.getInstance(applicationContext)
+            appDb.messageDao().getMessagesForChatFlow(chatId).collect { cachedEntities ->
+                if (cachedEntities.isNotEmpty() && messages.isEmpty()) {
+                    val cached = cachedEntities.map { entity ->
+                        Message(
+                            id = entity.id,
+                            senderId = entity.senderId,
+                            receiverId = entity.receiverId,
+                            text = entity.text,
+                            imageUrl = entity.imageUrl,
+                            timestamp = if (entity.timestamp > 0) com.google.firebase.Timestamp(entity.timestamp / 1000, ((entity.timestamp % 1000) * 1000000).toInt()) else null,
+                            seen = entity.seen
+                        )
+                    }
+                    runOnUiThread {
+                        messages.clear()
+                        messages.addAll(cached)
+                        adapter.notifyDataSetChanged()
+                        binding.recyclerView.scrollToPosition(messages.size - 1)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun writeMessagesToRoom(msgs: List<Message>) {
+        val entities = msgs.mapNotNull { msg ->
+            val id = msg.id ?: return@mapNotNull null
+            MessageEntity(
+                id = id,
+                chatId = chatId,
+                senderId = msg.senderId ?: "",
+                receiverId = msg.receiverId ?: "",
+                text = msg.text ?: "",
+                imageUrl = msg.imageUrl ?: "",
+                timestamp = msg.timestamp?.toDate()?.time ?: 0L,
+                seen = msg.seen
+            )
+        }
+        if (entities.isNotEmpty()) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                AppDatabase.getInstance(applicationContext).messageDao().upsert(entities)
+            }
+        }
+    }
+
     private fun populateMessages(snapshot: QuerySnapshot) {
         messages.clear()
         oldestMessageSnapshot = snapshot.documents.firstOrNull()
         val newestDoc = snapshot.documents.lastOrNull()
 
+        val loadedMessages = mutableListOf<Message>()
         for (doc in snapshot.documents) {
             val msg = doc.toObject(Message::class.java)
             if (msg != null) {
                 msg.id = doc.id
                 messages.add(msg)
+                loadedMessages.add(msg)
 
                 if (msg.receiverId == currentUid && !msg.seen) {
                     markAsSeen(msg.id!!)
@@ -311,6 +370,9 @@ class ChatActivity : AppCompatActivity() {
         }
         adapter.notifyDataSetChanged()
         binding.recyclerView.scrollToPosition(messages.size - 1)
+
+        // Write-through to Room
+        writeMessagesToRoom(loadedMessages)
 
         // Remove old listener before setting new one
         newMessagesListener?.remove()
@@ -384,6 +446,9 @@ class ChatActivity : AppCompatActivity() {
                         // Avoid duplicates if any race condition
                         if (messages.none { it.id == msg.id }) {
                             messages.add(msg)
+                            
+                            // Write-through new message to Room
+                            writeMessagesToRoom(listOf(msg))
                             
                             if (!isSearching) {
                                 adapter.notifyItemInserted(messages.size - 1)
@@ -538,6 +603,9 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (com.example.gupshup.data.local.CacheConfig.activeChatId == chatId) {
+            com.example.gupshup.data.local.CacheConfig.activeChatId = null
+        }
         userStatusListener?.remove()
         newMessagesListener?.remove()
         typingTimer?.cancel()

@@ -16,9 +16,14 @@ import com.example.gupshup.databinding.FragmentStatusBinding
 import com.example.gupshup.model.Status
 import com.example.gupshup.ui.chat.StatusStoryActivity
 import com.example.gupshup.util.CloudinaryManager
+import androidx.lifecycle.lifecycleScope
+import com.example.gupshup.data.local.AppDatabase
+import com.example.gupshup.data.local.entity.StatusEntity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class StatusFragment : Fragment() {
 
@@ -52,6 +57,7 @@ class StatusFragment : Fragment() {
 
         setupToolbar()
         setupAdapters()
+        loadCachedStatuses()
         fetchStatuses()
 
         binding.postStatusButton.setOnClickListener {
@@ -164,6 +170,37 @@ class StatusFragment : Fragment() {
         }
     }
 
+    private fun loadCachedStatuses() {
+        val twentyFourHoursAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000)
+        val appDb = AppDatabase.getInstance(requireContext())
+        viewLifecycleOwner.lifecycleScope.launch {
+            appDb.statusDao().getActiveStatusesFlow(twentyFourHoursAgo).collect { cachedEntities ->
+                if (_binding == null || !isAdded) return@collect
+                if (cachedEntities.isNotEmpty() && statusList.isEmpty()) {
+                    statusList.clear()
+                    statusList.addAll(cachedEntities.map { entity ->
+                        Status(
+                            statusId = entity.id,
+                            userId = entity.userId,
+                            userName = entity.userName,
+                            userProfileUrl = entity.userProfileUrl,
+                            text = entity.text,
+                            mediaUrl = entity.mediaUrl,
+                            type = entity.type,
+                            timestamp = entity.timestamp
+                        )
+                    })
+                    statusList.sortByDescending { it.timestamp }
+                    bubbleAdapter.notifyDataSetChanged()
+                    verticalAdapter.updateList(statusList)
+
+                    binding.statusEmptyState.visibility = View.GONE
+                    binding.statusRecyclerView.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
     private fun fetchStatuses() {
         if (statusListener != null) return
         val twentyFourHoursAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000)
@@ -174,13 +211,41 @@ class StatusFragment : Fragment() {
                 if (_binding == null || !isAdded) return@addSnapshotListener
 
                 statusList.clear()
+                val statusEntities = mutableListOf<StatusEntity>()
                 snapshot?.documents?.forEach { doc ->
                     val status = doc.toObject(Status::class.java)
-                    status?.let { statusList.add(it) }
+                    status?.let {
+                        statusList.add(it)
+                        statusEntities.add(
+                            StatusEntity(
+                                id = it.statusId,
+                                userId = it.userId,
+                                userName = it.userName,
+                                userProfileUrl = it.userProfileUrl,
+                                text = it.text,
+                                mediaUrl = it.mediaUrl,
+                                type = it.type,
+                                timestamp = it.timestamp,
+                                expiresAt = it.timestamp + (24 * 60 * 60 * 1000)
+                            )
+                        )
+                    }
                 }
                 statusList.sortByDescending { it.timestamp }
                 bubbleAdapter.notifyDataSetChanged()
                 verticalAdapter.updateList(statusList)
+
+                // Write-through to Room
+                if (statusEntities.isNotEmpty()) {
+                    val appContext = context?.applicationContext
+                    if (appContext != null) {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val appDb = AppDatabase.getInstance(appContext)
+                            appDb.statusDao().deleteExpired(System.currentTimeMillis())
+                            appDb.statusDao().upsert(statusEntities)
+                        }
+                    }
+                }
 
                 if (statusList.isEmpty()) {
                     binding.statusEmptyState.visibility = View.VISIBLE

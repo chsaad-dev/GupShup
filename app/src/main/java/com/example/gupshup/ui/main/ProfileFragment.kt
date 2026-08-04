@@ -15,9 +15,11 @@ import com.example.gupshup.databinding.FragmentProfileBinding
 import com.example.gupshup.ui.auth.LoginActivity
 import com.example.gupshup.util.CloudinaryManager
 import com.example.gupshup.util.ImageUtils
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
 
@@ -90,7 +92,27 @@ class ProfileFragment : Fragment() {
 
     private var profileListener: ListenerRegistration? = null
 
+    private fun observeRoomCache(uid: String) {
+        val appDb = com.example.gupshup.data.local.AppDatabase.getInstance(requireContext())
+        viewLifecycleOwner.lifecycleScope.launch {
+            appDb.userDao().getUserFlow(uid).collect { userEntity ->
+                if (_binding == null || !isAdded || userEntity == null) return@collect
+                if (!isEditMode) {
+                    binding.nameEditText.setText(userEntity.name)
+                    binding.emailEditText.setText(userEntity.email)
+                    binding.userIdEditText.setText(uid)
+                    binding.bioEditText.setText(userEntity.bio)
+
+                    context?.let { ctx ->
+                        ImageUtils.loadProfileImage(ctx, userEntity.photoUrl, binding.profileImageView)
+                    }
+                }
+            }
+        }
+    }
+
     private fun observeUserProfile(uid: String) {
+        observeRoomCache(uid)
         if (profileListener != null) return
 
         profileListener = db.collection("users").document(uid)
@@ -101,6 +123,21 @@ class ProfileFragment : Fragment() {
                 val email = doc.getString("email") ?: ""
                 val bio = doc.getString("bio") ?: ""
                 val profileUrl = doc.getString("profileImageUrl") ?: ""
+
+                val appContext = context?.applicationContext
+                if (appContext != null) {
+                    lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                        com.example.gupshup.data.local.AppDatabase.getInstance(appContext).userDao().upsertOne(
+                            com.example.gupshup.data.local.entity.UserEntity(
+                                uid = uid,
+                                name = name,
+                                email = email,
+                                photoUrl = profileUrl,
+                                bio = bio
+                            )
+                        )
+                    }
+                }
 
                 if (!isEditMode) {
                     binding.nameEditText.setText(name)

@@ -35,9 +35,9 @@ class UsersAdapter(
             binding.userEmail.text = user.email
 
 
-            android.util.Log.d("UsersAdapter", "Loading avatar for user ${user.name}, url: '${user.profileImageUrl}', privacyPhoto: ${user.privacyPhoto}")
+            android.util.Log.d("UsersAdapter", "Loading avatar for user ${user.name}, url: '${user.effectiveProfileImageUrl}', privacyPhoto: ${user.privacyPhoto}")
             val canSeePhoto = (user.privacyPhoto != "Nobody")
-            val avatarUrl = if (canSeePhoto) user.profileImageUrl else null
+            val avatarUrl = if (canSeePhoto) user.effectiveProfileImageUrl else null
             com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.userImage, avatarUrl, user.updatedAt)
 
 

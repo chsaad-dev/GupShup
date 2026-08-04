@@ -252,7 +252,7 @@ class HomeFragment : Fragment() {
                                             uid = user.uid,
                                             name = user.name,
                                             email = user.email,
-                                            profileImageUrl = user.profileImageUrl ?: "",
+                                            profileImageUrl = user.effectiveProfileImageUrl,
                                             bio = user.bio ?: "",
                                             online = user.isOnline
                                         )

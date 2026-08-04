@@ -226,6 +226,8 @@ class ChatActivity : AppCompatActivity() {
                 val privacyLastSeen = snapshot.getString("privacyLastSeen") ?: "Everyone"
                 val privacyPhoto = snapshot.getString("privacyPhoto") ?: "Everyone"
                 val photoUrl = snapshot.getString("profileImageUrl")
+                    ?: snapshot.getString("photoUrl")
+                    ?: snapshot.getString("photoUri")
                 val updatedAt = snapshot.getLong("updatedAt") ?: System.currentTimeMillis()
 
                 binding.userNameText.text = name

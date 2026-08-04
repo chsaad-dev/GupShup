@@ -7,6 +7,8 @@ data class User(
     var name: String = "",
     var email: String = "",
     var profileImageUrl: String? = null,
+    var photoUrl: String? = null,
+    var photoUri: String? = null,
     var bio: String? = null,
     var isOnline: Boolean = false,
     var lastSeen: Timestamp? = null,
@@ -19,4 +21,12 @@ data class User(
     var privacyOnline: String = "Everyone",
     var privacyLastSeen: String = "Everyone",
     var privacyPhoto: String = "Everyone"
-)
+) {
+    val effectiveProfileImageUrl: String
+        get() = when {
+            !profileImageUrl.isNullOrBlank() -> profileImageUrl!!
+            !photoUrl.isNullOrBlank() -> photoUrl!!
+            !photoUri.isNullOrBlank() -> photoUri!!
+            else -> ""
+        }
+}

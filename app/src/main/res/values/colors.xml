@@ -42,7 +42,7 @@
 
     <!-- Splash Gradient -->
     <color name="splashStart">#128C7E</color>
-    <color name="splashEnd">#075E54</color>
+    <color name="splashEnd">#0D6B5F</color>
 
     <!-- Utility Colors -->
     <color name="gray">#667781</color>

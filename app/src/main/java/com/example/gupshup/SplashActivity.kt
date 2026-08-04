@@ -6,9 +6,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.animation.OvershootInterpolator
-import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.gupshup.ui.auth.LoginActivity
 import com.example.gupshup.ui.main.MainNavigationActivity
@@ -20,8 +20,12 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Edge-to-edge
+
+        // Edge-to-edge window setup with light status bar icons (dark status bar content background)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.isAppearanceLightStatusBars = false
+
         setContentView(R.layout.activity_splash)
 
         val logo = findViewById<View>(R.id.splashLogo)
@@ -29,53 +33,49 @@ class SplashActivity : AppCompatActivity() {
         val tagline = findViewById<View>(R.id.splashTagline)
         val progress = findViewById<View>(R.id.splashProgress)
 
-        // Initial state for logo
-        logo.scaleX = 0f
-        logo.scaleY = 0f
+        // Initial animation states
+        logo.scaleX = 0.8f
+        logo.scaleY = 0.8f
         logo.alpha = 0f
+        appName.alpha = 0f
+        tagline.alpha = 0f
+        progress.alpha = 0f
 
-        // Logo entrance: scale + fade in with overshoot
-        val logoScaleX = ObjectAnimator.ofFloat(logo, "scaleX", 0f, 1f).apply {
-            duration = 600
-            interpolator = OvershootInterpolator(1.5f)
-        }
-        val logoScaleY = ObjectAnimator.ofFloat(logo, "scaleY", 0f, 1f).apply {
-            duration = 600
-            interpolator = OvershootInterpolator(1.5f)
-        }
-        val logoAlpha = ObjectAnimator.ofFloat(logo, "alpha", 0f, 1f).apply {
-            duration = 400
-        }
-
-        // App name fade + slide up
-        val nameAlpha = ObjectAnimator.ofFloat(appName, "alpha", 0f, 1f).apply {
+        // Logo scale 0.8 -> 1.0 & fade in over 500ms with OvershootInterpolator
+        val logoScaleX = ObjectAnimator.ofFloat(logo, "scaleX", 0.8f, 1.0f).apply {
             duration = 500
-            startDelay = 400
+            interpolator = OvershootInterpolator(1.2f)
         }
-        val nameTransY = ObjectAnimator.ofFloat(appName, "translationY", 30f, 0f).apply {
+        val logoScaleY = ObjectAnimator.ofFloat(logo, "scaleY", 0.8f, 1.0f).apply {
             duration = 500
-            startDelay = 400
-            interpolator = DecelerateInterpolator()
+            interpolator = OvershootInterpolator(1.2f)
+        }
+        val logoAlpha = ObjectAnimator.ofFloat(logo, "alpha", 0f, 1.0f).apply {
+            duration = 500
         }
 
-        // Tagline fade
-        val taglineAlpha = ObjectAnimator.ofFloat(tagline, "alpha", 0f, 1f).apply {
+        // App name & tagline fade in staggered 200ms after logo start
+        val nameAlpha = ObjectAnimator.ofFloat(appName, "alpha", 0f, 1.0f).apply {
             duration = 400
-            startDelay = 700
+            startDelay = 200
+        }
+        val taglineAlpha = ObjectAnimator.ofFloat(tagline, "alpha", 0f, 1.0f).apply {
+            duration = 400
+            startDelay = 350
         }
 
-        // Progress fade
-        val progressAlpha = ObjectAnimator.ofFloat(progress, "alpha", 0f, 1f).apply {
+        // Progress indicator fade in
+        val progressAlpha = ObjectAnimator.ofFloat(progress, "alpha", 0f, 1.0f).apply {
             duration = 300
-            startDelay = 900
+            startDelay = 500
         }
 
         AnimatorSet().apply {
-            playTogether(logoScaleX, logoScaleY, logoAlpha, nameAlpha, nameTransY, taglineAlpha, progressAlpha)
+            playTogether(logoScaleX, logoScaleY, logoAlpha, nameAlpha, taglineAlpha, progressAlpha)
             start()
         }
 
-        // Navigate after animation
+        // Authentication check & navigation after animation completes (1.8s delay)
         lifecycleScope.launch {
             delay(1800)
             val auth = FirebaseAuth.getInstance()
@@ -85,7 +85,6 @@ class SplashActivity : AppCompatActivity() {
                 LoginActivity::class.java
             }
             startActivity(Intent(this@SplashActivity, destination))
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }
     }

@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_splash_gradient"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="false">
 
-    <!-- Center Content -->
+    <!-- Center Content Stack -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,63 +14,59 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <!-- App Logo Circle -->
+        <!-- Logo: Circular White Surface (96dp) with Soft Shadow (Elevation Level 2 = 3dp) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/splashLogo"
             android:layout_width="96dp"
             android:layout_height="96dp"
             app:cardCornerRadius="48dp"
-            app:cardElevation="8dp"
+            app:cardElevation="@dimen/elevation_level_2"
             app:strokeWidth="0dp"
-            app:cardBackgroundColor="#FFFFFF">
+            app:cardBackgroundColor="@color/white">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="G"
-                android:textSize="44sp"
-                android:textStyle="bold"
-                android:textColor="@color/splashStart"
-                android:gravity="center"
-                android:fontFamily="@font/google_sans_medium" />
+                style="@style/TextAppearance.GupShup.Headline"
+                android:textSize="40sp"
+                android:textColor="@color/colorPrimary"
+                android:gravity="center" />
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- App Name -->
+        <!-- App Name: GupShup (Display style, White, Tight letter spacing) -->
         <TextView
             android:id="@+id/splashAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="GupShup"
-            android:textSize="36sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:fontFamily="@font/google_sans_medium"
-            android:layout_marginTop="20dp"
+            style="@style/TextAppearance.GupShup.Display"
+            android:textColor="@color/white"
+            android:layout_marginTop="@dimen/spacing_xl"
             android:alpha="0" />
 
-        <!-- Tagline -->
+        <!-- Tagline: Connect with friends (Body style, White at 80% opacity) -->
         <TextView
             android:id="@+id/splashTagline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Connect. Chat. Share."
-            android:textSize="16sp"
-            android:textColor="#B2FFFFFF"
-            android:fontFamily="@font/google_sans"
-            android:layout_marginTop="8dp"
+            android:text="Connect with friends"
+            style="@style/TextAppearance.GupShup.Body"
+            android:textColor="#CCFFFFFF"
+            android:layout_marginTop="@dimen/spacing_sm"
             android:alpha="0" />
 
     </LinearLayout>
 
-    <!-- Bottom Loading Indicator -->
+    <!-- Bottom: Thin Circular Progress Indicator (White, 3dp stroke, 64dp from bottom) -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/splashProgress"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="64dp"
         android:indeterminate="true"
-        app:indicatorColor="#FFFFFF"
+        app:indicatorColor="@color/white"
         app:trackColor="#33FFFFFF"
         app:indicatorSize="32dp"
         app:trackThickness="3dp"

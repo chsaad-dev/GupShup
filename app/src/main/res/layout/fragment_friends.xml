@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/friendsLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?attr/colorSurface">
 
+    <!-- Material 3 Toolbar (Surface-toned) -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/friendsToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
         app:title="Friend Requests"
+        app:titleTextAppearance="@style/TextAppearance.GupShup.Headline"
         app:titleTextColor="?attr/colorOnSurface"
-        app:navigationIcon="@drawable/ic_back"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="?attr/colorOnSurface" />
 
+    <!-- Main Container with Swipe Refresh -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
@@ -27,58 +28,81 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- Shimmer Placeholder -->
+            <!-- Shimmer Loading Placeholder -->
             <include
                 android:id="@+id/shimmerPlaceholder"
                 layout="@layout/shimmer_home_placeholder" />
 
-            <!-- Actual RecyclerView -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/friendsRecyclerView"
+            <!-- Main Content Stack with Section Header -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingTop="8dp"
-                android:paddingBottom="16dp"
-                android:clipToPadding="false"
-                android:visibility="gone" />
+                android:orientation="vertical">
 
-            <!-- Empty State -->
+                <!-- Section Header (Label style, OnSurfaceVariant, Uppercase, 16dp top margin) -->
+                <TextView
+                    android:id="@+id/sectionHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PENDING REQUESTS"
+                    style="@style/TextAppearance.GupShup.Label"
+                    android:textColor="@color/onSurfaceVariant"
+                    android:layout_marginStart="@dimen/spacing_lg"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:layout_marginBottom="@dimen/spacing_sm" />
+
+                <!-- Friend Requests List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/friendsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingBottom="@dimen/spacing_lg"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- Intentional Empty State (Widget.GupShup.EmptyState style) -->
             <LinearLayout
                 android:id="@+id/emptyStateView"
+                style="@style/Widget.GupShup.EmptyState"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:visibility="gone"
-                android:padding="32dp">
+                android:padding="@dimen/spacing_3xl"
+                android:visibility="gone">
 
+                <!-- 120dp Person Outline Illustration at 30% Opacity -->
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="@dimen/empty_state_illustration_size"
+                    android:layout_height="@dimen/empty_state_illustration_size"
                     android:src="@drawable/ic_person"
                     android:alpha="0.3"
-                    app:tint="?attr/colorOnSurfaceVariant" />
+                    app:tint="@color/onSurfaceVariant" />
 
+                <!-- Title: Headline Style -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="No pending requests"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginTop="16dp" />
+                    style="@style/TextAppearance.GupShup.Headline"
+                    android:layout_marginTop="@dimen/spacing_2xl" />
 
+                <!-- Subtitle: Body Style in OnSurfaceVariant -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Friend requests will appear here"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOutline"
-                    android:layout_marginTop="8dp"
+                    style="@style/TextAppearance.GupShup.Body"
+                    android:textColor="@color/onSurfaceVariant"
+                    android:layout_marginTop="@dimen/spacing_sm"
                     android:textAlignment="center" />
             </LinearLayout>
 
         </FrameLayout>
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

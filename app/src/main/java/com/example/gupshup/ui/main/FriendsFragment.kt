@@ -11,8 +11,11 @@ import com.example.gupshup.adapter.UsersAdapter
 import com.example.gupshup.databinding.FragmentFriendsBinding
 import com.example.gupshup.model.User
 import com.facebook.shimmer.ShimmerFrameLayout
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 class FriendsFragment : Fragment() {
 
@@ -40,7 +43,11 @@ class FriendsFragment : Fragment() {
         binding.friendsToolbar.title = "Friend Requests"
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            loadFriendRequests(isForceRefresh = true)
+            if (currentUid != null) {
+                checkCacheAndLoad(currentUid, isForceRefresh = true)
+            } else {
+                binding.swipeRefreshLayout.isRefreshing = false
+            }
         }
 
         adapter = UsersAdapter(
@@ -60,10 +67,67 @@ class FriendsFragment : Fragment() {
             )
 
         if (!isDataLoaded) {
-            showShimmer()
-            loadFriendRequests(isForceRefresh = false)
+            if (currentUid != null) {
+                checkCacheAndLoad(currentUid, isForceRefresh = false)
+            } else {
+                loadFriendRequests(isForceRefresh = false)
+            }
         } else {
             showContent()
+        }
+    }
+
+    private fun checkCacheAndLoad(uid: String, isForceRefresh: Boolean = false) {
+        if (isForceRefresh) {
+            android.util.Log.d("FriendsFragment", "[CachePolicy] Force refresh requested -> Fetching from Firestore")
+            showShimmer()
+            loadFriendRequests(isForceRefresh = true)
+            return
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val appDb = com.example.gupshup.data.local.AppDatabase.getInstance(requireContext())
+            val requests = appDb.friendRequestDao().getPendingIncomingFlow(uid).firstOrNull() ?: emptyList()
+            val pendingUids = requests.map { it.fromUid }
+
+            if (pendingUids.isNotEmpty()) {
+                val cachedUserEntities = appDb.userDao().getUsersByIds(pendingUids).firstOrNull() ?: emptyList()
+
+                if (cachedUserEntities.isNotEmpty()) {
+                    friendRequests.clear()
+                    friendRequests.addAll(cachedUserEntities.map { entity ->
+                        User(
+                            uid = entity.uid,
+                            name = entity.name,
+                            email = entity.email,
+                            profileImageUrl = entity.photoUrl,
+                            bio = entity.bio,
+                            isOnline = entity.online
+                        )
+                    })
+                    adapter.notifyDataSetChanged()
+                    showContent()
+
+                    val maxReqCachedAt = requests.maxOfOrNull { it.cachedAt } ?: 0L
+                    val maxUserCachedAt = cachedUserEntities.maxOfOrNull { it.cachedAt } ?: 0L
+                    val reqStale = (System.currentTimeMillis() - maxReqCachedAt) > com.example.gupshup.data.local.CacheConfig.FRIEND_CACHE_STALENESS_MS
+                    val usersStale = (System.currentTimeMillis() - maxUserCachedAt) > com.example.gupshup.data.local.CacheConfig.FRIEND_CACHE_STALENESS_MS
+
+                    if (reqStale || usersStale) {
+                        android.util.Log.d("FriendsFragment", "[CachePolicy] Room cache STALE -> Fetching from Firestore")
+                        loadFriendRequests(isForceRefresh = false)
+                    } else {
+                        android.util.Log.d("FriendsFragment", "[CachePolicy] Room cache FRESH -> Skipping Firestore fetch")
+                        isDataLoaded = true
+                        _binding?.swipeRefreshLayout?.isRefreshing = false
+                    }
+                    return@launch
+                }
+            }
+
+            android.util.Log.d("FriendsFragment", "[CachePolicy] No Room cache found -> Fetching from Firestore")
+            showShimmer()
+            loadFriendRequests(isForceRefresh = false)
         }
     }
 
@@ -114,6 +178,21 @@ class FriendsFragment : Fragment() {
 
                 val pendingUids = pendingSnapshot.mapNotNull { it.getString("fromUid") }
 
+                val appContext = context?.applicationContext
+                val reqEntities = pendingSnapshot.map { doc ->
+                    com.example.gupshup.data.local.entity.FriendRequestEntity(
+                        id = doc.id,
+                        fromUid = doc.getString("fromUid") ?: "",
+                        toUid = doc.getString("toUid") ?: "",
+                        status = "pending"
+                    )
+                }
+                if (appContext != null && reqEntities.isNotEmpty()) {
+                    lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                        com.example.gupshup.data.local.AppDatabase.getInstance(appContext).friendRequestDao().upsert(reqEntities)
+                    }
+                }
+
                 if (pendingUids.isEmpty()) {
                     friendRequests.clear()
                     adapter.notifyDataSetChanged()
@@ -128,8 +207,26 @@ class FriendsFragment : Fragment() {
                     .addOnSuccessListener { userSnapshot ->
                         if (_binding == null || !isAdded) return@addOnSuccessListener
 
+                        val fetched = userSnapshot.mapNotNull { it.toObject(User::class.java) }
                         friendRequests.clear()
-                        friendRequests.addAll(userSnapshot.mapNotNull { it.toObject(User::class.java) })
+                        friendRequests.addAll(fetched)
+                        
+                        val userEntities = fetched.map { user ->
+                            com.example.gupshup.data.local.entity.UserEntity(
+                                uid = user.uid,
+                                name = user.name,
+                                email = user.email,
+                                photoUrl = user.profileImageUrl ?: "",
+                                bio = user.bio ?: "",
+                                online = user.isOnline
+                            )
+                        }
+                        if (appContext != null && userEntities.isNotEmpty()) {
+                            lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                com.example.gupshup.data.local.AppDatabase.getInstance(appContext).userDao().upsert(userEntities)
+                            }
+                        }
+
                         adapter.notifyDataSetChanged()
                         isDataLoaded = true
                         showContent()

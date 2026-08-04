@@ -27,6 +27,7 @@ class HomeFragment : Fragment() {
 
     private val unreadCountMap = mutableMapOf<String, Int>()
     private val listenerRegistrations = mutableListOf<ListenerRegistration>()
+    private var isDataLoaded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -64,12 +65,15 @@ class HomeFragment : Fragment() {
             )
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            loadAcceptedFriends()
+            loadAcceptedFriends(isForceRefresh = true)
         }
 
-        // Show shimmer initially
-        showShimmer()
-        loadAcceptedFriends()
+        if (!isDataLoaded) {
+            showShimmer()
+            loadAcceptedFriends(isForceRefresh = false)
+        } else {
+            showContent()
+        }
     }
 
     private fun showShimmer() {
@@ -101,7 +105,12 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun loadAcceptedFriends() {
+    private fun loadAcceptedFriends(isForceRefresh: Boolean = false) {
+        if (isDataLoaded && !isForceRefresh) {
+            showContent()
+            return
+        }
+
         val currentUid = auth.currentUser?.uid ?: return
         val friendIds = mutableSetOf<String>()
 
@@ -126,6 +135,7 @@ class HomeFragment : Fragment() {
                     users.clear()
                     adapter.notifyDataSetChanged()
                     updateHomeBadge()
+                    isDataLoaded = true
                     showContent()
                     _binding?.swipeRefreshLayout?.isRefreshing = false
                     return@addOnSuccessListener
@@ -157,6 +167,7 @@ class HomeFragment : Fragment() {
                             adapter.notifyDataSetChanged()
                             
                             if (completedChunks == chunks.size) {
+                                isDataLoaded = true
                                 showContent()
                                 _binding?.swipeRefreshLayout?.isRefreshing = false
                             }
@@ -165,6 +176,7 @@ class HomeFragment : Fragment() {
                             if (_binding == null || !isAdded) return@addOnFailureListener
                             completedChunks++
                             if (completedChunks == chunks.size) {
+                                isDataLoaded = true
                                 showContent()
                                 _binding?.swipeRefreshLayout?.isRefreshing = false
                             }

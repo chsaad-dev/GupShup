@@ -17,6 +17,7 @@ import com.example.gupshup.util.CloudinaryManager
 import com.example.gupshup.util.ImageUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 class ProfileFragment : Fragment() {
 
@@ -61,7 +62,7 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        loadUserProfile(uid)
+        observeUserProfile(uid)
 
         binding.editSaveButton.setOnClickListener {
             if (!isEditMode) {
@@ -87,26 +88,29 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun loadUserProfile(uid: String) {
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { doc ->
-                if (_binding == null || !isAdded) return@addOnSuccessListener
+    private var profileListener: ListenerRegistration? = null
+
+    private fun observeUserProfile(uid: String) {
+        if (profileListener != null) return
+
+        profileListener = db.collection("users").document(uid)
+            .addSnapshotListener { doc, _ ->
+                if (_binding == null || !isAdded || doc == null || !doc.exists()) return@addSnapshotListener
 
                 val name = doc.getString("name") ?: ""
                 val email = doc.getString("email") ?: ""
                 val bio = doc.getString("bio") ?: ""
                 val profileUrl = doc.getString("profileImageUrl") ?: ""
 
-                binding.nameEditText.setText(name)
-                binding.emailEditText.setText(email)
-                binding.userIdEditText.setText(uid)
-                binding.bioEditText.setText(bio)
+                if (!isEditMode) {
+                    binding.nameEditText.setText(name)
+                    binding.emailEditText.setText(email)
+                    binding.userIdEditText.setText(uid)
+                    binding.bioEditText.setText(bio)
 
-                ImageUtils.loadProfileImage(requireContext(), profileUrl, binding.profileImageView)
-            }
-            .addOnFailureListener {
-                if (_binding != null && isAdded) {
-                    Toast.makeText(requireContext(), "❌ Failed to load profile", Toast.LENGTH_SHORT).show()
+                    context?.let { ctx ->
+                        ImageUtils.loadProfileImage(ctx, profileUrl, binding.profileImageView)
+                    }
                 }
             }
     }
@@ -184,6 +188,8 @@ class ProfileFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        profileListener?.remove()
+        profileListener = null
         _binding = null
     }
 }

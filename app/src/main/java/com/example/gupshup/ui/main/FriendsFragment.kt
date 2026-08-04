@@ -31,13 +31,16 @@ class FriendsFragment : Fragment() {
         return binding.root
     }
 
+    private var isDataLoaded = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as? AppCompatActivity)?.setSupportActionBar(binding.friendsToolbar)
+        (activity as AppCompatActivity).setSupportActionBar(binding.friendsToolbar)
+        binding.friendsToolbar.title = "Friend Requests"
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            loadFriendRequests()
+            loadFriendRequests(isForceRefresh = true)
         }
 
         adapter = UsersAdapter(
@@ -56,8 +59,12 @@ class FriendsFragment : Fragment() {
                 requireContext(), R.anim.layout_animation_fall_down
             )
 
-        showShimmer()
-        loadFriendRequests()
+        if (!isDataLoaded) {
+            showShimmer()
+            loadFriendRequests(isForceRefresh = false)
+        } else {
+            showContent()
+        }
     }
 
     private fun showShimmer() {
@@ -88,7 +95,12 @@ class FriendsFragment : Fragment() {
         }
     }
 
-    private fun loadFriendRequests() {
+    private fun loadFriendRequests(isForceRefresh: Boolean = false) {
+        if (isDataLoaded && !isForceRefresh) {
+            showContent()
+            return
+        }
+
         if (currentUid == null) return
 
         val requestsRef = db.collection("friend_requests")
@@ -105,6 +117,7 @@ class FriendsFragment : Fragment() {
                 if (pendingUids.isEmpty()) {
                     friendRequests.clear()
                     adapter.notifyDataSetChanged()
+                    isDataLoaded = true
                     showContent()
                     _binding?.swipeRefreshLayout?.isRefreshing = false
                     return@addOnSuccessListener
@@ -118,6 +131,7 @@ class FriendsFragment : Fragment() {
                         friendRequests.clear()
                         friendRequests.addAll(userSnapshot.mapNotNull { it.toObject(User::class.java) })
                         adapter.notifyDataSetChanged()
+                        isDataLoaded = true
                         showContent()
                         _binding?.swipeRefreshLayout?.isRefreshing = false
                     }
@@ -152,14 +166,14 @@ class FriendsFragment : Fragment() {
                             .addOnSuccessListener {
                                 if (_binding == null || !isAdded) return@addOnSuccessListener
                                 showToast("Friend request accepted")
-                                loadFriendRequests()
+                                loadFriendRequests(isForceRefresh = true)
                             }
                     } else {
                         doc.delete()
                             .addOnSuccessListener {
                                 if (_binding == null || !isAdded) return@addOnSuccessListener
                                 showToast("Friend request rejected")
-                                loadFriendRequests()
+                                loadFriendRequests(isForceRefresh = true)
                             }
                     }
                 }

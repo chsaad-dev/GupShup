@@ -3,7 +3,6 @@ package com.example.gupshup.ui.main
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +21,14 @@ class MainNavigationActivity : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
     private lateinit var networkObserver: NetworkObserver
 
+    private val homeFragment by lazy { HomeFragment() }
+    private val statusFragment by lazy { StatusFragment() }
+    private val searchFragment by lazy { SearchFragment() }
+    private val friendsFragment by lazy { FriendsFragment() }
+    private val profileFragment by lazy { ProfileFragment() }
+
+    private var activeFragment: Fragment = homeFragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,19 +46,58 @@ class MainNavigationActivity : AppCompatActivity() {
         networkObserver = NetworkObserver(this)
         observeNetwork()
 
-        loadFragment(HomeFragment())
+        setupFragmentNavigation(savedInstanceState)
         checkPendingRequestsBadge()
 
-        binding.bottomNav.setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.menu_home -> loadFragment(HomeFragment())
-                R.id.menu_status -> loadFragment(StatusFragment())
-                R.id.menu_search -> loadFragment(SearchFragment())
-                R.id.menu_friends -> loadFragment(FriendsFragment())
-                R.id.menu_profile -> loadFragment(ProfileFragment())
+        binding.bottomNav.setOnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.menu_home -> switchFragment(homeFragment, "home")
+                R.id.menu_status -> switchFragment(statusFragment, "status")
+                R.id.menu_search -> switchFragment(searchFragment, "search")
+                R.id.menu_friends -> switchFragment(friendsFragment, "friends")
+                R.id.menu_profile -> switchFragment(profileFragment, "profile")
             }
             true
         }
+    }
+
+    private fun setupFragmentNavigation(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, homeFragment, "home")
+                .commit()
+            activeFragment = homeFragment
+        } else {
+            val restoredHome = supportFragmentManager.findFragmentByTag("home") ?: homeFragment
+            val restoredStatus = supportFragmentManager.findFragmentByTag("status") ?: statusFragment
+            val restoredSearch = supportFragmentManager.findFragmentByTag("search") ?: searchFragment
+            val restoredFriends = supportFragmentManager.findFragmentByTag("friends") ?: friendsFragment
+            val restoredProfile = supportFragmentManager.findFragmentByTag("profile") ?: profileFragment
+
+            activeFragment = when (binding.bottomNav.selectedItemId) {
+                R.id.menu_status -> restoredStatus
+                R.id.menu_search -> restoredSearch
+                R.id.menu_friends -> restoredFriends
+                R.id.menu_profile -> restoredProfile
+                else -> restoredHome
+            }
+        }
+    }
+
+    private fun switchFragment(targetFragment: Fragment, tag: String) {
+        if (activeFragment == targetFragment) return
+
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.hide(activeFragment)
+
+        if (!targetFragment.isAdded) {
+            transaction.add(R.id.fragmentContainer, targetFragment, tag)
+        } else {
+            transaction.show(targetFragment)
+        }
+
+        transaction.commit()
+        activeFragment = targetFragment
     }
 
     private fun observeNetwork() {
@@ -73,16 +119,6 @@ class MainNavigationActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(
-                R.anim.fade_in,
-                R.anim.fade_out
-            )
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
-    }
-
     private fun checkPendingRequestsBadge() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         db.collection("friend_requests")
@@ -96,7 +132,6 @@ class MainNavigationActivity : AppCompatActivity() {
             }
     }
 
-    // Called by HomeFragment live when unread changes
     fun updateHomeBadge(unreadMap: Map<String, Int>, totalUnread: Int = unreadMap.values.sum()) {
         val badge = binding.bottomNav.getOrCreateBadge(R.id.menu_home)
         badge.isVisible = totalUnread > 0
@@ -114,6 +149,11 @@ class MainNavigationActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        setUserOnline(false)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         setUserOnline(false)
     }
 

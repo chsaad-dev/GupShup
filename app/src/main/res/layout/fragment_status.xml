@@ -1,114 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- Material Toolbar -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/statusToolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
+    <!-- AppBar & Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="?attr/colorSurface"
-        app:title="Status"
-        app:titleTextColor="?attr/colorOnSurface"
-        app:titleCentered="false"
-        app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="?attr/colorOnSurface"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:elevation="@dimen/elevation_level_0">
 
-    <!-- Bubbles RecyclerView (Stories) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/statusBubbleRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingVertical="12dp"
-        android:clipToPadding="false"
-        android:orientation="horizontal"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@id/statusToolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/statusToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorSurface"
+            app:title="Status"
+            app:titleTextAppearance="@style/TextAppearance.GupShup.Headline"
+            app:titleTextColor="?attr/colorOnSurface"
+            app:titleCentered="false"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="?attr/colorOnSurface" />
 
-    <!-- Input Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/statusInputCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:cardBackgroundColor="?attr/colorSurfaceContainer"
-        app:strokeWidth="0dp"
-        app:layout_constraintTop_toBottomOf="@id/statusBubbleRecyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+    <!-- Main Scrollable Content Container -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Share your thoughts..."
-            app:boxBackgroundMode="none">
+            android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/statusEditText"
+            <!-- Horizontal Status Story Bubbles (My Status + Friend Stories) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/statusBubbleRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:gravity="top|start"
-                android:inputType="textMultiLine"
-                android:maxLines="5"
-                android:textColor="?attr/colorOnSurface"/>
-        </com.google.android.material.textfield.TextInputLayout>
-    </com.google.android.material.card.MaterialCardView>
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/spacing_lg"
+                android:paddingVertical="@dimen/spacing_md"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-    <!-- Buttons Container -->
-    <LinearLayout
-        android:id="@+id/buttonContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/statusInputCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginHorizontal="@dimen/spacing_lg" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/addPhotoButton"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_weight="1"
-            android:text="Add Photo"
-            android:layout_marginEnd="8dp"
-            app:icon="@drawable/ic_add_status"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            app:cornerRadius="26dp"/>
+            <!-- Compose Status Card: Widget.GupShup.Card style, 12dp internal padding -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/statusInputCard"
+                style="@style/Widget.GupShup.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/spacing_lg"
+                app:contentPadding="@dimen/spacing_md">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/postStatusButton"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_weight="1"
-            android:text="Post Status"
-            style="@style/Widget.Material3.Button"
-            app:cornerRadius="26dp"/>
-    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-    <!-- Status List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/statusRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:padding="16dp"
-        android:clipToPadding="false"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/buttonContainer"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+                    <!-- Borderless Multi-line EditText -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Share your thoughts..."
+                        app:boxBackgroundMode="none"
+                        app:hintAnimationEnabled="false">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/statusEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="90dp"
+                            android:gravity="top|start"
+                            android:inputType="textMultiLine"
+                            android:maxLines="4"
+                            android:background="@null"
+                            style="@style/TextAppearance.GupShup.Body" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Action Row: Add Photo Chip + Compact Post Button -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="@dimen/spacing_md">
+
+                        <!-- Add Photo Outlined Chip (20dp radius, photo icon leading) -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/addPhotoButton"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:text="Add Photo"
+                            android:textAppearance="@style/TextAppearance.GupShup.Label"
+                            android:textColor="?attr/colorOnSurface"
+                            app:icon="@drawable/ic_add_status"
+                            app:iconTint="@color/colorPrimary"
+                            app:iconSize="18dp"
+                            app:cornerRadius="20dp"
+                            app:strokeColor="@color/outline"
+                            app:strokeWidth="1dp" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <!-- Compact Post Status Button (Widget.GupShup.Button.Filled, height 40dp) -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/postStatusButton"
+                            style="@style/Widget.GupShup.Button.Filled"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:text="Post Status"
+                            android:textAppearance="@style/TextAppearance.GupShup.Label"
+                            android:paddingHorizontal="@dimen/spacing_lg" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Recent Updates Section Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recent updates"
+                style="@style/TextAppearance.GupShup.Label"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginStart="@dimen/spacing_lg"
+                android:layout_marginTop="@dimen/spacing_lg"
+                android:layout_marginBottom="@dimen/spacing_sm" />
+
+            <!-- Vertical Status List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/statusRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/spacing_lg"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Empty State Container -->
+            <LinearLayout
+                android:id="@+id/statusEmptyState"
+                style="@style/Widget.GupShup.EmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone"
+                android:paddingVertical="@dimen/spacing_3xl">
+
+                <ImageView
+                    android:layout_width="@dimen/empty_state_illustration_size"
+                    android:layout_height="@dimen/empty_state_illustration_size"
+                    android:src="@drawable/status_ring"
+                    android:alpha="0.3"
+                    app:tint="@color/onSurfaceVariant" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No status updates"
+                    style="@style/TextAppearance.GupShup.Headline"
+                    android:layout_marginTop="@dimen/spacing_2xl" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Updates from friends appear here"
+                    style="@style/TextAppearance.GupShup.Body"
+                    android:textColor="@color/onSurfaceVariant"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:textAlignment="center" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

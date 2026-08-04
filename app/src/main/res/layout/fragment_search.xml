@@ -11,11 +11,11 @@
         android:id="@+id/searchToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="?attr/colorSurface"
         app:title="Search"
-        app:titleTextColor="?attr/colorOnPrimary"
+        app:titleTextColor="?attr/colorOnSurface"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="?attr/colorOnPrimary" />
+        app:navigationIconTint="?attr/colorOnSurface" />
 
     <LinearLayout
         android:layout_width="match_parent"

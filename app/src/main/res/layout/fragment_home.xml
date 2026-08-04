@@ -12,10 +12,11 @@
         android:id="@+id/homeToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="?attr/colorSurface"
         android:elevation="0dp"
         app:title="GupShup"
-        app:titleTextColor="?attr/colorOnPrimary"
+        app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+        app:titleTextColor="?attr/colorOnSurface"
         app:titleCentered="false"
         app:menu="@menu/home_menu" />
 

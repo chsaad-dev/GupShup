@@ -93,7 +93,7 @@ class ProfileFragment : Fragment() {
 
                     com.example.gupshup.util.ImageLoaderUtil.loadAvatar(
                         binding.profileImageView,
-                        userEntity.photoUrl,
+                        userEntity.profileImageUrl,
                         userEntity.updatedAt
                     )
                 }
@@ -123,7 +123,7 @@ class ProfileFragment : Fragment() {
                                 uid = uid,
                                 name = name,
                                 email = email,
-                                photoUrl = profileUrl,
+                                profileImageUrl = profileUrl,
                                 bio = bio,
                                 updatedAt = updatedAt
                             )

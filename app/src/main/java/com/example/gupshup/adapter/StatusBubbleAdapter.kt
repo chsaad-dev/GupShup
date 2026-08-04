@@ -30,6 +30,7 @@ class StatusBubbleAdapter(
         val status = statusList[position]
         holder.userName.text = status.userName
 
+        android.util.Log.d("StatusBubbleAdapter", "Loading status avatar for user ${status.userName}, url: '${status.userProfileUrl}'")
         com.example.gupshup.util.ImageLoaderUtil.loadAvatar(holder.profileImage, status.userProfileUrl)
 
         holder.itemView.setOnClickListener {

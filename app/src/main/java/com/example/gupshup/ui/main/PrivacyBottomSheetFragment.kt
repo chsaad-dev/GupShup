@@ -58,6 +58,10 @@ class PrivacyBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun updateSwitchUI(online: String, lastSeen: String, photo: String) {
+        binding.switchOnlineStatus.setOnCheckedChangeListener(null)
+        binding.switchLastSeen.setOnCheckedChangeListener(null)
+        binding.switchProfilePhoto.setOnCheckedChangeListener(null)
+
         binding.switchOnlineStatus.isChecked = (online == "Everyone")
         binding.textSubtitleOnline.text = if (online == "Everyone") "Visible to everyone" else "Hidden (Nobody)"
 
@@ -66,6 +70,8 @@ class PrivacyBottomSheetFragment : BottomSheetDialogFragment() {
 
         binding.switchProfilePhoto.isChecked = (photo == "Everyone")
         binding.textSubtitlePhoto.text = if (photo == "Everyone") "Visible to everyone" else "Hidden (Nobody)"
+
+        setupListeners()
     }
 
     private fun setupListeners() {

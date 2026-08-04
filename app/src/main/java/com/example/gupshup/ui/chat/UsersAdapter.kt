@@ -35,7 +35,10 @@ class UsersAdapter(
             binding.userEmail.text = user.email
 
 
-            com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.userImage, user.profileImageUrl, user.updatedAt)
+            android.util.Log.d("UsersAdapter", "Loading avatar for user ${user.name}, url: '${user.profileImageUrl}', privacyPhoto: ${user.privacyPhoto}")
+            val canSeePhoto = (user.privacyPhoto != "Nobody")
+            val avatarUrl = if (canSeePhoto) user.profileImageUrl else null
+            com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.userImage, avatarUrl, user.updatedAt)
 
 
             binding.onlineIndicator.visibility = if (user.isOnline) View.VISIBLE else View.GONE

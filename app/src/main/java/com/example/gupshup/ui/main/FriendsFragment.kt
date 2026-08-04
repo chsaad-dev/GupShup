@@ -100,7 +100,7 @@ class FriendsFragment : Fragment() {
                             uid = entity.uid,
                             name = entity.name,
                             email = entity.email,
-                            profileImageUrl = entity.photoUrl,
+                            profileImageUrl = entity.profileImageUrl,
                             bio = entity.bio,
                             isOnline = entity.online
                         )
@@ -216,7 +216,7 @@ class FriendsFragment : Fragment() {
                                 uid = user.uid,
                                 name = user.name,
                                 email = user.email,
-                                photoUrl = user.profileImageUrl ?: "",
+                                profileImageUrl = user.profileImageUrl ?: "",
                                 bio = user.bio ?: "",
                                 online = user.isOnline
                             )

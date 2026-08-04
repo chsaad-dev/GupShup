@@ -234,6 +234,7 @@ class ChatActivity : AppCompatActivity() {
                 val canSeeLastSeen = (privacyLastSeen == "Everyone")
                 val canSeePhoto = (privacyPhoto == "Everyone")
 
+                android.util.Log.d("ChatActivity", "Loading avatar for $name, url: '$photoUrl', privacyPhoto: $privacyPhoto, canSeePhoto: $canSeePhoto")
                 if (canSeePhoto) {
                     com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.toolbarAvatar, photoUrl, updatedAt)
                 } else {

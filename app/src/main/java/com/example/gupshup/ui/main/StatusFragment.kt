@@ -214,19 +214,33 @@ class StatusFragment : Fragment() {
                 val statusEntities = mutableListOf<StatusEntity>()
                 snapshot?.documents?.forEach { doc ->
                     val status = doc.toObject(Status::class.java)
-                    status?.let {
-                        statusList.add(it)
+                    status?.let { st ->
+                        statusList.add(st)
+                        if (st.userProfileUrl.isEmpty()) {
+                            db.collection("users").document(st.userId).get().addOnSuccessListener { uDoc ->
+                                if (_binding == null || !isAdded || uDoc == null || !uDoc.exists()) return@addOnSuccessListener
+                                val freshPhotoUrl = uDoc.getString("profileImageUrl") ?: ""
+                                if (freshPhotoUrl.isNotEmpty()) {
+                                    val index = statusList.indexOfFirst { s -> s.statusId == st.statusId }
+                                    if (index != -1) {
+                                        statusList[index] = statusList[index].copy(userProfileUrl = freshPhotoUrl)
+                                        bubbleAdapter.notifyItemChanged(index)
+                                        verticalAdapter.updateList(statusList)
+                                    }
+                                }
+                            }
+                        }
                         statusEntities.add(
                             StatusEntity(
-                                id = it.statusId,
-                                userId = it.userId,
-                                userName = it.userName,
-                                userProfileUrl = it.userProfileUrl,
-                                text = it.text,
-                                mediaUrl = it.mediaUrl,
-                                type = it.type,
-                                timestamp = it.timestamp,
-                                expiresAt = it.timestamp + (24 * 60 * 60 * 1000)
+                                id = st.statusId,
+                                userId = st.userId,
+                                userName = st.userName,
+                                userProfileUrl = st.userProfileUrl,
+                                text = st.text,
+                                mediaUrl = st.mediaUrl,
+                                type = st.type,
+                                timestamp = st.timestamp,
+                                expiresAt = st.timestamp + (24 * 60 * 60 * 1000)
                             )
                         )
                     }

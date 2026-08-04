@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 Color Palette (WhatsApp-inspired Modern Teal) -->
-    
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- GupShup Material 3 Color Palette — LIGHT MODE      -->
+    <!-- ═══════════════════════════════════════════════════ -->
+
     <!-- Primary Brand Colors -->
     <color name="colorPrimary">#00A884</color>
-    <color name="colorPrimaryContainer">#D0F8EC</color>
+    <color name="colorPrimaryContainer">#B2F1E0</color>
     <color name="onPrimaryContainer">#00201A</color>
     <color name="onPrimary">#FFFFFF</color>
 
-    <!-- Secondary Colors (Accents) -->
+    <!-- Secondary Colors -->
     <color name="colorSecondary">#4A635D</color>
     <color name="onSecondary">#FFFFFF</color>
     <color name="colorSecondaryContainer">#CCE8E0</color>
     <color name="onSecondaryContainer">#05201A</color>
 
-    <!-- Tertiary Colors (Optional accents) -->
+    <!-- Tertiary Colors -->
     <color name="colorTertiary">#4B607C</color>
     <color name="onTertiary">#FFFFFF</color>
     <color name="colorTertiaryContainer">#D3E4FF</color>
     <color name="onTertiaryContainer">#041C35</color>
 
     <!-- Surface Colors -->
-    <color name="background">#FFFFFF</color>
-    <color name="onBackground">#191C1B</color>
-    <color name="surface">#FBFDFD</color>
-    <color name="onSurface">#191C1B</color>
-    <color name="surfaceVariant">#DBE5E0</color>
-    <color name="onSurfaceVariant">#3F4946</color>
-    <color name="colorSurfaceContainer">#F0F4F3</color>
-    <color name="colorSurfaceContainerLow">#F6FBF9</color>
-    <color name="outline">#6F7976</color>
-    <color name="outlineVariant">#BFC9C5</color>
-    
-    <color name="bubbleStroke">#00000000</color>
+    <color name="background">#F8FAFC</color>
+    <color name="onBackground">#0F172A</color>
+    <color name="surface">#F8FAFC</color>
+    <color name="onSurface">#0F172A</color>
+    <color name="surfaceVariant">#E2E8F0</color>
+    <color name="onSurfaceVariant">#475569</color>
+    <color name="colorSurfaceContainer">#F1F5F9</color>
+    <color name="colorSurfaceContainerLow">#F8FAFC</color>
+    <color name="colorSurfaceContainerHigh">#E2E8F0</color>
+    <color name="outline">#94A3B8</color>
+    <color name="outlineVariant">#CBD5E1</color>
 
     <!-- Error Colors -->
     <color name="error">#BA1A1A</color>
@@ -40,33 +41,36 @@
     <color name="errorContainer">#FFDAD6</color>
     <color name="onErrorContainer">#410002</color>
 
-    <!-- Legacy / Compatibility Colors (Mapped to new implementation) -->
+    <!-- Chat Specific -->
+    <color name="bubbleSent">#DCF8C6</color>
+    <color name="bubbleReceived">#FFFFFF</color>
+    <color name="chatBackground">#ECE5DD</color>
+    <color name="bubbleSentText">#0F172A</color>
+    <color name="bubbleReceivedText">#0F172A</color>
+    <color name="bubbleStroke">#00000000</color>
+
+    <!-- Status / Online -->
+    <color name="online_green">#25D366</color>
+
+    <!-- Utility Colors -->
+    <color name="gray">#94A3B8</color>
+    <color name="lightGray">#E2E8F0</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Splash -->
+    <color name="splashStart">#00A884</color>
+    <color name="splashEnd">#005C4B</color>
+
+    <!-- Legacy references maintained for safety -->
     <color name="purple_200">@color/colorPrimaryContainer</color>
     <color name="purple_500">@color/colorPrimary</color>
     <color name="purple_700">@color/colorSecondary</color>
     <color name="teal_200">@color/colorSecondaryContainer</color>
     <color name="teal_700">@color/colorSecondary</color>
-    
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
-    
-    <!-- Chat Specific -->
-    <color name="bubbleSent">#E7FFDB</color> <!-- Classic Soft Green -->
-    <color name="bubbleReceived">#FFFFFF</color>
-    <color name="chatBackground">#EFE7DE</color> <!-- Subtle Doodle-like bg color -->
-
-    <!-- Status/Online -->
-    <color name="online_green">#25D366</color>
-    
-    <color name="gray">#757575</color>
-    <color name="lightGray">#E0E0E0</color>
-
-    <!-- Legacy references maintained for safety -->
     <color name="colorPrimaryVariant">@color/colorSecondary</color>
     <color name="colorAccent">@color/colorSecondary</color>
     <color name="backgroundLight">@color/background</color>
-    
-    <!-- Fix for legacy drawables -->
     <color name="primaryColor">@color/colorPrimary</color>
     <color name="primaryLight">@color/colorPrimaryContainer</color>
     <color name="appBackground">@color/surface</color>

@@ -1,22 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Circle shape for the profile image -->
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--  Shape Appearances                              -->
+    <!-- ═══════════════════════════════════════════════ -->
+
+    <!-- Circle shape for profile images -->
     <style name="CircleImage">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <!-- Asymmetric Sent Bubble: rounded except bottom-end -->
+    <style name="ShapeAppearance.GupShup.Bubble.Sent" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopStart">16dp</item>
+        <item name="cornerSizeTopEnd">16dp</item>
+        <item name="cornerSizeBottomStart">16dp</item>
+        <item name="cornerSizeBottomEnd">4dp</item>
+    </style>
+
+    <!-- Asymmetric Received Bubble: rounded except bottom-start -->
+    <style name="ShapeAppearance.GupShup.Bubble.Received" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopStart">16dp</item>
+        <item name="cornerSizeTopEnd">16dp</item>
+        <item name="cornerSizeBottomStart">4dp</item>
+        <item name="cornerSizeBottomEnd">16dp</item>
+    </style>
+
+    <!-- Card style for list items -->
+    <style name="GupShup.CardStyle" parent="Widget.Material3.CardView.Filled">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">1dp</item>
+    </style>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--  Reaction Emoji style                           -->
+    <!-- ═══════════════════════════════════════════════ -->
     <style name="ReactionEmoji">
         <item name="android:textSize">26sp</item>
         <item name="android:layout_margin">6dp</item>
         <item name="android:clickable">true</item>
     </style>
 
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--  Profile styles                                 -->
+    <!-- ═══════════════════════════════════════════════ -->
     <style name="ProfileLabel">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">#444</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
         <item name="android:layout_marginTop">12dp</item>
     </style>
 
@@ -28,7 +64,5 @@
         <item name="android:textSize">15sp</item>
         <item name="android:layout_marginTop">6dp</item>
     </style>
-
-
 
 </resources>

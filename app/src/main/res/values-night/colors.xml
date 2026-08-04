@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 Dark Theme Palette -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- GupShup Material 3 Color Palette — DARK MODE       -->
+    <!-- ═══════════════════════════════════════════════════ -->
 
     <!-- Primary Brand Colors -->
-    <color name="colorPrimary">#00A884</color>
-    <color name="colorPrimaryContainer">#00503F</color>
-    <color name="onPrimaryContainer">#D0F8EC</color>
-    <color name="onPrimary">#00382C</color>
+    <color name="colorPrimary">#00C896</color>
+    <color name="colorPrimaryContainer">#005140</color>
+    <color name="onPrimaryContainer">#B2F1E0</color>
+    <color name="onPrimary">#003025</color>
 
-    <!-- Secondary Colors (Accents) -->
-    <color name="colorSecondary">#B1CCCA</color>
-    <color name="onSecondary">#1C3531</color>
-    <color name="colorSecondaryContainer">#334B47</color>
+    <!-- Secondary Colors -->
+    <color name="colorSecondary">#B1CCC4</color>
+    <color name="onSecondary">#1C352E</color>
+    <color name="colorSecondaryContainer">#334B45</color>
     <color name="onSecondaryContainer">#CCE8E0</color>
 
     <!-- Tertiary Colors -->
-    <color name="colorTertiary">#B4C8EB</color>
-    <color name="onTertiary">#1E314C</color>
-    <color name="colorTertiaryContainer">#344863</color>
+    <color name="colorTertiary">#B4C8E8</color>
+    <color name="onTertiary">#1E324B</color>
+    <color name="colorTertiaryContainer">#354963</color>
     <color name="onTertiaryContainer">#D3E4FF</color>
 
     <!-- Surface Colors -->
-    <color name="background">#121212</color>
-    <color name="onBackground">#E1E3E0</color>
-    <color name="surface">#121212</color>
-    <color name="onSurface">#E1E3E0</color>
-    <color name="surfaceVariant">#404944</color>
-    <color name="onSurfaceVariant">#BFC9C5</color>
-    <color name="colorSurfaceContainer">#1E2623</color>
-    <color name="colorSurfaceContainerLow">#1A211F</color>
-    <color name="outline">#B0BDB9</color>
-    <color name="outlineVariant">#404944</color>
-
-
-    <color name="bubbleStroke">#374248</color>
+    <color name="background">#0F172A</color>
+    <color name="onBackground">#E2E8F0</color>
+    <color name="surface">#0F172A</color>
+    <color name="onSurface">#E2E8F0</color>
+    <color name="surfaceVariant">#334155</color>
+    <color name="onSurfaceVariant">#94A3B8</color>
+    <color name="colorSurfaceContainer">#1E293B</color>
+    <color name="colorSurfaceContainerLow">#151D2E</color>
+    <color name="colorSurfaceContainerHigh">#283548</color>
+    <color name="outline">#64748B</color>
+    <color name="outlineVariant">#334155</color>
 
     <!-- Error Colors -->
     <color name="error">#FFB4AB</color>
@@ -41,33 +41,36 @@
     <color name="errorContainer">#93000A</color>
     <color name="onErrorContainer">#FFDAD6</color>
 
-    <!-- Legacy / Compatibility Colors -->
+    <!-- Chat Specific -->
+    <color name="bubbleSent">#054D3B</color>
+    <color name="bubbleReceived">#1E293B</color>
+    <color name="chatBackground">#0B141A</color>
+    <color name="bubbleSentText">#E2E8F0</color>
+    <color name="bubbleReceivedText">#E2E8F0</color>
+    <color name="bubbleStroke">#00000000</color>
+
+    <!-- Status / Online -->
+    <color name="online_green">#25D366</color>
+
+    <!-- Utility Colors -->
+    <color name="gray">#64748B</color>
+    <color name="lightGray">#334155</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Splash -->
+    <color name="splashStart">#00A884</color>
+    <color name="splashEnd">#003025</color>
+
+    <!-- Legacy references maintained for safety -->
     <color name="purple_200">@color/colorPrimaryContainer</color>
     <color name="purple_500">@color/colorPrimary</color>
     <color name="purple_700">@color/colorSecondary</color>
     <color name="teal_200">@color/colorSecondaryContainer</color>
     <color name="teal_700">@color/colorSecondary</color>
-
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
-
-    <!-- Chat Specific -->
-    <color name="bubbleSent">#005C4B</color> <!-- Dark Green -->
-    <color name="bubbleReceived">#202C33</color> <!-- Dark Gray -->
-    <color name="chatBackground">#0B141A</color> <!-- Dark BG -->
-
-    <!-- Status/Online -->
-    <color name="online_green">#25D366</color>
-
-    <color name="gray">#9E9E9E</color>
-    <color name="lightGray">#424242</color>
-
-    <!-- Legacy references maintained -->
     <color name="colorPrimaryVariant">@color/colorSecondary</color>
     <color name="colorAccent">@color/colorSecondary</color>
     <color name="backgroundLight">@color/background</color>
-
-    <!-- Fix for legacy drawables -->
     <color name="primaryColor">@color/colorPrimary</color>
     <color name="primaryLight">@color/colorPrimaryContainer</color>
     <color name="appBackground">@color/surface</color>

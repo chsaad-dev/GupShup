@@ -14,7 +14,7 @@
         app:cardBackgroundColor="@color/bubbleReceived"
         app:cardElevation="0dp"
         app:strokeWidth="0dp"
-        app:cardCornerRadius="18dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.GupShup.Bubble.Received"
         android:layout_marginStart="2dp"
         android:layout_marginEnd="48dp">
 
@@ -39,7 +39,7 @@
                 android:id="@+id/messageText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/colorOnSurface"
+                android:textColor="@color/bubbleReceivedText"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif" />
 
@@ -58,10 +58,12 @@
         android:id="@+id/reactionView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FF4081"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:layout_marginTop="-8dp"
         android:layout_marginStart="8dp"
-        android:elevation="2dp" />
+        android:elevation="2dp"
+        android:background="@drawable/bg_reaction_pill"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="2dp" />
 
 </LinearLayout>

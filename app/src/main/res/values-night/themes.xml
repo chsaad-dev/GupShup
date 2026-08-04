@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.GupShup" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Base Application Theme — Dark -->
+    <style name="Theme.GupShup" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Color Attributes -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/onPrimary</item>
@@ -27,31 +28,40 @@
         <item name="colorSurfaceContainer">@color/colorSurfaceContainer</item>
         <item name="colorSurfaceContainerLow">@color/colorSurfaceContainerLow</item>
         <item name="android:textColorHint">@color/onSurfaceVariant</item>
-        
+
         <item name="colorError">@color/error</item>
         <item name="colorOnError">@color/onError</item>
         <item name="colorErrorContainer">@color/errorContainer</item>
         <item name="colorOnErrorContainer">@color/onErrorContainer</item>
 
         <!-- Status Bar -->
-        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- Navigation Bar -->
         <item name="android:navigationBarColor">@color/surface</item>
         <item name="android:windowLightNavigationBar">false</item>
-        
-        <!-- Typography & Text -->
+
+        <!-- Typography -->
         <item name="android:textColorPrimary">@color/onSurface</item>
         <item name="android:textColorSecondary">@color/onSurfaceVariant</item>
 
-        <!-- Components Style Overrides -->
+        <!-- Component Style Overrides -->
         <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
         <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
         <item name="toolbarStyle">@style/Widget.Material3.Toolbar</item>
         <item name="bottomNavigationStyle">@style/Widget.Material3.BottomNavigationView</item>
     </style>
-    
-    <!-- Legacy Theme Reference -->
+
+    <!-- Splash Screen Theme — Dark -->
+    <style name="Theme.GupShup.Splash" parent="Theme.GupShup">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/splashEnd</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
+    <!-- Legacy Theme Reference for safety -->
     <style name="Theme.Gupshup" parent="Theme.GupShup" />
+
 </resources>

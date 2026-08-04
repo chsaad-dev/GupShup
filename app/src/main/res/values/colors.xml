@@ -1,42 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ═══════════════════════════════════════════════════ -->
-    <!-- GupShup Material 3 Color Palette — LIGHT MODE      -->
+    <!-- GupShup Design Tokens — LIGHT MODE COLORS           -->
     <!-- ═══════════════════════════════════════════════════ -->
 
-    <!-- Primary Brand Colors -->
-    <color name="colorPrimary">#00A884</color>
-    <color name="colorPrimaryContainer">#B2F1E0</color>
-    <color name="onPrimaryContainer">#00201A</color>
+    <!-- Brand Identity -->
+    <color name="colorPrimary">#128C7E</color>
+    <color name="colorPrimaryContainer">#E7F9F1</color>
+    <color name="onPrimaryContainer">#05362E</color>
     <color name="onPrimary">#FFFFFF</color>
 
-    <!-- Secondary Colors -->
-    <color name="colorSecondary">#4A635D</color>
-    <color name="onSecondary">#FFFFFF</color>
-    <color name="colorSecondaryContainer">#CCE8E0</color>
-    <color name="onSecondaryContainer">#05201A</color>
+    <!-- Surfaces & Backgrounds -->
+    <color name="background">#FFFFFF</color>
+    <color name="onBackground">#0B141A</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="onSurface">#0B141A</color>
+    <color name="surfaceVariant">#EEF3F1</color>
+    <color name="onSurfaceVariant">#667781</color>
+    <color name="colorSurfaceContainer">#EEF3F1</color>
+    <color name="colorSurfaceContainerLow">#F7F9FA</color>
+    <color name="colorSurfaceContainerHigh">#EEF3F1</color>
+    <color name="outline">#E0E4E2</color>
+    <color name="outlineVariant">#E0E4E2</color>
 
-    <!-- Tertiary Colors -->
-    <color name="colorTertiary">#4B607C</color>
-    <color name="onTertiary">#FFFFFF</color>
-    <color name="colorTertiaryContainer">#D3E4FF</color>
-    <color name="onTertiaryContainer">#041C35</color>
-
-    <!-- Surface Colors -->
-    <color name="background">#F8FAFC</color>
-    <color name="onBackground">#0F172A</color>
-    <color name="surface">#F8FAFC</color>
-    <color name="onSurface">#0F172A</color>
-    <color name="surfaceVariant">#E2E8F0</color>
-    <color name="onSurfaceVariant">#475569</color>
-    <color name="colorSurfaceContainer">#F1F5F9</color>
-    <color name="colorSurfaceContainerLow">#F8FAFC</color>
-    <color name="colorSurfaceContainerHigh">#E2E8F0</color>
-    <color name="outline">#94A3B8</color>
-    <color name="outlineVariant">#CBD5E1</color>
-
-    <!-- Error Colors -->
-    <color name="error">#BA1A1A</color>
+    <!-- Errors & Feedback -->
+    <color name="error">#D32F2F</color>
     <color name="onError">#FFFFFF</color>
     <color name="errorContainer">#FFDAD6</color>
     <color name="onErrorContainer">#410002</color>
@@ -45,31 +33,42 @@
     <color name="bubbleSent">#DCF8C6</color>
     <color name="bubbleReceived">#FFFFFF</color>
     <color name="chatBackground">#ECE5DD</color>
-    <color name="bubbleSentText">#0F172A</color>
-    <color name="bubbleReceivedText">#0F172A</color>
+    <color name="bubbleSentText">#0B141A</color>
+    <color name="bubbleReceivedText">#0B141A</color>
     <color name="bubbleStroke">#00000000</color>
 
-    <!-- Status / Online -->
+    <!-- Status & Presence -->
     <color name="online_green">#25D366</color>
 
+    <!-- Splash Gradient -->
+    <color name="splashStart">#128C7E</color>
+    <color name="splashEnd">#075E54</color>
+
     <!-- Utility Colors -->
-    <color name="gray">#94A3B8</color>
-    <color name="lightGray">#E2E8F0</color>
+    <color name="gray">#667781</color>
+    <color name="lightGray">#E0E4E2</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
-    <!-- Splash -->
-    <color name="splashStart">#00A884</color>
-    <color name="splashEnd">#005C4B</color>
+    <!-- Secondary & Tertiary Aliases for M3 Compatibility -->
+    <color name="colorSecondary">#128C7E</color>
+    <color name="onSecondary">#FFFFFF</color>
+    <color name="colorSecondaryContainer">#E7F9F1</color>
+    <color name="onSecondaryContainer">#05362E</color>
 
-    <!-- Legacy references maintained for safety -->
+    <color name="colorTertiary">#075E54</color>
+    <color name="onTertiary">#FFFFFF</color>
+    <color name="colorTertiaryContainer">#D3E4FF</color>
+    <color name="onTertiaryContainer">#041C35</color>
+
+    <!-- Legacy references maintained for full build safety -->
     <color name="purple_200">@color/colorPrimaryContainer</color>
     <color name="purple_500">@color/colorPrimary</color>
     <color name="purple_700">@color/colorSecondary</color>
     <color name="teal_200">@color/colorSecondaryContainer</color>
     <color name="teal_700">@color/colorSecondary</color>
     <color name="colorPrimaryVariant">@color/colorSecondary</color>
-    <color name="colorAccent">@color/colorSecondary</color>
+    <color name="colorAccent">@color/colorPrimary</color>
     <color name="backgroundLight">@color/background</color>
     <color name="primaryColor">@color/colorPrimary</color>
     <color name="primaryLight">@color/colorPrimaryContainer</color>

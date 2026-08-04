@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- GupShup Design Tokens — SPACING (4dp Grid)          -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_xl">20dp</dimen>
+    <dimen name="spacing_2xl">24dp</dimen>
+    <dimen name="spacing_3xl">32dp</dimen>
+    <dimen name="spacing_4xl">48dp</dimen>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- GupShup Design Tokens — CORNER RADII               -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <dimen name="radius_small">8dp</dimen>
+    <dimen name="radius_medium">14dp</dimen>
+    <dimen name="radius_large">24dp</dimen>
+    <dimen name="radius_bubble">18dp</dimen>
+    <dimen name="radius_bubble_tail">4dp</dimen>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- GupShup Design Tokens — ELEVATION                  -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <dimen name="elevation_level_0">0dp</dimen>
+    <dimen name="elevation_level_1">1dp</dimen>
+    <dimen name="elevation_level_2">3dp</dimen>
+    <dimen name="elevation_level_3">6dp</dimen>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- Component Fixed Dimensions                          -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <dimen name="button_height">52dp</dimen>
+    <dimen name="input_height">56dp</dimen>
+    <dimen name="empty_state_illustration_size">120dp</dimen>
+    <dimen name="avatar_size_medium">56dp</dimen>
+    <dimen name="avatar_size_large">96dp</dimen>
+    <dimen name="avatar_ring_width">2dp</dimen>
+</resources>

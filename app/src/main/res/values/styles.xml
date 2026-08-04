@@ -1,68 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- ═══════════════════════════════════════════════ -->
-    <!--  Shape Appearances                              -->
-    <!-- ═══════════════════════════════════════════════ -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  GupShup Typography System                          -->
+    <!-- ═══════════════════════════════════════════════════ -->
 
-    <!-- Circle shape for profile images -->
-    <style name="CircleImage">
+    <style name="TextAppearance.GupShup.Display" parent="TextAppearance.Material3.DisplayMedium">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/google_sans_medium</item>
+        <item name="android:letterSpacing">-0.03</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.GupShup.Headline" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/google_sans_medium</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.GupShup.Title" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/google_sans_medium</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.GupShup.Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="android:lineSpacingExtra">7sp</item> <!-- 15sp size + 7sp extra = 22sp line height -->
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.GupShup.Label" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">@font/google_sans_medium</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.GupShup.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  GupShup Shape Appearances                          -->
+    <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- Circle shape for profile avatars -->
+    <style name="CircleImage" parent="ShapeAppearance.Material3.Corner.Full">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
 
-    <!-- Asymmetric Sent Bubble: rounded except bottom-end -->
+    <!-- Asymmetric Sent Bubble: 18dp top-start/top-end/bottom-start, 4dp tail at bottom-end -->
     <style name="ShapeAppearance.GupShup.Bubble.Sent" parent="ShapeAppearance.Material3.Corner.Medium">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopLeft">16dp</item>
-        <item name="cornerSizeTopRight">16dp</item>
-        <item name="cornerSizeBottomLeft">16dp</item>
-        <item name="cornerSizeBottomRight">4dp</item>
+        <item name="cornerSizeTopLeft">@dimen/radius_bubble</item>
+        <item name="cornerSizeTopRight">@dimen/radius_bubble</item>
+        <item name="cornerSizeBottomLeft">@dimen/radius_bubble</item>
+        <item name="cornerSizeBottomRight">@dimen/radius_bubble_tail</item>
     </style>
 
-    <!-- Asymmetric Received Bubble: rounded except bottom-start -->
+    <!-- Asymmetric Received Bubble: 18dp top-start/top-end/bottom-end, 4dp tail at bottom-start -->
     <style name="ShapeAppearance.GupShup.Bubble.Received" parent="ShapeAppearance.Material3.Corner.Medium">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopLeft">16dp</item>
-        <item name="cornerSizeTopRight">16dp</item>
-        <item name="cornerSizeBottomLeft">4dp</item>
-        <item name="cornerSizeBottomRight">16dp</item>
+        <item name="cornerSizeTopLeft">@dimen/radius_bubble</item>
+        <item name="cornerSizeTopRight">@dimen/radius_bubble</item>
+        <item name="cornerSizeBottomLeft">@dimen/radius_bubble_tail</item>
+        <item name="cornerSizeBottomRight">@dimen/radius_bubble</item>
     </style>
 
-    <!-- Card style for list items -->
-    <style name="GupShup.CardStyle" parent="Widget.Material3.CardView.Filled">
-        <item name="cardCornerRadius">12dp</item>
-        <item name="cardElevation">1dp</item>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!--  GupShup Component Base Styles                       -->
+    <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- Base Component Style for AAPT namespace resolution -->
+    <style name="Widget.GupShup" parent="" />
+
+    <!-- Filled Button Style (Height 52dp, Radius 14dp, Elevation Level 1) -->
+    <style name="Widget.GupShup.Button.Filled" parent="Widget.Material3.Button">
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="cornerRadius">@dimen/radius_medium</item>
+        <item name="elevation">@dimen/elevation_level_1</item>
+        <item name="rippleColor">@color/colorPrimaryContainer</item>
+        <item name="android:fontFamily">@font/google_sans_medium</item>
+        <item name="android:textSize">15sp</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
-    <!-- ═══════════════════════════════════════════════ -->
-    <!--  Reaction Emoji style                           -->
-    <!-- ═══════════════════════════════════════════════ -->
+    <!-- TextField Style (Radius 14dp, 1dp outline default, 2dp brand outline focused, 56dp height, floating label) -->
+    <style name="Widget.GupShup.TextField" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/radius_medium</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radius_medium</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radius_medium</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radius_medium</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="boxStrokeColor">@color/colorPrimary</item>
+        <item name="hintTextColor">?attr/colorPrimary</item>
+        <item name="android:fontFamily">@font/google_sans</item>
+    </style>
+
+    <!-- Card Style (Radius 14dp, Elevation Level 1, 16dp internal padding) -->
+    <style name="Widget.GupShup.Card" parent="Widget.Material3.CardView.Filled">
+        <item name="cardCornerRadius">@dimen/radius_medium</item>
+        <item name="cardElevation">@dimen/elevation_level_1</item>
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainerLow</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="contentPadding">@dimen/spacing_lg</item>
+    </style>
+
+    <!-- Avatar Style (Circular, 2dp ring in brand color when online) -->
+    <style name="Widget.GupShup.Avatar">
+        <item name="shapeAppearanceOverlay">@style/CircleImage</item>
+        <item name="strokeColor">?attr/colorPrimary</item>
+        <item name="strokeWidth">@dimen/avatar_ring_width</item>
+    </style>
+
+    <!-- Empty State Base Style Container -->
+    <style name="Widget.GupShup.EmptyState">
+        <item name="android:gravity">center</item>
+        <item name="android:padding">@dimen/spacing_3xl</item>
+    </style>
+
+    <!-- Legacy Style Aliases for backward compatibility -->
+    <style name="GupShup.CardStyle" parent="Widget.GupShup.Card" />
+
     <style name="ReactionEmoji">
         <item name="android:textSize">26sp</item>
-        <item name="android:layout_margin">6dp</item>
+        <item name="android:layout_margin">@dimen/spacing_xs</item>
         <item name="android:clickable">true</item>
     </style>
 
-    <!-- ═══════════════════════════════════════════════ -->
-    <!--  Profile styles                                 -->
-    <!-- ═══════════════════════════════════════════════ -->
     <style name="ProfileLabel">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
-        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginTop">@dimen/spacing_md</item>
     </style>
 
     <style name="ProfileField">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/edittext_bg</item>
-        <item name="android:padding">12dp</item>
+        <item name="android:padding">@dimen/spacing_md</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:layout_marginTop">@dimen/spacing_xs</item>
     </style>
 
 </resources>

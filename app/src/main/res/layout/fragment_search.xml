@@ -1,94 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?attr/colorSurface">
 
+    <!-- Material 3 Toolbar (Surface-toned) -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/searchToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
-        app:title="Search"
+        app:title="Search Users"
+        app:titleTextAppearance="@style/TextAppearance.GupShup.Headline"
         app:titleTextColor="?attr/colorOnSurface"
-        app:navigationIcon="@drawable/ic_back"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="?attr/colorOnSurface" />
 
+    <!-- Pill-shaped Search Bar Container (48dp height, 28dp radius, Surface Container High, no border, 16dp side margins) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:paddingHorizontal="@dimen/spacing_lg"
+        android:paddingBottom="@dimen/spacing_md"
         android:background="?attr/colorSurface">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:hint="Search users"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_input_pill"
+            app:boxBackgroundMode="none"
+            app:hintAnimationEnabled="false"
             app:startIconDrawable="@drawable/ic_search"
-            app:startIconTint="?attr/colorOnSurfaceVariant"
-            app:boxBackgroundColor="?attr/colorSurfaceContainer">
+            app:startIconTint="@color/onSurfaceVariant"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/onSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/searchInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:hint="Search by name or email"
                 android:inputType="text"
                 android:maxLines="1"
-                android:textColor="?attr/colorOnSurface" />
+                android:background="@null"
+                android:paddingVertical="0dp"
+                style="@style/TextAppearance.GupShup.Body" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
+    <!-- Main Results / Empty Container -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <!-- Search Results List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/searchRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
-            android:clipToPadding="false" />
+            android:paddingBottom="@dimen/spacing_lg"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
 
-        <!-- Initial State / Empty Results -->
+        <!-- Intentional Empty / Initial State (Widget.GupShup.EmptyState style) -->
         <LinearLayout
             android:id="@+id/searchEmptyState"
+            style="@style/Widget.GupShup.EmptyState"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="32dp">
+            android:padding="@dimen/spacing_3xl">
 
+            <!-- 120dp Magnifying Glass Illustration (Subtle Brand Tint at 40% Opacity) -->
             <ImageView
                 android:id="@+id/searchEmptyIcon"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="@dimen/empty_state_illustration_size"
+                android:layout_height="@dimen/empty_state_illustration_size"
                 android:src="@drawable/ic_search"
-                android:alpha="0.3" />
+                android:alpha="0.4"
+                app:tint="@color/colorPrimary" />
 
+            <!-- Title: Headline Style -->
             <TextView
                 android:id="@+id/searchEmptyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Search for users"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:layout_marginTop="16dp" />
+                style="@style/TextAppearance.GupShup.Headline"
+                android:layout_marginTop="@dimen/spacing_2xl" />
 
+            <!-- Subtitle: Body Style in OnSurfaceVariant -->
             <TextView
                 android:id="@+id/searchEmptySubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Find friends by name or email"
-                android:textSize="14sp"
-                android:textColor="?attr/colorOutline"
-                android:layout_marginTop="8dp"
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="@dimen/spacing_sm"
                 android:textAlignment="center" />
         </LinearLayout>
+
     </FrameLayout>
 </LinearLayout>

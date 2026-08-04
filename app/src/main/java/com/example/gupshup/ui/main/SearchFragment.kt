@@ -68,6 +68,7 @@ class SearchFragment : Fragment() {
                     } else {
                         allUsers.clear()
                         adapter.notifyDataSetChanged()
+                        updateEmptyState()
                     }
                 }
             }
@@ -75,6 +76,18 @@ class SearchFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+        updateEmptyState()
+    }
+
+    private fun updateEmptyState() {
+        if (_binding == null) return
+        if (allUsers.isEmpty()) {
+            binding.searchEmptyState.visibility = View.VISIBLE
+            binding.searchRecyclerView.visibility = View.GONE
+        } else {
+            binding.searchEmptyState.visibility = View.GONE
+            binding.searchRecyclerView.visibility = View.VISIBLE
+        }
     }
 
     private fun searchUsers(query: String) {
@@ -105,6 +118,7 @@ class SearchFragment : Fragment() {
                         allUsers.clear()
                         allUsers.addAll(searchResults.filter { !blockedUids.contains(it.uid) })
                         adapter.notifyDataSetChanged()
+                        updateEmptyState()
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(requireContext(), "❌ Failed to load friend requests: ${e.message}", Toast.LENGTH_LONG).show()

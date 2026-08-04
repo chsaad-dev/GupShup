@@ -14,3 +14,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+google-services.json
+*.jks
+*.keystore
+.env
+secrets.properties
+.kotlin/

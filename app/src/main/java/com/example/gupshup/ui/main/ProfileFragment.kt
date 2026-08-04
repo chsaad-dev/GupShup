@@ -1,24 +1,22 @@
 package com.example.gupshup.ui.main
 
-import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
-import android.util.Base64
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.gupshup.R
 import com.example.gupshup.databinding.FragmentProfileBinding
 import com.example.gupshup.ui.auth.LoginActivity
+import com.example.gupshup.util.CloudinaryManager
+import com.example.gupshup.util.ImageUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 
 class ProfileFragment : Fragment() {
 
@@ -28,31 +26,16 @@ class ProfileFragment : Fragment() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
     private var isEditMode = false
-    private var selectedBase64Image: String? = null
+    private var selectedImageUri: Uri? = null
 
     // Image picker launcher
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
-            try {
-                val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream?.close()
-
-                // Compress image
-                val outputStream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
-                val byteArray = outputStream.toByteArray()
-                selectedBase64Image = Base64.encodeToString(byteArray, Base64.DEFAULT)
-
-                // Show image instantly
-                Glide.with(requireContext())
-                    .load(bitmap)
-                    .placeholder(R.drawable.ic_profile_placeholder)
-                    .into(binding.profileImageView)
-
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "❌ Image selection failed", Toast.LENGTH_SHORT).show()
-            }
+            selectedImageUri = uri
+            Glide.with(requireContext())
+                .load(uri)
+                .placeholder(R.drawable.ic_profile_placeholder)
+                .into(binding.profileImageView)
         }
     }
 
@@ -87,7 +70,6 @@ class ProfileFragment : Fragment() {
             imagePickerLauncher.launch("image/*")
         }
 
-
         binding.logoutBtn.setOnClickListener {
             auth.signOut()
             val intent = Intent(requireContext(), LoginActivity::class.java)
@@ -102,22 +84,21 @@ class ProfileFragment : Fragment() {
                 val name = doc.getString("name") ?: ""
                 val email = doc.getString("email") ?: ""
                 val bio = doc.getString("bio") ?: ""
-                val imageBase64 = doc.getString("profileImageUrl") ?: ""
+                val profileUrl = doc.getString("profileImageUrl") ?: ""
 
                 binding.nameEditText.setText(name)
                 binding.emailEditText.setText(email)
                 binding.userIdEditText.setText(uid)
                 binding.bioEditText.setText(bio)
 
-                if (imageBase64.isNotBlank()) {
-                    Glide.with(requireContext())
-                        .load("data:image/png;base64,$imageBase64")
-                        .placeholder(R.drawable.ic_profile_placeholder)
-                        .into(binding.profileImageView)
+                if (_binding != null && isAdded) {
+                    ImageUtils.loadProfileImage(requireContext(), profileUrl, binding.profileImageView)
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "❌ Failed to load profile", Toast.LENGTH_SHORT).show()
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "❌ Failed to load profile", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
@@ -125,24 +106,63 @@ class ProfileFragment : Fragment() {
         val name = binding.nameEditText.text.toString().trim()
         val bio = binding.bioEditText.text.toString().trim()
 
+        if (name.isEmpty()) {
+            Toast.makeText(requireContext(), "Name cannot be empty", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.editSaveButton.isEnabled = false
+        binding.editSaveButton.text = "Saving..."
+
+        val uriToUpload = selectedImageUri
+        if (uriToUpload != null) {
+            Toast.makeText(requireContext(), "Uploading photo to Cloudinary...", Toast.LENGTH_SHORT).show()
+            CloudinaryManager.uploadImage(
+                context = requireContext(),
+                imageUri = uriToUpload,
+                folder = "gupshup/profiles",
+                onSuccess = { uploadedUrl ->
+                    updateFirestoreProfile(uid, name, bio, uploadedUrl)
+                },
+                onError = { errorMsg ->
+                    if (isAdded) {
+                        Toast.makeText(requireContext(), "❌ Photo upload failed: $errorMsg", Toast.LENGTH_LONG).show()
+                        binding.editSaveButton.isEnabled = true
+                        binding.editSaveButton.text = "Save"
+                    }
+                }
+            )
+        } else {
+            updateFirestoreProfile(uid, name, bio, null)
+        }
+    }
+
+    private fun updateFirestoreProfile(uid: String, name: String, bio: String, profileImageUrl: String?) {
         val updates = mutableMapOf<String, Any>(
             "name" to name,
             "bio" to bio
         )
 
-        // If image is selected, add to Firestore
-        selectedBase64Image?.let {
+        profileImageUrl?.let {
             updates["profileImageUrl"] = it
         }
 
         db.collection("users").document(uid)
             .update(updates)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "✅ Profile updated", Toast.LENGTH_SHORT).show()
-                enableEditing(false)
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "✅ Profile updated", Toast.LENGTH_SHORT).show()
+                    selectedImageUri = null
+                    binding.editSaveButton.isEnabled = true
+                    enableEditing(false)
+                }
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "❌ Update failed", Toast.LENGTH_SHORT).show()
+                if (isAdded) {
+                    Toast.makeText(requireContext(), "❌ Profile update failed", Toast.LENGTH_SHORT).show()
+                    binding.editSaveButton.isEnabled = true
+                    binding.editSaveButton.text = "Save"
+                }
             }
     }
 

@@ -35,14 +35,7 @@ class UsersAdapter(
             binding.userEmail.text = user.email
 
             // Load profile image
-            if (!user.profileImageUrl.isNullOrEmpty()) {
-                Glide.with(context)
-                    .load(user.profileImageUrl)
-                    .placeholder(R.drawable.ic_profile_placeholder)
-                    .into(binding.userImage)
-            } else {
-                binding.userImage.setImageResource(R.drawable.ic_profile_placeholder)
-            }
+            com.example.gupshup.util.ImageUtils.loadProfileImage(context, user.profileImageUrl, binding.userImage)
 
             // Unread message count badge
             val unreadCount = unreadCountMap[user.uid] ?: 0

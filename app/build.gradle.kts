@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -17,6 +19,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Load credentials safely from local.properties (ignored by Git)
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(localPropertiesFile.inputStream())
+        }
+        val cloudName = localProperties.getProperty("cloudinary.cloud_name") ?: "gupshup_cloud"
+        val uploadPreset = localProperties.getProperty("cloudinary.upload_preset") ?: "gupshup_preset"
+
+        resValue("string", "cloudinary_cloud_name", cloudName)
+        resValue("string", "cloudinary_upload_preset", uploadPreset)
     }
 
     buildTypes {
@@ -53,7 +67,7 @@ dependencies {
 
     implementation("com.google.firebase:firebase-auth:22.3.0")
     implementation("com.google.firebase:firebase-firestore:24.10.0")
-    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("com.cloudinary:cloudinary-android:2.5.0")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
     implementation("com.github.bumptech.glide:glide:4.15.1")

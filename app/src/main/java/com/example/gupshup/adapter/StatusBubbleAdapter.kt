@@ -30,10 +30,7 @@ class StatusBubbleAdapter(
         val status = statusList[position]
         holder.userName.text = status.userName
 
-        Glide.with(holder.itemView.context)
-            .load(status.userProfileUrl)
-            .placeholder(R.drawable.ic_profile_placeholder)
-            .into(holder.profileImage)
+        com.example.gupshup.util.ImageUtils.loadProfileImage(holder.itemView.context, status.userProfileUrl, holder.profileImage)
 
         holder.itemView.setOnClickListener {
             onStatusClick(status)

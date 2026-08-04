@@ -187,24 +187,6 @@
                     app:iconGravity="textStart"
                     app:iconTint="@color/white" />
 
-                <!-- Logout Button: Outlined error-colored variant (1dp error border, transparent fill, error text/icon), 12dp below Edit Profile -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/logoutBtn"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height"
-                    android:layout_marginTop="@dimen/spacing_md"
-                    android:text="Logout"
-                    android:textAppearance="@style/TextAppearance.GupShup.Label"
-                    android:textColor="@color/error"
-                    android:backgroundTint="@android:color/transparent"
-                    app:icon="@drawable/ic_logout"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/error"
-                    app:strokeColor="@color/error"
-                    app:strokeWidth="1dp"
-                    app:cornerRadius="@dimen/radius_medium" />
-
             </LinearLayout>
 
         </LinearLayout>

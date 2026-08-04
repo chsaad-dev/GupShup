@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.gupshup.R
 import com.example.gupshup.databinding.FragmentProfileBinding
-import com.example.gupshup.ui.auth.LoginActivity
 import com.example.gupshup.util.CloudinaryManager
 import com.example.gupshup.util.ImageUtils
 import androidx.lifecycle.lifecycleScope
@@ -77,13 +76,6 @@ class ProfileFragment : Fragment() {
                 Toast.makeText(requireContext(), "Edit mode enabled", Toast.LENGTH_SHORT).show()
             }
             imagePickerLauncher.launch("image/*")
-        }
-
-        binding.logoutBtn.setOnClickListener {
-            auth.signOut()
-            val intent = Intent(requireContext(), LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
         }
     }
 

@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/chatBackground">
+    android:orientation="vertical"
+    android:background="@color/colorSurfaceContainerLow">
 
     <!-- Offline Banner -->
     <TextView
         android:id="@+id/offlineBanner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#E53935"
+        android:background="@color/error"
         android:text="No internet connection"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        android:textAlignment="center"
-        android:paddingVertical="4dp"
+        style="@style/TextAppearance.GupShup.Caption"
+        android:textColor="@color/onError"
+        android:gravity="center"
+        android:paddingVertical="@dimen/spacing_xs"
         android:visibility="gone" />
 
-    <!-- Material 3 Toolbar -->
+    <!-- Material 3 Toolbar (Surface-toned flat style, back icon, 40dp avatar, Title name, Caption status, search/menu icons) -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/chatToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
-        android:elevation="1dp"
+        app:elevation="@dimen/elevation_level_0"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="?attr/colorOnSurface">
 
@@ -35,117 +35,133 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- 40dp Avatar -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/toolbarAvatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_profile_placeholder"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                android:padding="2dp"
-                android:visibility="visible"/>
+                app:shapeAppearanceOverlay="@style/CircleImage" />
 
+            <!-- User Name & Status Stack -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="12dp">
+                android:layout_marginStart="@dimen/spacing_md">
 
+                <!-- Name: Title Style -->
                 <TextView
                     android:id="@+id/userNameText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Username"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
+                    style="@style/TextAppearance.GupShup.Title"
                     android:maxLines="1"
                     android:ellipsize="end" />
 
+                <!-- Status: Caption Style in OnSurfaceVariant -->
                 <TextView
                     android:id="@+id/userStatusText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Online"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="12sp"
+                    style="@style/TextAppearance.GupShup.Caption"
+                    android:textColor="@color/onSurfaceVariant"
                     android:maxLines="1" />
             </LinearLayout>
+
         </LinearLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
-    <!-- RecyclerView for Chat -->
+    <!-- Top Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/outline" />
+
+    <!-- RecyclerView for Chat Messages -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingHorizontal="8dp"
-        android:paddingTop="8dp"
+        android:paddingHorizontal="@dimen/spacing_sm"
+        android:paddingTop="@dimen/spacing_sm"
+        android:paddingBottom="@dimen/spacing_sm"
         android:clipToPadding="false"
         android:scrollbars="vertical" />
 
-    <!-- Input Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/colorOutlineVariant" />
-
-    <!-- Input Area -->
+    <!-- Input Bar Area: Surface background, Pill shape input (28dp radius, Surface Container High, no border), separate 44dp circular FAB -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="8dp"
+        android:paddingHorizontal="@dimen/spacing_sm"
+        android:paddingVertical="@dimen/spacing_sm"
         android:background="?attr/colorSurface">
 
-        <ImageButton
-            android:id="@+id/attachButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_add_status"
-            app:tint="?attr/colorPrimary"
-            android:contentDescription="Attach Media"
-            android:padding="8dp"
-            android:layout_marginEnd="4dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputLayout"
+        <!-- Input Pill Container (28dp radius, Surface Container High background) -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Message"
-            app:boxBackgroundMode="outline"
-            app:boxCornerRadiusTopStart="24dp"
-            app:boxCornerRadiusTopEnd="24dp"
-            app:boxCornerRadiusBottomStart="24dp"
-            app:boxCornerRadiusBottomEnd="24dp"
-            app:boxStrokeColor="?attr/colorPrimary"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_input_pill"
+            android:paddingHorizontal="@dimen/spacing_xs"
+            android:paddingVertical="2dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/messageInput"
-                android:layout_width="match_parent"
+            <!-- Attach Icon (Left inside pill) -->
+            <ImageButton
+                android:id="@+id/attachButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_add_status"
+                app:tint="@color/onSurfaceVariant"
+                android:contentDescription="Attach Media"
+                android:padding="@dimen/spacing_sm" />
+
+            <!-- Text Input Layout (No box stroke) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputLayout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:inputType="textCapSentences|textMultiLine"
-                android:maxLines="4"
-                android:textColor="?attr/colorOnSurface" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight="1"
+                android:hint="Message"
+                app:boxBackgroundMode="none"
+                app:hintAnimationEnabled="false">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/messageInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLines="4"
+                    android:paddingVertical="@dimen/spacing_sm"
+                    style="@style/TextAppearance.GupShup.Body" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <!-- Send Button: Separate Circular Primary FAB (44dp) outside pill -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/sendButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="4dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="@dimen/spacing_sm"
             android:src="@drawable/ic_send"
-            app:tint="?attr/colorOnPrimary"
-            app:backgroundTint="?attr/colorPrimary"
-            app:elevation="2dp"
-            app:fabSize="mini" />
+            app:tint="@color/white"
+            app:backgroundTint="@color/colorPrimary"
+            app:elevation="@dimen/elevation_level_2"
+            app:fabCustomSize="44dp"
+            app:fabSize="normal"
+            android:contentDescription="Send Message" />
 
     </LinearLayout>
 

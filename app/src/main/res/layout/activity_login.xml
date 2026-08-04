@@ -10,14 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Top Header Area (48dp top margin) -->
+        <!-- Top Header Area -->
         <LinearLayout
             android:id="@+id/topHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:layout_marginTop="@dimen/spacing_4xl"
+            android:layout_marginTop="@dimen/spacing_2xl"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">

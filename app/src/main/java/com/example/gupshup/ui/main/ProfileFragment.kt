@@ -87,6 +87,7 @@ class ProfileFragment : Fragment() {
             appDb.userDao().getUserFlow(uid).collect { userEntity ->
                 if (_binding == null || !isAdded || userEntity == null) return@collect
                 if (!isEditMode) {
+                    binding.profileNameHeader.text = userEntity.name
                     binding.nameEditText.setText(userEntity.name)
                     binding.emailEditText.setText(userEntity.email)
                     binding.userIdEditText.setText(uid)
@@ -133,6 +134,7 @@ class ProfileFragment : Fragment() {
                 }
 
                 if (!isEditMode) {
+                    binding.profileNameHeader.text = name
                     binding.nameEditText.setText(name)
                     binding.emailEditText.setText(email)
                     binding.userIdEditText.setText(uid)

@@ -14,19 +14,19 @@
     <!-- Asymmetric Sent Bubble: rounded except bottom-end -->
     <style name="ShapeAppearance.GupShup.Bubble.Sent" parent="ShapeAppearance.Material3.Corner.Medium">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopStart">16dp</item>
-        <item name="cornerSizeTopEnd">16dp</item>
-        <item name="cornerSizeBottomStart">16dp</item>
-        <item name="cornerSizeBottomEnd">4dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">16dp</item>
+        <item name="cornerSizeBottomRight">4dp</item>
     </style>
 
     <!-- Asymmetric Received Bubble: rounded except bottom-start -->
     <style name="ShapeAppearance.GupShup.Bubble.Received" parent="ShapeAppearance.Material3.Corner.Medium">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopStart">16dp</item>
-        <item name="cornerSizeTopEnd">16dp</item>
-        <item name="cornerSizeBottomStart">4dp</item>
-        <item name="cornerSizeBottomEnd">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">4dp</item>
+        <item name="cornerSizeBottomRight">16dp</item>
     </style>
 
     <!-- Card style for list items -->

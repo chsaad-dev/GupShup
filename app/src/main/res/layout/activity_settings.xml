@@ -727,6 +727,60 @@
                     android:textColor="@color/onSurfaceVariant" />
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginStart="56dp" />
+
+            <!-- User ID Row -->
+            <LinearLayout
+                android:id="@+id/rowUserId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="56dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/spacing_lg"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_fingerprint"
+                    app:tint="@color/onSurfaceVariant"
+                    android:contentDescription="User ID Icon" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="User ID"
+                    style="@style/TextAppearance.GupShup.Body"
+                    android:layout_marginStart="@dimen/spacing_lg" />
+
+                <TextView
+                    android:id="@+id/textUserId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    style="@style/TextAppearance.GupShup.Caption"
+                    android:textColor="@color/onSurfaceVariant"
+                    android:layout_marginEnd="@dimen/spacing_xs"
+                    android:ellipsize="middle"
+                    android:maxEms="10"
+                    android:singleLine="true" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="@color/onSurfaceVariant"
+                    android:contentDescription="Copy User ID" />
+            </LinearLayout>
+
 
             <!-- ACCOUNT ACTIONS SECTION (32dp top margin) -->
             <LinearLayout

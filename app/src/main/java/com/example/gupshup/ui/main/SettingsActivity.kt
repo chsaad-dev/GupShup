@@ -61,6 +61,8 @@ class SettingsActivity : AppCompatActivity() {
         val enterSendEnabled = prefs.getBoolean("pref_enter_send", false)
         binding.switchEnterSend.isChecked = enterSendEnabled
 
+        binding.textUserId.text = auth.currentUser?.uid ?: ""
+
         updateWallpaperText()
         updatePrivacyText()
     }
@@ -146,6 +148,14 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.rowFontSize.setOnClickListener {
             showFontSizeDialog()
+        }
+
+        binding.rowUserId.setOnClickListener {
+            val uid = auth.currentUser?.uid ?: return@setOnClickListener
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clip = android.content.ClipData.newPlainText("User ID", uid)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(this, "User ID copied to clipboard", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnSettingsLogout.setOnClickListener {

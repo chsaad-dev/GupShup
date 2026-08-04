@@ -70,10 +70,9 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        binding.editProfilePicBtn.setOnClickListener {
+        binding.avatarContainer.setOnClickListener {
             if (!isEditMode) {
                 enableEditing(true)
-                Toast.makeText(requireContext(), "Edit mode enabled", Toast.LENGTH_SHORT).show()
             }
             imagePickerLauncher.launch("image/*")
         }
@@ -90,7 +89,6 @@ class ProfileFragment : Fragment() {
                     binding.profileNameHeader.text = userEntity.name
                     binding.nameEditText.setText(userEntity.name)
                     binding.emailEditText.setText(userEntity.email)
-                    binding.userIdEditText.setText(uid)
                     binding.bioEditText.setText(userEntity.bio)
 
                     com.example.gupshup.util.ImageLoaderUtil.loadAvatar(
@@ -137,7 +135,6 @@ class ProfileFragment : Fragment() {
                     binding.profileNameHeader.text = name
                     binding.nameEditText.setText(name)
                     binding.emailEditText.setText(email)
-                    binding.userIdEditText.setText(uid)
                     binding.bioEditText.setText(bio)
 
                     com.example.gupshup.util.ImageLoaderUtil.loadAvatar(

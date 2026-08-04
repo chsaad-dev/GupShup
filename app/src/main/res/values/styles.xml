@@ -57,6 +57,15 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <!-- Sheet with 24dp top corners only -->
+    <style name="ShapeAppearance.GupShup.TopSheet" parent="ShapeAppearance.Material3.Corner.Large">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/radius_large</item>
+        <item name="cornerSizeTopRight">@dimen/radius_large</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
     <!-- Asymmetric Sent Bubble: 18dp top-start/top-end/bottom-start, 4dp tail at bottom-end -->
     <style name="ShapeAppearance.GupShup.Bubble.Sent" parent="ShapeAppearance.Material3.Corner.Medium">
         <item name="cornerFamily">rounded</item>

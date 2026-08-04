@@ -1,286 +1,279 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
     android:fillViewport="true">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="32dp">
-
-    <!-- Status Bar Spacer -->
-    <View
-        android:id="@+id/statusBarSpacer"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHeight_percent="0.04" />
+        android:layout_height="wrap_content">
 
-    <!-- Back Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/backButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        app:icon="@drawable/ic_arrow_back"
-        app:iconGravity="textStart"
-        app:iconPadding="0dp"
-        app:iconSize="24dp"
-        app:iconTint="?attr/colorOnSurface"
-        style="@style/Widget.Material3.Button.IconButton"
-        app:layout_constraintTop_toBottomOf="@id/statusBarSpacer"
-        app:layout_constraintStart_toStartOf="parent" />
+        <!-- Back Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="@dimen/spacing_lg"
+            android:layout_marginTop="@dimen/spacing_lg"
+            app:icon="@drawable/ic_arrow_back"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="24dp"
+            app:iconTint="?attr/colorOnSurface"
+            style="@style/Widget.Material3.Button.IconButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- App Logo/Icon -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/logoCard"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        app:cardCornerRadius="36dp"
-        app:cardElevation="0dp"
-        app:strokeWidth="0dp"
-        app:cardBackgroundColor="?attr/colorPrimary"
-        app:layout_constraintTop_toBottomOf="@id/backButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="2dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="G"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnPrimary"
-            android:gravity="center" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Register Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/registerCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
-        app:strokeWidth="1dp"
-        app:strokeColor="?attr/colorOutline"
-        app:cardBackgroundColor="?attr/colorSurfaceContainer"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/logoCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
+        <!-- Top Header Area (48dp top margin) -->
         <LinearLayout
+            android:id="@+id/topHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="32dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/spacing_xl"
+            app:layout_constraintTop_toBottomOf="@id/backButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Welcome Text -->
+            <!-- Monogram Avatar: 64dp, Primary Container background, brand-colored "G" -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/logoCard"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="@dimen/elevation_level_0"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@color/colorPrimaryContainer">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="G"
+                    style="@style/TextAppearance.GupShup.Headline"
+                    android:textSize="32sp"
+                    android:textColor="@color/colorPrimary"
+                    android:gravity="center" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- App Title: Headline Style -->
             <TextView
+                android:id="@+id/appTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create account"
-                android:textSize="24sp"
-                android:textStyle="bold"
+                android:text="GupShup"
+                style="@style/TextAppearance.GupShup.Headline"
                 android:textColor="?attr/colorOnSurface"
-                android:fontFamily="@font/google_sans_medium"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Join GupShup and start chatting"
-                android:textSize="14sp"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:fontFamily="@font/google_sans"
-                android:layout_marginBottom="15dp" />
-
-            <!-- Name Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/nameLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:hint="Full name"
-                app:startIconDrawable="@drawable/ic_person"
-                app:startIconTint="?attr/colorOnSurfaceVariant"
-                app:helperTextEnabled="false"
-                app:errorEnabled="true">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/nameInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:textColor="?attr/colorOnSurface"
-                    android:fontFamily="@font/google_sans" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Email Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/emailLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:hint="Email address"
-                android:layout_marginTop="10dp"
-                app:startIconDrawable="@drawable/ic_email"
-                app:startIconTint="?attr/colorOnSurfaceVariant"
-                app:helperTextEnabled="false"
-                app:errorEnabled="true">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/emailInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:textColor="?attr/colorOnSurface"
-                    android:fontFamily="@font/google_sans" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Password Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/passwordLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:hint="Password"
-                android:layout_marginTop="10dp"
-                app:startIconDrawable="@drawable/ic_lock"
-                app:startIconTint="?attr/colorOnSurfaceVariant"
-                app:endIconMode="password_toggle"
-                app:helperText="At least 6 characters"
-                app:errorEnabled="true">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/passwordInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:textColor="?attr/colorOnSurface"
-                    android:fontFamily="@font/google_sans" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Register Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/registerButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Create Account"
-                android:textSize="16sp"
-                android:fontFamily="@font/google_sans_medium"
-                android:layout_marginTop="15dp"
-                app:cornerRadius="16dp"
-                style="@style/Widget.Material3.Button.UnelevatedButton" />
-
-            <!-- Progress Indicator -->
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progressIndicator"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                app:indicatorColor="?attr/colorPrimary" />
-
+                android:layout_marginTop="@dimen/spacing_sm" />
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
-    <!-- OR Divider -->
-    <LinearLayout
-        android:id="@+id/orDivider"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginHorizontal="40dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/registerCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <View
+        <!-- Form Container Sheet: Rising from bottom, 24dp top corner radius only, Surface Container Low background -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/registerCard"
             android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1"
-            android:background="?attr/colorOutline" />
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/spacing_2xl"
+            app:cardElevation="@dimen/elevation_level_1"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/colorSurfaceContainerLow"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.GupShup.TopSheet"
+            app:layout_constraintTop_toBottomOf="@id/topHeader"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="OR"
-            android:textSize="12sp"
-            android:textColor="?attr/colorOutline"
-            android:fontFamily="@font/google_sans_medium"
-            android:paddingHorizontal="16dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_2xl">
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1"
-            android:background="?attr/colorOutline" />
-    </LinearLayout>
+                <!-- Headline -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Create account"
+                    style="@style/TextAppearance.GupShup.Headline" />
 
-    <!-- Google Sign-In Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/googleSignInButton"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:text="Continue with Google"
-        android:textSize="16sp"
-        android:fontFamily="@font/google_sans_medium"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        app:icon="@drawable/ic_google"
-        app:iconGravity="textStart"
-        app:iconPadding="12dp"
-        app:iconSize="20dp"
-        app:iconTint="@null"
-        app:cornerRadius="16dp"
-        app:strokeColor="?attr/colorOutline"
-        app:layout_constraintTop_toBottomOf="@id/orDivider"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+                <!-- Subtitle -->
+                <TextView
+                    android:id="@+id/subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Join GupShup and start chatting"
+                    style="@style/TextAppearance.GupShup.Body"
+                    android:textColor="@color/onSurfaceVariant"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:layout_marginBottom="@dimen/spacing_xl" />
 
-    <!-- Login Link -->
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/googleSignInButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp">
+                <!-- Name Field (Widget.GupShup.TextField style) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/nameLayout"
+                    style="@style/Widget.GupShup.TextField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Full name"
+                    app:startIconDrawable="@drawable/ic_person"
+                    app:startIconTint="@color/onSurfaceVariant"
+                    app:errorEnabled="true"
+                    app:errorTextAppearance="@style/TextAppearance.GupShup.Caption">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Already have an account? "
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="14sp"
-            android:fontFamily="@font/google_sans" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/nameInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        style="@style/TextAppearance.GupShup.Body" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/goToLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign in"
-            android:textColor="?attr/colorPrimary"
-            android:textSize="14sp"
-            android:fontFamily="@font/google_sans_medium"
-            android:padding="4dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-    </LinearLayout>
+                <!-- Email Field (Widget.GupShup.TextField style, 16dp gap) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/emailLayout"
+                    style="@style/Widget.GupShup.TextField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:hint="Email address"
+                    app:startIconDrawable="@drawable/ic_email"
+                    app:startIconTint="@color/onSurfaceVariant"
+                    app:errorEnabled="true"
+                    app:errorTextAppearance="@style/TextAppearance.GupShup.Caption">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/emailInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        style="@style/TextAppearance.GupShup.Body" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Field (Widget.GupShup.TextField style, 16dp gap) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/passwordLayout"
+                    style="@style/Widget.GupShup.TextField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:hint="Password"
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:startIconTint="@color/onSurfaceVariant"
+                    app:endIconMode="password_toggle"
+                    app:endIconTint="@color/onSurfaceVariant"
+                    app:helperText="At least 6 characters"
+                    app:helperTextTextAppearance="@style/TextAppearance.GupShup.Caption"
+                    app:errorEnabled="true"
+                    app:errorTextAppearance="@style/TextAppearance.GupShup.Caption">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/passwordInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        style="@style/TextAppearance.GupShup.Body" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Primary Create Account Button: Widget.GupShup.Button.Filled, 24dp top margin -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/registerButton"
+                    style="@style/Widget.GupShup.Button.Filled"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_marginTop="@dimen/spacing_2xl"
+                    android:text="Create Account" />
+
+                <!-- Progress Indicator -->
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progressIndicator"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:visibility="gone"
+                    app:indicatorColor="@color/colorPrimary" />
+
+                <!-- OR Divider Row -->
+                <LinearLayout
+                    android:id="@+id/orDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="@dimen/spacing_xl"
+                    android:layout_marginBottom="@dimen/spacing_xl">
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/outline" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OR"
+                        style="@style/TextAppearance.GupShup.Caption"
+                        android:paddingHorizontal="@dimen/spacing_sm" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/outline" />
+                </LinearLayout>
+
+                <!-- Google Sign-In Button (Outlined variant, 14dp radius, 52dp height) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/googleSignInButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:text="Continue with Google"
+                    android:textAppearance="@style/TextAppearance.GupShup.Label"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@drawable/ic_google"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/spacing_md"
+                    app:iconSize="20dp"
+                    app:iconTint="@null"
+                    app:cornerRadius="@dimen/radius_medium"
+                    app:strokeColor="@color/outline"
+                    app:strokeWidth="1dp" />
+
+                <!-- Login Link Row: 16dp bottom margin -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="@dimen/spacing_2xl"
+                    android:layout_marginBottom="@dimen/spacing_lg">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Already have an account? "
+                        style="@style/TextAppearance.GupShup.Body"
+                        android:textColor="@color/onSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/goToLogin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sign in"
+                        style="@style/TextAppearance.GupShup.Body"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:padding="@dimen/spacing_xs"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackgroundBorderless" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

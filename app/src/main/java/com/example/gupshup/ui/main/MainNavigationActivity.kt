@@ -46,6 +46,9 @@ class MainNavigationActivity : AppCompatActivity() {
         networkObserver = NetworkObserver(this)
         observeNetwork()
 
+        // Session cache cleanup
+        com.example.gupshup.data.local.CacheCleanupManager.runSessionCleanup(this)
+
         setupFragmentNavigation(savedInstanceState)
         checkPendingRequestsBadge()
 

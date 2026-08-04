@@ -46,12 +46,12 @@ class StatusViewActivity : AppCompatActivity() {
         statusText = intent.getStringExtra("STATUS_TEXT")
         statusTimestamp = intent.getLongExtra("STATUS_TIMESTAMP", 0L)
 
-        // Show status data
+
         statusTextView.text = statusText ?: ""
         userNameTextView.text = statusUserName ?: ""
         timestampTextView.text = formatTimestamp(statusTimestamp)
 
-        // Mark status as viewed
+
         addViewRecord()
 
         // Show viewers only if the status belongs to current user

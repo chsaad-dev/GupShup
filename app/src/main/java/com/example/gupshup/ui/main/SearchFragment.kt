@@ -37,7 +37,7 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 🔙 Back button
+
         binding.searchToolbar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -45,7 +45,7 @@ class SearchFragment : Fragment() {
         adapter = UsersAdapter(
             context = requireContext(),
             userList = allUsers,
-            unreadCountMap = emptyMap(), // ✅ FIXED: No unread count needed here
+            unreadCountMap = emptyMap(),
             onUserClick = { user -> sendFriendRequest(user) },
             showAddButton = true
         )

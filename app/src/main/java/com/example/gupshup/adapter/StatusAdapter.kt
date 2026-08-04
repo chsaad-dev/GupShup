@@ -46,18 +46,18 @@ class StatusAdapter(
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
         holder.deleteIcon.visibility = if (status.userId == currentUserId) View.VISIBLE else View.GONE
 
-        // Handle full-screen status view
+
         holder.itemView.setOnClickListener {
             if (holder.adapterPosition != RecyclerView.NO_POSITION) {
                 val context = holder.itemView.context
                 val intent = Intent(context, StatusStoryActivity::class.java)
-                intent.putExtra("STATUS_DATA", status)  // Serializable model passed
+                intent.putExtra("STATUS_DATA", status)
                 context.startActivity(intent)
                 onStatusClick(status)
             }
         }
 
-        // Handle delete status
+
         holder.deleteIcon.setOnClickListener {
             if (holder.adapterPosition != RecyclerView.NO_POSITION) {
                 onDeleteClick(status)

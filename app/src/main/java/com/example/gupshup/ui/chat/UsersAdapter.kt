@@ -34,13 +34,13 @@ class UsersAdapter(
             binding.userName.text = user.name
             binding.userEmail.text = user.email
 
-            // Load profile image
+
             com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.userImage, user.profileImageUrl, user.updatedAt)
 
-            // Online presence indicator
+
             binding.onlineIndicator.visibility = if (user.isOnline) View.VISIBLE else View.GONE
 
-            // Unread message count badge
+
             val unreadCount = unreadCountMap[user.uid] ?: 0
             if (unreadCount > 0) {
                 binding.unreadCountText.text = unreadCount.toString()
@@ -49,7 +49,7 @@ class UsersAdapter(
                 binding.unreadCountText.visibility = View.GONE
             }
 
-            // Hide all buttons first
+
             binding.addFriendBtn.visibility = View.GONE
             binding.acceptButton.visibility = View.GONE
             binding.rejectButton.visibility = View.GONE

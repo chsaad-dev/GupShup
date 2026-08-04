@@ -52,11 +52,11 @@ class ChatActivity : AppCompatActivity() {
     private var userStatusListener: ListenerRegistration? = null
     private var newMessagesListener: ListenerRegistration? = null
     
-    // Search
+
     private var originalMessages = mutableListOf<Message>()
     private var isSearching = false
 
-    // Pagination variables
+
     private var isLoading = false
     private val PAGE_SIZE = 50L
     private var oldestMessageSnapshot: DocumentSnapshot? = null
@@ -95,7 +95,7 @@ class ChatActivity : AppCompatActivity() {
         // Load cached messages from Room first for instant display
         loadCachedMessages()
         
-        // Initial Data Load from Firestore
+
         loadInitialMessages()
         observeReceiverStatus()
         setupTypingWatcher()
@@ -235,12 +235,12 @@ class ChatActivity : AppCompatActivity() {
         )
         binding.recyclerView.adapter = adapter
 
-        // Pagination Scroll Listener
+
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 
-                // If scrolled to top (dy < 0 means scrolling up) and not loading
+
                 if (dy < 0 && !isLoading && !isSearching) {
                     val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
                     if (firstVisibleItemPosition == 0 && oldestMessageSnapshot != null) {
@@ -260,19 +260,19 @@ class ChatActivity : AppCompatActivity() {
             .orderBy("timestamp", Query.Direction.ASCENDING)
             .limitToLast(PAGE_SIZE)
 
-        // Step 1: Try loading from cache first for instant display
+
         query.get(Source.CACHE)
             .addOnSuccessListener { cacheSnapshot ->
                 if (!cacheSnapshot.isEmpty) {
                     populateMessages(cacheSnapshot)
                 }
-                // Step 2: Then fetch from server to get fresh data
+
                 query.get(Source.SERVER)
                     .addOnSuccessListener { serverSnapshot ->
                         if (!serverSnapshot.isEmpty) {
                             populateMessages(serverSnapshot)
                         } else if (cacheSnapshot.isEmpty) {
-                            // Truly empty chat
+
                             listenForNewMessages(null)
                         }
                         isLoading = false
@@ -286,7 +286,7 @@ class ChatActivity : AppCompatActivity() {
                     }
             }
             .addOnFailureListener {
-                // No cache, go straight to server
+
                 query.get(Source.SERVER)
                     .addOnSuccessListener { serverSnapshot ->
                         if (!serverSnapshot.isEmpty) {
@@ -371,7 +371,7 @@ class ChatActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
         binding.recyclerView.scrollToPosition(messages.size - 1)
 
-        // Write-through to Room
+
         writeMessagesToRoom(loadedMessages)
 
         // Remove old listener before setting new one
@@ -383,7 +383,7 @@ class ChatActivity : AppCompatActivity() {
         if (oldestMessageSnapshot == null) return
         isLoading = true
         
-        // Save current scroll state
+
         // We want to keep the current top item visible after insertion
         
         db.collection("chats")
@@ -406,11 +406,11 @@ class ChatActivity : AppCompatActivity() {
                         }
                     }
                     
-                    // Add all to TOP
+
                     messages.addAll(0, newMessages)
                     adapter.notifyItemRangeInserted(0, newMessages.size)
                 } else {
-                    // No more older messages
+
                     oldestMessageSnapshot = null
                 }
                 isLoading = false
@@ -447,7 +447,7 @@ class ChatActivity : AppCompatActivity() {
                         if (messages.none { it.id == msg.id }) {
                             messages.add(msg)
                             
-                            // Write-through new message to Room
+
                             writeMessagesToRoom(listOf(msg))
                             
                             if (!isSearching) {
@@ -461,7 +461,7 @@ class ChatActivity : AppCompatActivity() {
                         }
                     }
                 } else if (change.type == DocumentChange.Type.MODIFIED) {
-                    // Handle reactions / seen updates
+
                     val msg = change.document.toObject(Message::class.java)
                     if (msg != null) {
                         msg.id = change.document.id

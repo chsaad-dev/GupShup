@@ -42,11 +42,11 @@ class MainNavigationActivity : AppCompatActivity() {
         binding = ActivityMainNavigationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Network observer
+
         networkObserver = NetworkObserver(this)
         observeNetwork()
 
-        // Session cache cleanup
+
         com.example.gupshup.data.local.CacheCleanupManager.runSessionCleanup(this)
 
         setupFragmentNavigation(savedInstanceState)

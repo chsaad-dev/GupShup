@@ -10,7 +10,7 @@ class GupShupApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize Cloudinary SDK
+
         CloudinaryManager.init(this)
 
         // Configure Firestore for offline persistence with a larger cache

@@ -48,7 +48,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Check if user is already logged in and verified
+
         auth.currentUser?.let { user ->
             if (user.isEmailVerified) {
                 startActivity(Intent(this, MainNavigationActivity::class.java))
@@ -63,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
         setupGoogleSignIn()
         setupUI()
 
-        // Fade-in animation for the login card
+
         binding.loginCard.alpha = 0f
         binding.loginCard.animate().alpha(1f).setDuration(500).setStartDelay(200).start()
     }
@@ -103,7 +103,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnSuccessListener { authResult ->
                 val user = authResult.user
                 if (user != null) {
-                    // Check if user doc exists in Firestore
+
                     db.collection("users").document(user.uid).get()
                         .addOnSuccessListener { doc ->
                             if (!doc.exists()) {
@@ -151,10 +151,10 @@ class LoginActivity : AppCompatActivity() {
         val email = binding.emailInput.text.toString().trim()
         val password = binding.passwordInput.text.toString().trim()
 
-        // Clear previous errors
+
         clearErrors()
 
-        // Validate inputs
+
         if (!validateInputs(email, password)) return
 
         showLoading(true)
@@ -168,10 +168,10 @@ class LoginActivity : AppCompatActivity() {
                         showLoading(false)
                         if (reloadTask.isSuccessful) {
                             if (user.isEmailVerified) {
-                                // Email is verified, proceed to main app
+
                                 navigateToMain()
                             } else {
-                                // Email not verified, go to verification screen
+
                                 val intent = Intent(this, EmailVerificationActivity::class.java)
                                 intent.putExtra("email", user.email)
                                 startActivity(intent)

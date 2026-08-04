@@ -22,7 +22,7 @@ class EmailVerificationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Check if user is null or already verified
+
         val currentUser = auth.currentUser
         if (currentUser == null) {
             redirectToLogin()
@@ -87,7 +87,7 @@ class EmailVerificationActivity : AppCompatActivity() {
             showLoading(false)
             if (task.isSuccessful) {
                 if (user.isEmailVerified) {
-                    // Update user verification status in Firestore
+
                     updateUserVerificationStatus()
                 } else {
                     Toast.makeText(

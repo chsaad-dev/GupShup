@@ -77,7 +77,7 @@ class StatusFragment : Fragment() {
     }
 
     private fun setupAdapters() {
-        // Horizontal Bubble Adapter
+
         bubbleAdapter = StatusBubbleAdapter(statusList) { status ->
             openStatusStory(status)
         }
@@ -85,7 +85,7 @@ class StatusFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.statusBubbleRecyclerView.adapter = bubbleAdapter
 
-        // Vertical Status List Adapter
+
         verticalAdapter = StatusAdapter(
             statusList = statusList,
             onStatusClick = { status -> openStatusStory(status) },
@@ -235,7 +235,7 @@ class StatusFragment : Fragment() {
                 bubbleAdapter.notifyDataSetChanged()
                 verticalAdapter.updateList(statusList)
 
-                // Write-through to Room
+
                 if (statusEntities.isNotEmpty()) {
                     val appContext = context?.applicationContext
                     if (appContext != null) {

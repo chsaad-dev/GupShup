@@ -48,7 +48,7 @@ class NetworkObserver(context: Context) {
 
         connectivityManager.registerNetworkCallback(request, callback)
 
-        // Emit initial state
+
         val currentNetwork = connectivityManager.activeNetwork
         val caps = connectivityManager.getNetworkCapabilities(currentNetwork)
         val isConnected = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true

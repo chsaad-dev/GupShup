@@ -59,22 +59,22 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // Profile navigation
+
         binding.rowProfile.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        // Privacy click
+
         binding.rowPrivacy.setOnClickListener {
             Toast.makeText(this, "Privacy settings", Toast.LENGTH_SHORT).show()
         }
 
-        // Blocked contacts click
+
         binding.rowBlocked.setOnClickListener {
             Toast.makeText(this, "Blocked contacts", Toast.LENGTH_SHORT).show()
         }
 
-        // Switches persistence
+
         binding.switchMessageNotifications.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("pref_notifications", isChecked).apply()
         }
@@ -87,17 +87,17 @@ class SettingsActivity : AppCompatActivity() {
             prefs.edit().putBoolean("pref_enter_send", isChecked).apply()
         }
 
-        // Theme Dialog Selector
+
         binding.rowTheme.setOnClickListener {
             showThemeSelectionDialog()
         }
 
-        // Font Size Dialog Selector
+
         binding.rowFontSize.setOnClickListener {
             showFontSizeDialog()
         }
 
-        // Logout
+
         binding.btnSettingsLogout.setOnClickListener {
             auth.signOut()
             val intent = Intent(this, LoginActivity::class.java)
@@ -106,7 +106,7 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
-        // Delete Account
+
         binding.textDeleteAccount.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Delete Account")

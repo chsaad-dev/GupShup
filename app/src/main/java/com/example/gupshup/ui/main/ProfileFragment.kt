@@ -31,7 +31,7 @@ class ProfileFragment : Fragment() {
     private var isEditMode = false
     private var selectedImageUri: Uri? = null
 
-    // Image picker launcher
+
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             selectedImageUri = uri
@@ -47,7 +47,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val uid = auth.currentUser?.uid ?: return
 
-        // Toolbar back button & settings click
+
         binding.profileToolbar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }

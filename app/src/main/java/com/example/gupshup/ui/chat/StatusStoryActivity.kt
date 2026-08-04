@@ -30,14 +30,14 @@ class StatusStoryActivity : AppCompatActivity() {
         binding = ActivityStatusStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Get values from intent
+
         val statusId = intent.getStringExtra("STATUS_ID")
         val userId = intent.getStringExtra("STATUS_USER_ID")
         val userName = intent.getStringExtra("STATUS_USER_NAME")
         val text = intent.getStringExtra("STATUS_TEXT")
         val timestamp = intent.getLongExtra("STATUS_TIMESTAMP", 0L)
 
-        // Validate
+
         if (statusId == null || userId == null) {
             Toast.makeText(this, "Status not found", Toast.LENGTH_SHORT).show()
             finish()
@@ -47,7 +47,7 @@ class StatusStoryActivity : AppCompatActivity() {
         val mediaUrl = intent.getStringExtra("STATUS_MEDIA_URL") ?: ""
         val type = intent.getStringExtra("STATUS_TYPE") ?: "text"
 
-        // Build status object
+
         status = Status(
             statusId = statusId,
             userId = userId,

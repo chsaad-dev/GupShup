@@ -163,7 +163,7 @@ class HomeFragment : Fragment() {
         if (users.isEmpty()) {
             _binding?.homeRecyclerView?.visibility = View.GONE
             _binding?.emptyStateView?.visibility = View.VISIBLE
-            // Fade in the empty state
+
             _binding?.emptyStateView?.alpha = 0f
             _binding?.emptyStateView?.animate()?.alpha(1f)?.setDuration(400)?.start()
         } else {

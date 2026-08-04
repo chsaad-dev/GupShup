@@ -48,7 +48,7 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Redirect if already logged in and verified
+
         auth.currentUser?.let { user ->
             if (user.isEmailVerified) {
                 startActivity(Intent(this, MainNavigationActivity::class.java))
@@ -146,10 +146,10 @@ class RegisterActivity : AppCompatActivity() {
         val email = binding.emailInput.text.toString().trim()
         val password = binding.passwordInput.text.toString().trim()
 
-        // Clear previous errors
+
         clearErrors()
 
-        // Validate inputs
+
         if (!validateInputs(name, email, password)) return
 
         showLoading(true)
@@ -158,10 +158,10 @@ class RegisterActivity : AppCompatActivity() {
             .addOnSuccessListener { authResult ->
                 val user = authResult.user
                 if (user != null) {
-                    // Send email verification
+
                     user.sendEmailVerification()
                         .addOnSuccessListener {
-                            // Save user data to Firestore
+
                             val userData = User(
                                 uid = user.uid,
                                 name = name,
@@ -174,7 +174,7 @@ class RegisterActivity : AppCompatActivity() {
                                 .set(userData)
                                 .addOnSuccessListener {
                                     showLoading(false)
-                                    // Navigate to email verification screen
+
                                     val intent = Intent(this, EmailVerificationActivity::class.java)
                                     intent.putExtra("email", email)
                                     startActivity(intent)

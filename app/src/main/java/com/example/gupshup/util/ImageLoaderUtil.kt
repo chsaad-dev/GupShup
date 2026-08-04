@@ -84,7 +84,7 @@ object ImageLoaderUtil {
 
         val trimmed = url.trim()
 
-        // Construct cache key signature
+
         val cacheKeyString = if (updatedAt != null && updatedAt > 0L) {
             "${trimmed}_$updatedAt"
         } else {

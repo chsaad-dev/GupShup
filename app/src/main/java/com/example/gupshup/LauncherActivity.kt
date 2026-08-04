@@ -14,10 +14,8 @@ class LauncherActivity : AppCompatActivity() {
         val currentUser = FirebaseAuth.getInstance().currentUser
 
         if (currentUser != null) {
-            // ✅ Already logged in → Go to Main App with Bottom Navigation
             startActivity(Intent(this, MainNavigationActivity::class.java))
         } else {
-            // 🚫 Not logged in → Go to Login screen
             startActivity(Intent(this, LoginActivity::class.java))
         }
 

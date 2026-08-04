@@ -16,7 +16,8 @@
         app:titleTextAppearance="@style/TextAppearance.GupShup.Headline"
         app:titleTextColor="?attr/colorOnSurface"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:navigationIconTint="?attr/colorOnSurface" />
+        app:navigationIconTint="?attr/colorOnSurface"
+        app:menu="@menu/profile_menu" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

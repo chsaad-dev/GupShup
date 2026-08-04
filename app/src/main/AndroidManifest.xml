@@ -54,6 +54,12 @@
             android:exported="false"
             android:theme="@style/Theme.GupShup" />
 
+        <!-- ✅ Settings Screen -->
+        <activity
+            android:name=".ui.main.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GupShup" />
+
     </application>
 
 </manifest>

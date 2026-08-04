@@ -47,9 +47,18 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val uid = auth.currentUser?.uid ?: return
 
-        // Toolbar back button
+        // Toolbar back button & settings click
         binding.profileToolbar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.profileToolbar.setOnMenuItemClickListener { menuItem ->
+            if (menuItem.itemId == R.id.action_settings) {
+                startActivity(Intent(requireContext(), SettingsActivity::class.java))
+                true
+            } else {
+                false
+            }
         }
 
         loadUserProfile(uid)

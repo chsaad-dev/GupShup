@@ -202,7 +202,7 @@ class FriendsFragment : Fragment() {
                     return@addOnSuccessListener
                 }
 
-                usersRef.whereIn("uid", pendingUids)
+                usersRef.whereIn(com.google.firebase.firestore.FieldPath.documentId(), pendingUids)
                     .get()
                     .addOnSuccessListener { userSnapshot ->
                         if (_binding == null || !isAdded) return@addOnSuccessListener

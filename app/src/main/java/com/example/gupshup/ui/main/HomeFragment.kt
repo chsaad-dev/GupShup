@@ -213,7 +213,7 @@ class HomeFragment : Fragment() {
 
                 chunks.forEach { chunk ->
                     db.collection("users")
-                        .whereIn("uid", chunk)
+                        .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
                         .get()
                         .addOnSuccessListener { result ->
                             if (_binding == null || !isAdded) return@addOnSuccessListener

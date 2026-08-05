@@ -98,7 +98,7 @@ class StatusViewActivity : AppCompatActivity() {
                     Toast.makeText(this, "No viewers yet", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
-                db.collection("users").whereIn("uid", viewerIds)
+                db.collection("users").whereIn(com.google.firebase.firestore.FieldPath.documentId(), viewerIds)
                     .get()
                     .addOnSuccessListener { usersSnapshot ->
                         progressBar.visibility = View.GONE

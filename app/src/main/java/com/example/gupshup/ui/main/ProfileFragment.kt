@@ -194,7 +194,7 @@ class ProfileFragment : Fragment() {
         }
 
         db.collection("users").document(uid)
-            .update(updates)
+            .set(updates, com.google.firebase.firestore.SetOptions.merge())
             .addOnSuccessListener {
                 if (isAdded) {
                     Toast.makeText(requireContext(), "✅ Profile updated", Toast.LENGTH_SHORT).show()

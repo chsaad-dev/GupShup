@@ -67,7 +67,7 @@ class BlockedContactsActivity : AppCompatActivity() {
                     }
 
                     db.collection("users")
-                        .whereIn("uid", blockedIds.take(10))
+                        .whereIn(com.google.firebase.firestore.FieldPath.documentId(), blockedIds.take(10))
                         .get()
                         .addOnSuccessListener { querySnapshot ->
                             blockedUsersList.clear()

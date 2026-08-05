@@ -574,6 +574,16 @@ class ChatActivity : AppCompatActivity() {
             .update("seen", true)
     }
 
+    private fun updateChatMetadata(lastMessageText: String) {
+        val now = Timestamp.now()
+        val chatMeta = mapOf(
+            "lastMessage" to lastMessageText,
+            "lastMessageTimestamp" to now,
+            "lastSenderId" to currentUid
+        )
+        db.collection("chats").document(chatId).set(chatMeta, SetOptions.merge())
+    }
+
     private fun sendMessage(text: String) {
         val message = Message(
             senderId = currentUid,
@@ -589,6 +599,7 @@ class ChatActivity : AppCompatActivity() {
             .document(chatId)
             .collection("messages")
             .add(message)
+        updateChatMetadata(text)
     }
 
     private fun sendImageMessage(imageUrl: String) {
@@ -607,6 +618,7 @@ class ChatActivity : AppCompatActivity() {
             .document(chatId)
             .collection("messages")
             .add(message)
+        updateChatMetadata("📷 Photo")
     }
 
     private fun showImagePreviewDialog(imageUrl: String) {

@@ -19,6 +19,8 @@ class UsersAdapter(
     private val context: Context,
     private val userList: List<User>,
     private val unreadCountMap: Map<String, Int> = emptyMap(),
+    private val lastMessageMap: Map<String, String> = emptyMap(),
+    private val lastMessageTimeMap: Map<String, Long> = emptyMap(),
     private val onUserClick: ((User) -> Unit)? = null,
     private val showAddButton: Boolean = false,
     private val showRequestButtons: Boolean = false,
@@ -32,26 +34,42 @@ class UsersAdapter(
     inner class UserViewHolder(val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
             binding.userName.text = user.name
-            binding.userEmail.text = user.email
 
+            val lastMsg = lastMessageMap[user.uid]
+            val timeMs = lastMessageTimeMap[user.uid] ?: 0L
+
+            val displaySubtitle = when {
+                !lastMsg.isNullOrBlank() -> lastMsg
+                showAddButton || showRequestButtons -> user.email
+                !user.bio.isNullOrBlank() -> user.bio
+                else -> "No messages yet"
+            }
+            binding.userEmail.text = displaySubtitle
+
+            val formattedTime = formatTime(timeMs)
+            if (formattedTime.isNotEmpty()) {
+                binding.lastMessageTime.text = formattedTime
+                binding.lastMessageTime.visibility = View.VISIBLE
+            } else {
+                binding.lastMessageTime.visibility = View.GONE
+            }
 
             android.util.Log.d("UsersAdapter", "Loading avatar for user ${user.name}, url: '${user.effectiveProfileImageUrl}', privacyPhoto: ${user.privacyPhoto}")
             val canSeePhoto = (user.privacyPhoto != "Nobody")
             val avatarUrl = if (canSeePhoto) user.effectiveProfileImageUrl else null
             com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.userImage, avatarUrl, user.updatedAt)
 
-
             binding.onlineIndicator.visibility = if (user.isOnline) View.VISIBLE else View.GONE
-
 
             val unreadCount = unreadCountMap[user.uid] ?: 0
             if (unreadCount > 0) {
                 binding.unreadCountText.text = unreadCount.toString()
                 binding.unreadCountText.visibility = View.VISIBLE
+                binding.userEmail.setTypeface(null, android.graphics.Typeface.BOLD)
             } else {
                 binding.unreadCountText.visibility = View.GONE
+                binding.userEmail.setTypeface(null, android.graphics.Typeface.NORMAL)
             }
-
 
             binding.addFriendBtn.visibility = View.GONE
             binding.acceptButton.visibility = View.GONE
@@ -128,5 +146,21 @@ class UsersAdapter(
                         }
                     }
             }
+    }
+
+    private fun formatTime(timestampMs: Long): String {
+        if (timestampMs <= 0L) return ""
+        val msgCal = java.util.Calendar.getInstance().apply { timeInMillis = timestampMs }
+        val nowCal = java.util.Calendar.getInstance()
+
+        return if (msgCal.get(java.util.Calendar.YEAR) == nowCal.get(java.util.Calendar.YEAR) &&
+            msgCal.get(java.util.Calendar.DAY_OF_YEAR) == nowCal.get(java.util.Calendar.DAY_OF_YEAR)) {
+            java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(timestampMs)
+        } else if (msgCal.get(java.util.Calendar.YEAR) == nowCal.get(java.util.Calendar.YEAR) &&
+            nowCal.get(java.util.Calendar.DAY_OF_YEAR) - msgCal.get(java.util.Calendar.DAY_OF_YEAR) == 1) {
+            "Yesterday"
+        } else {
+            java.text.SimpleDateFormat("dd/MM/yy", java.util.Locale.getDefault()).format(timestampMs)
+        }
     }
 }

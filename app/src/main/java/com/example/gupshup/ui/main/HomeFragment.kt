@@ -30,6 +30,8 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: UsersAdapter
 
     private val unreadCountMap = mutableMapOf<String, Int>()
+    private val lastMessageMap = mutableMapOf<String, String>()
+    private val lastMessageTimeMap = mutableMapOf<String, Long>()
     private val listenerRegistrations = mutableListOf<ListenerRegistration>()
     private var isDataLoaded = false
 
@@ -53,7 +55,9 @@ class HomeFragment : Fragment() {
         adapter = UsersAdapter(
             requireContext(),
             users,
-            unreadCountMap = unreadCountMap
+            unreadCountMap = unreadCountMap,
+            lastMessageMap = lastMessageMap,
+            lastMessageTimeMap = lastMessageTimeMap
         ) { user ->
             val intent = Intent(requireContext(), ChatActivity::class.java)
             intent.putExtra("receiverId", user.uid)
@@ -110,7 +114,10 @@ class HomeFragment : Fragment() {
                             privacyPhoto = entity.privacyPhoto
                         )
                     })
-                    users.forEach { observeUnreadMessages(it.uid) }
+                    users.forEach {
+                        observeUnreadMessages(it.uid)
+                        observeChatMetadata(it.uid)
+                    }
                     adapter.notifyDataSetChanged()
                     showContent()
                 }
@@ -237,6 +244,7 @@ class HomeFragment : Fragment() {
                                                 )
                                             )
                                             observeUnreadMessages(user.uid)
+                                            observeChatMetadata(user.uid)
                                         }
                                     }
 
@@ -299,6 +307,34 @@ class HomeFragment : Fragment() {
             }
 
         listenerRegistrations.add(listener)
+    }
+
+    private fun observeChatMetadata(friendUid: String) {
+        val currentUid = auth.currentUser?.uid ?: return
+        val chatId = if (currentUid < friendUid) "${currentUid}${friendUid}" else "${friendUid}${currentUid}"
+
+        val listener = db.collection("chats")
+            .document(chatId)
+            .addSnapshotListener { snapshot, _ ->
+                if (_binding == null || !isAdded) return@addSnapshotListener
+                if (snapshot != null && snapshot.exists()) {
+                    val lastMsg = snapshot.getString("lastMessage") ?: ""
+                    val timestamp = snapshot.getTimestamp("lastMessageTimestamp")
+                    val timeMs = timestamp?.toDate()?.time ?: 0L
+
+                    lastMessageMap[friendUid] = lastMsg
+                    lastMessageTimeMap[friendUid] = timeMs
+
+                    sortUsersByLatestMessage()
+                    adapter.notifyDataSetChanged()
+                }
+            }
+
+        listenerRegistrations.add(listener)
+    }
+
+    private fun sortUsersByLatestMessage() {
+        users.sortByDescending { lastMessageTimeMap[it.uid] ?: 0L }
     }
 
     private fun updateHomeBadge() {

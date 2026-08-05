@@ -92,31 +92,27 @@ class HomeFragment : Fragment() {
     private fun checkCacheAndLoad(currentUid: String, isForceRefresh: Boolean = false) {
         viewLifecycleOwner.lifecycleScope.launch {
             val appDb = AppDatabase.getInstance(requireContext())
-            appDb.friendRequestDao().getAcceptedFlow(currentUid).collect { requests ->
-                if (_binding == null || !isAdded) return@collect
-                val friendIds = requests.map { if (it.fromUid == currentUid) it.toUid else it.fromUid }
+            val requests = appDb.friendRequestDao().getAcceptedFlow(currentUid).firstOrNull() ?: emptyList()
+            val friendIds = requests.map { if (it.fromUid == currentUid) it.toUid else it.fromUid }
 
-                if (friendIds.isNotEmpty()) {
-                    appDb.userDao().getUsersByIds(friendIds).collect { cachedUserEntities ->
-                        if (_binding == null || !isAdded) return@collect
-                        if (cachedUserEntities.isNotEmpty()) {
-                            users.clear()
-                            users.addAll(cachedUserEntities.map { entity ->
-                                User(
-                                    uid = entity.uid,
-                                    name = entity.name,
-                                    email = entity.email,
-                                    profileImageUrl = entity.profileImageUrl,
-                                    bio = entity.bio,
-                                    isOnline = entity.online,
-                                    privacyPhoto = entity.privacyPhoto
-                                )
-                            })
-                            users.forEach { observeUnreadMessages(it.uid) }
-                            adapter.notifyDataSetChanged()
-                            showContent()
-                        }
-                    }
+            if (friendIds.isNotEmpty()) {
+                val cachedUserEntities = appDb.userDao().getUsersByIds(friendIds).firstOrNull() ?: emptyList()
+                if (cachedUserEntities.isNotEmpty()) {
+                    users.clear()
+                    users.addAll(cachedUserEntities.map { entity ->
+                        User(
+                            uid = entity.uid,
+                            name = entity.name,
+                            email = entity.email,
+                            profileImageUrl = entity.profileImageUrl,
+                            bio = entity.bio,
+                            isOnline = entity.online,
+                            privacyPhoto = entity.privacyPhoto
+                        )
+                    })
+                    users.forEach { observeUnreadMessages(it.uid) }
+                    adapter.notifyDataSetChanged()
+                    showContent()
                 }
             }
         }
@@ -153,133 +149,127 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadAcceptedFriends(isForceRefresh: Boolean = false) {
-        if (isDataLoaded && !isForceRefresh) {
-            showContent()
-            return
-        }
-
         val currentUid = auth.currentUser?.uid ?: return
-        val friendIds = mutableSetOf<String>()
 
         listenerRegistrations.forEach { it.remove() }
         listenerRegistrations.clear()
         unreadCountMap.clear()
 
-        db.collection("friend_requests")
+        val requestsRef = db.collection("friend_requests")
+        requestsRef.whereEqualTo("fromUid", currentUid)
             .whereEqualTo("status", "accepted")
             .get()
-            .addOnSuccessListener { requests ->
-                if (_binding == null || !isAdded) return@addOnSuccessListener
+            .addOnSuccessListener { sentQuery ->
+                requestsRef.whereEqualTo("toUid", currentUid)
+                    .whereEqualTo("status", "accepted")
+                    .get()
+                    .addOnSuccessListener { receivedQuery ->
+                        if (_binding == null || !isAdded) return@addOnSuccessListener
+                        val friendIds = mutableSetOf<String>()
+                        val reqEntities = mutableListOf<com.example.gupshup.data.local.entity.FriendRequestEntity>()
 
-                val reqEntities = mutableListOf<com.example.gupshup.data.local.entity.FriendRequestEntity>()
-                for (doc in requests) {
-                    val from = doc.getString("fromUid")
-                    val to = doc.getString("toUid")
-                    if (from == currentUid) friendIds.add(to ?: "")
-                    if (to == currentUid) friendIds.add(from ?: "")
-                    reqEntities.add(
-                        com.example.gupshup.data.local.entity.FriendRequestEntity(
-                            id = doc.id,
-                            fromUid = from ?: "",
-                            toUid = to ?: "",
-                            status = "accepted"
-                        )
-                    )
-                }
+                        for (doc in sentQuery) {
+                            val to = doc.getString("toUid") ?: ""
+                            if (to.isNotEmpty()) friendIds.add(to)
+                            reqEntities.add(com.example.gupshup.data.local.entity.FriendRequestEntity(doc.id, currentUid, to, "accepted"))
+                        }
+                        for (doc in receivedQuery) {
+                            val from = doc.getString("fromUid") ?: ""
+                            if (from.isNotEmpty()) friendIds.add(from)
+                            reqEntities.add(com.example.gupshup.data.local.entity.FriendRequestEntity(doc.id, from, currentUid, "accepted"))
+                        }
 
-                val appContext = context?.applicationContext
-                if (appContext != null) {
-                    lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                        AppDatabase.getInstance(appContext).friendRequestDao().upsert(reqEntities)
-                    }
-                }
-
-                if (friendIds.isEmpty()) {
-                    users.clear()
-                    adapter.notifyDataSetChanged()
-                    updateHomeBadge()
-                    isDataLoaded = true
-                    showContent()
-                    _binding?.swipeRefreshLayout?.isRefreshing = false
-                    return@addOnSuccessListener
-                }
-
-                // Firestore 'whereIn' supports max 10 values. We must split into chunks.
-                val chunks = friendIds.toList().chunked(10)
-                users.clear() // Clear once before fetching all chunks
-
-                // We need to track when all chunks are loaded to stop refreshing
-                var completedChunks = 0
-
-                chunks.forEach { chunk ->
-                    db.collection("users")
-                        .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
-                        .get()
-                        .addOnSuccessListener { result ->
-                            if (_binding == null || !isAdded) return@addOnSuccessListener
-
-                            val fetchedUsers = mutableListOf<User>()
-                            val fetchedEntities = mutableListOf<com.example.gupshup.data.local.entity.UserEntity>()
-
-                            for (doc in result) {
-                                android.util.Log.d("HomeFragment_DEBUG", "User doc ${doc.id}: data=${doc.data}")
-                                val user = doc.toObject(User::class.java) ?: User()
-                                if (user.uid.isEmpty()) {
-                                    user.uid = doc.id
-                                }
-                                val pUrl = doc.getString("profileImageUrl")
-                                    ?: doc.getString("photoUrl")
-                                    ?: doc.getString("photoUri")
-                                    ?: ""
-                                if (pUrl.isNotEmpty()) {
-                                    user.profileImageUrl = pUrl
-                                }
-                                val privacyPhoto = doc.getString("privacyPhoto") ?: "Everyone"
-                                user.privacyPhoto = privacyPhoto
-
-                                if (user.uid != currentUid) {
-                                    users.add(user)
-                                    fetchedUsers.add(user)
-                                    fetchedEntities.add(
-                                        com.example.gupshup.data.local.entity.UserEntity(
-                                            uid = user.uid,
-                                            name = user.name,
-                                            email = user.email,
-                                            profileImageUrl = user.effectiveProfileImageUrl,
-                                            bio = user.bio ?: "",
-                                            online = user.isOnline,
-                                            privacyPhoto = privacyPhoto
-                                        )
-                                    )
-                                    observeUnreadMessages(user.uid)
-                                }
+                        val appContext = context?.applicationContext
+                        if (appContext != null && reqEntities.isNotEmpty()) {
+                            lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                AppDatabase.getInstance(appContext).friendRequestDao().upsert(reqEntities)
                             }
+                        }
 
-                            if (appContext != null && fetchedEntities.isNotEmpty()) {
-                                lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                    AppDatabase.getInstance(appContext).userDao().upsert(fetchedEntities)
-                                }
-                            }
-                            
-                            completedChunks++
+                        if (friendIds.isEmpty()) {
+                            users.clear()
                             adapter.notifyDataSetChanged()
-                            
-                            if (completedChunks == chunks.size) {
-                                isDataLoaded = true
-                                showContent()
-                                _binding?.swipeRefreshLayout?.isRefreshing = false
-                            }
+                            isDataLoaded = true
+                            showContent()
+                            _binding?.swipeRefreshLayout?.isRefreshing = false
+                            return@addOnSuccessListener
                         }
-                        .addOnFailureListener {
-                            if (_binding == null || !isAdded) return@addOnFailureListener
-                            completedChunks++
-                            if (completedChunks == chunks.size) {
-                                isDataLoaded = true
-                                showContent()
-                                _binding?.swipeRefreshLayout?.isRefreshing = false
-                            }
+
+                        val chunks = friendIds.toList().chunked(10)
+                        users.clear()
+                        var completedChunks = 0
+
+                        chunks.forEach { chunk ->
+                            db.collection("users")
+                                .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
+                                .get()
+                                .addOnSuccessListener { result ->
+                                    if (_binding == null || !isAdded) return@addOnSuccessListener
+
+                                    val fetchedEntities = mutableListOf<com.example.gupshup.data.local.entity.UserEntity>()
+                                    for (doc in result) {
+                                        android.util.Log.d("HomeFragment_DEBUG", "User doc ${doc.id}: data=${doc.data}")
+                                        val user = doc.toObject(User::class.java) ?: User()
+                                        if (user.uid.isEmpty()) {
+                                            user.uid = doc.id
+                                        }
+                                        val pUrl = doc.getString("profileImageUrl")
+                                            ?: doc.getString("photoUrl")
+                                            ?: doc.getString("photoUri")
+                                            ?: ""
+                                        if (pUrl.isNotEmpty()) {
+                                            user.profileImageUrl = pUrl
+                                        }
+                                        val privacyPhoto = doc.getString("privacyPhoto") ?: "Everyone"
+                                        user.privacyPhoto = privacyPhoto
+
+                                        if (user.uid != currentUid) {
+                                            users.add(user)
+                                            fetchedEntities.add(
+                                                com.example.gupshup.data.local.entity.UserEntity(
+                                                    uid = user.uid,
+                                                    name = user.name,
+                                                    email = user.email,
+                                                    profileImageUrl = user.effectiveProfileImageUrl,
+                                                    bio = user.bio ?: "",
+                                                    online = user.isOnline,
+                                                    privacyPhoto = privacyPhoto
+                                                )
+                                            )
+                                            observeUnreadMessages(user.uid)
+                                        }
+                                    }
+
+                                    if (appContext != null && fetchedEntities.isNotEmpty()) {
+                                        lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                            AppDatabase.getInstance(appContext).userDao().upsert(fetchedEntities)
+                                        }
+                                    }
+
+                                    completedChunks++
+                                    adapter.notifyDataSetChanged()
+                                    if (completedChunks == chunks.size) {
+                                        isDataLoaded = true
+                                        showContent()
+                                        _binding?.swipeRefreshLayout?.isRefreshing = false
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    if (_binding == null || !isAdded) return@addOnFailureListener
+                                    completedChunks++
+                                    if (completedChunks == chunks.size) {
+                                        isDataLoaded = true
+                                        showContent()
+                                        _binding?.swipeRefreshLayout?.isRefreshing = false
+                                    }
+                                }
                         }
-                }
+                    }
+                    .addOnFailureListener {
+                        if (_binding == null || !isAdded) return@addOnFailureListener
+                        showContent()
+                        _binding?.swipeRefreshLayout?.isRefreshing = false
+                    }
             }
             .addOnFailureListener {
                 if (_binding == null || !isAdded) return@addOnFailureListener

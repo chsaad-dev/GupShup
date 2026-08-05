@@ -156,6 +156,16 @@ class SettingsActivity : AppCompatActivity() {
             showFontSizeDialog()
         }
 
+        binding.rowHelpCenter.setOnClickListener {
+            val helpSheet = HelpCenterBottomSheetFragment()
+            helpSheet.show(supportFragmentManager, "HelpCenterBottomSheet")
+        }
+
+        binding.rowReportProblem.setOnClickListener {
+            val reportSheet = ReportProblemBottomSheetFragment()
+            reportSheet.show(supportFragmentManager, "ReportProblemBottomSheet")
+        }
+
         val copyAction = {
             val uid = auth.currentUser?.uid ?: ""
             if (uid.isNotEmpty()) {

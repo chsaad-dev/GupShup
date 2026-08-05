@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface"
+    android:padding="24dp">
+
+    <!-- Handle Bar for BottomSheet -->
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/outline"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Help Center &amp; FAQ"
+        style="@style/TextAppearance.GupShup.Headline"
+        android:textColor="?attr/colorOnSurface" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Find quick answers to common questions about GupShup."
+        style="@style/TextAppearance.GupShup.Body"
+        android:textColor="@color/onSurfaceVariant"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="20dp" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="280dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- FAQ Item 1 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔒 How do Privacy settings work?"
+                style="@style/TextAppearance.GupShup.Title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You can control who sees your online status, last seen, and profile picture in Settings ➔ Privacy."
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginBottom="16dp" />
+
+            <!-- FAQ Item 2 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📸 How do I change my Profile Picture or Bio?"
+                style="@style/TextAppearance.GupShup.Title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Go to the Profile tab or tap Profile in Settings to update your avatar, display name, and bio."
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginBottom="16dp" />
+
+            <!-- FAQ Item 3 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🚫 How do I block or unblock contacts?"
+                style="@style/TextAppearance.GupShup.Title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Manage blocked users in Settings ➔ Blocked contacts or directly from user profile screens."
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginBottom="16dp" />
+
+            <!-- FAQ Item 4 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💬 How do I customize Chat Wallpaper &amp; Theme?"
+                style="@style/TextAppearance.GupShup.Title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Personalize app themes, font sizes, and chat wallpapers in Settings ➔ Chat section."
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Contact Support via Email Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnContactEmail"
+        style="@style/Widget.GupShup.Button.Filled"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Contact Support via Email"
+        app:icon="@drawable/ic_email"
+        app:iconGravity="textStart"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

@@ -105,28 +105,45 @@ class SearchFragment : Fragment() {
                     }
 
                 db.collection("friend_requests")
-                    .whereIn("status", listOf("accepted", "pending"))
+                    .whereEqualTo("fromUid", currentUid)
                     .get()
-                    .addOnSuccessListener { requests ->
+                    .addOnSuccessListener { sentReqs ->
                         if (_binding == null || !isAdded) return@addOnSuccessListener
 
-                        val blockedUids = mutableSetOf<String>()
-                        for (req in requests) {
-                            val from = req.getString("fromUid")
-                            val to = req.getString("toUid")
-                            if (from == currentUid || to == currentUid) {
-                                blockedUids.add(if (from == currentUid) to!! else from!!)
-                            }
-                        }
+                        db.collection("friend_requests")
+                            .whereEqualTo("toUid", currentUid)
+                            .get()
+                            .addOnSuccessListener { recvReqs ->
+                                if (_binding == null || !isAdded) return@addOnSuccessListener
 
-                        allUsers.clear()
-                        allUsers.addAll(searchResults.filter { !blockedUids.contains(it.uid) })
-                        adapter.notifyDataSetChanged()
-                        updateEmptyState()
+                                val blockedUids = mutableSetOf<String>()
+                                for (req in sentReqs) {
+                                    val status = req.getString("status")
+                                    if (status == "accepted" || status == "pending") {
+                                        req.getString("toUid")?.let { blockedUids.add(it) }
+                                    }
+                                }
+                                for (req in recvReqs) {
+                                    val status = req.getString("status")
+                                    if (status == "accepted" || status == "pending") {
+                                        req.getString("fromUid")?.let { blockedUids.add(it) }
+                                    }
+                                }
+
+                                allUsers.clear()
+                                allUsers.addAll(searchResults.filter { !blockedUids.contains(it.uid) })
+                                adapter.notifyDataSetChanged()
+                                updateEmptyState()
+                            }
+                            .addOnFailureListener { e ->
+                                if (_binding != null && isAdded) {
+                                    context?.let { Toast.makeText(it, "Failed to load requests: ${e.message}", Toast.LENGTH_LONG).show() }
+                                }
+                            }
                     }
                     .addOnFailureListener { e ->
                         if (_binding != null && isAdded) {
-                            context?.let { Toast.makeText(it, "❌ Failed to load friend requests: ${e.message}", Toast.LENGTH_LONG).show() }
+                            context?.let { Toast.makeText(it, "Failed to load requests: ${e.message}", Toast.LENGTH_LONG).show() }
                         }
                     }
 

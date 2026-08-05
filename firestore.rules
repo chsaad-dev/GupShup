@@ -1,0 +1,93 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // -------------------------------------------------------------
+    // USERS COLLECTION
+    // -------------------------------------------------------------
+    match /users/{userId} {
+      // Any authenticated user can view profiles (for search, chat list, and status)
+      allow read: if isAuthenticated();
+      
+      // Users can only create, edit, or delete their own profile document
+      allow create, update, delete: if isUser(userId);
+    }
+
+    // -------------------------------------------------------------
+    // FRIEND REQUESTS COLLECTION
+    // -------------------------------------------------------------
+    match /friend_requests/{requestId} {
+      // Read: sender or recipient
+      allow read: if isAuthenticated() && 
+        (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      
+      // Create: sender must match authenticated user
+      allow create: if isAuthenticated() && request.resource.data.fromUid == request.auth.uid;
+      
+      // Update & Delete: either sender or recipient
+      allow update, delete: if isAuthenticated() && 
+        (resource.data.toUid == request.auth.uid || resource.data.fromUid == request.auth.uid);
+    }
+
+    // -------------------------------------------------------------
+    // STATUSES & STATUS COLLECTIONS
+    // -------------------------------------------------------------
+    match /status/{statusId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+
+      match /comments/{commentId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isAuthenticated();
+      }
+
+      match /views/{viewId} {
+        allow read: if isAuthenticated();
+        allow create, update, delete: if isAuthenticated();
+      }
+    }
+
+    match /statuses/{statusId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // -------------------------------------------------------------
+    // CHATS & MESSAGES COLLECTIONS
+    // -------------------------------------------------------------
+    match /chats/{chatId} {
+      allow read, write: if isAuthenticated();
+
+      match /messages/{messageId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && request.resource.data.senderId == request.auth.uid;
+        allow update, delete: if isAuthenticated();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // REPORTS COLLECTION (App Issue & Bug Reports)
+    // -------------------------------------------------------------
+    match /reports/{reportId} {
+      // Logged-in users can submit reports under their own UID
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Reports are confidential (users cannot read, update, or delete submitted reports)
+      allow read, update, delete: if false;
+    }
+  }
+}

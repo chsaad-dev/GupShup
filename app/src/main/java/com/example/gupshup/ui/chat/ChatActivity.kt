@@ -101,6 +101,7 @@ class ChatActivity : AppCompatActivity() {
         setupTypingWatcher()
         updateTypingStatus(false)
         applyWallpaper()
+        setupEnterKeySend()
 
         binding.sendButton.setOnClickListener {
             val text = binding.messageInput.text.toString().trim()
@@ -274,6 +275,34 @@ class ChatActivity : AppCompatActivity() {
         } else {
             val defaultColor = getColor(R.color.colorSurfaceContainerLow)
             binding.recyclerView.setBackgroundColor(defaultColor)
+        }
+    }
+
+    private fun setupEnterKeySend() {
+        val prefs = getSharedPreferences("gupshup_prefs", MODE_PRIVATE)
+        val enterSend = prefs.getBoolean("pref_enter_send", false)
+
+        if (enterSend) {
+            binding.messageInput.imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEND
+            binding.messageInput.setRawInputType(android.text.InputType.TYPE_CLASS_TEXT)
+            binding.messageInput.setOnEditorActionListener { _, actionId, event ->
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND ||
+                    (event != null && event.keyCode == android.view.KeyEvent.KEYCODE_ENTER && event.action == android.view.KeyEvent.ACTION_DOWN)) {
+                    val text = binding.messageInput.text.toString().trim()
+                    if (text.isNotEmpty()) {
+                        sendMessage(text)
+                        binding.messageInput.setText("")
+                        updateTypingStatus(false)
+                    }
+                    true
+                } else {
+                    false
+                }
+            }
+        } else {
+            binding.messageInput.imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_UNSPECIFIED
+            binding.messageInput.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            binding.messageInput.setOnEditorActionListener(null)
         }
     }
 
@@ -697,6 +726,11 @@ class ChatActivity : AppCompatActivity() {
         super.onResume()
         val userRef = db.collection("users").document(currentUid)
         userRef.update("isOnline", true)
+        applyWallpaper()
+        setupEnterKeySend()
+        if (::adapter.isInitialized) {
+            adapter.notifyDataSetChanged()
+        }
     }
 
     override fun onDestroy() {

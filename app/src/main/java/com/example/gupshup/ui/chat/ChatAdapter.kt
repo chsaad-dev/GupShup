@@ -47,12 +47,20 @@ class ChatAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val message = messages[position]
         val timeFormatted = formatTimestamp(message.timestamp)
-
         val reactionsSummary = buildReactionSummary(message.reactions)
 
+        val prefs = holder.itemView.context.getSharedPreferences("gupshup_prefs", android.content.Context.MODE_PRIVATE)
+        val fontSizeSp = when (prefs.getString("pref_font_size", "Medium")) {
+            "Small" -> 13f
+            "Large" -> 18f
+            else -> 15f
+        }
+
         if (holder is SentViewHolder) {
+            holder.binding.messageText.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, fontSizeSp)
             bindSentMessage(holder, message, timeFormatted, reactionsSummary)
         } else if (holder is ReceivedViewHolder) {
+            holder.binding.messageText.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, fontSizeSp)
             bindReceivedMessage(holder, message, timeFormatted, reactionsSummary)
         }
     }

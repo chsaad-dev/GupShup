@@ -15,6 +15,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
+import androidx.activity.OnBackPressedCallback
+
 class MainNavigationActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainNavigationBinding
@@ -51,6 +53,17 @@ class MainNavigationActivity : AppCompatActivity() {
 
         setupFragmentNavigation(savedInstanceState)
         checkPendingRequestsBadge()
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.bottomNav.selectedItemId != R.id.menu_home) {
+                    binding.bottomNav.selectedItemId = R.id.menu_home
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
 
         binding.bottomNav.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
@@ -143,6 +156,10 @@ class MainNavigationActivity : AppCompatActivity() {
 
     fun selectSearchTab() {
         binding.bottomNav.selectedItemId = R.id.menu_search
+    }
+
+    fun selectHomeTab() {
+        binding.bottomNav.selectedItemId = R.id.menu_home
     }
 
     override fun onResume() {

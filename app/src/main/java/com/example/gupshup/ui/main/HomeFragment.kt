@@ -309,6 +309,16 @@ class HomeFragment : Fragment() {
         listenerRegistrations.add(listener)
     }
 
+    private fun extractTimeMs(obj: Any?): Long {
+        return when (obj) {
+            is com.google.firebase.Timestamp -> obj.toDate().time
+            is Number -> obj.toLong()
+            is java.util.Date -> obj.time
+            is String -> obj.toLongOrNull() ?: 0L
+            else -> 0L
+        }
+    }
+
     private fun observeChatMetadata(friendUid: String) {
         val currentUid = auth.currentUser?.uid ?: return
         val chatId = if (currentUid < friendUid) "${currentUid}${friendUid}" else "${friendUid}${currentUid}"
@@ -319,18 +329,57 @@ class HomeFragment : Fragment() {
                 if (_binding == null || !isAdded) return@addSnapshotListener
                 if (snapshot != null && snapshot.exists()) {
                     val lastMsg = snapshot.getString("lastMessage") ?: ""
-                    val timestamp = snapshot.getTimestamp("lastMessageTimestamp")
-                    val timeMs = timestamp?.toDate()?.time ?: 0L
+                    val rawTs = snapshot.get("lastMessageTimestamp") ?: snapshot.get("timestamp")
+                    val timeMs = extractTimeMs(rawTs)
 
-                    lastMessageMap[friendUid] = lastMsg
-                    lastMessageTimeMap[friendUid] = timeMs
+                    if (lastMsg.isNotEmpty()) {
+                        lastMessageMap[friendUid] = lastMsg
+                    }
 
-                    sortUsersByLatestMessage()
-                    adapter.notifyDataSetChanged()
+                    if (timeMs > 0L) {
+                        lastMessageTimeMap[friendUid] = timeMs
+                        sortUsersByLatestMessage()
+                        adapter.notifyDataSetChanged()
+                    } else {
+                        fetchLatestMessageFallback(chatId, friendUid)
+                    }
+                } else {
+                    fetchLatestMessageFallback(chatId, friendUid)
                 }
             }
 
         listenerRegistrations.add(listener)
+    }
+
+    private fun fetchLatestMessageFallback(chatId: String, friendUid: String) {
+        db.collection("chats")
+            .document(chatId)
+            .collection("messages")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { msgSnap ->
+                if (_binding == null || !isAdded) return@addOnSuccessListener
+                if (msgSnap != null && !msgSnap.isEmpty) {
+                    val doc = msgSnap.documents[0]
+                    val text = doc.getString("text") ?: ""
+                    val img = doc.getString("imageUrl") ?: ""
+                    val type = doc.getString("type") ?: ""
+                    val msgText = if (type == "image" || img.isNotEmpty()) "📷 Photo" else text
+
+                    val rawTs = doc.get("timestamp")
+                    val fallbackTimeMs = extractTimeMs(rawTs)
+
+                    if (msgText.isNotEmpty()) {
+                        lastMessageMap[friendUid] = msgText
+                    }
+                    if (fallbackTimeMs > 0L) {
+                        lastMessageTimeMap[friendUid] = fallbackTimeMs
+                        sortUsersByLatestMessage()
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+            }
     }
 
     private fun sortUsersByLatestMessage() {

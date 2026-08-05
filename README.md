@@ -6,16 +6,16 @@
 ![Gradle](https://img.shields.io/badge/AGP-8.11.0-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-purple.svg)
 
-**GupShup** is a modern, feature-rich Android messaging application built with Kotlin, Material Design 3 Views, Room local SQLite database, Firebase Firestore, Firebase Authentication, and Cloudinary Media SDK. It features an offline-first architecture, real-time 1-on-1 chat, WhatsApp-style last message previews with smart timestamps, multimedia status stories, friend request management, online presence tracking, strict security rules, and a comprehensive Settings hub with native support & reporting tools.
+**GupShup** is a modern, feature-rich Android messaging application built with Kotlin, Material Design 3 Views, Room local SQLite database, Firebase Firestore, Firebase Authentication, and Cloudinary Media SDK. It features an offline-first architecture, real-time 1-on-1 chat, WhatsApp-style last message previews with smart timestamps, multimedia status stories, friend request management, online presence tracking, strict security rules, and a comprehensive Settings hub with native support and reporting tools.
 
 ---
 
 ## Key Features
 
-### WhatsApp-Style Chat List & Real-Time Sorting
-- **Last Message Previews**: Home screen replaces email text with live message previews (text content or `"📷 Photo"` indicator).
+### Real-Time Chat List & Activity Sorting
+- **Last Message Previews**: Home screen replaces email addresses with live message previews (text content or photo indicator).
 - **Smart Formatted Timestamps**: Top-right timestamp formatting (`11:15 AM` for today, `Yesterday`, `dd/MM/yy` for older dates) with multi-type timestamp parsing and subcollection fallback.
-- **Dynamic Reordering**: Conversations automatically re-order in real time so the contact with the latest message always rises to the top of your chat list.
+- **Dynamic Reordering**: Conversations automatically re-order in real time so the contact with the latest message always rises to the top of the chat list.
 - **Unread Badges & Highlighting**: Bold text formatting on unread message previews with dynamic bottom navigation badge count updates.
 
 ### Help Center & In-App Bug Reporting

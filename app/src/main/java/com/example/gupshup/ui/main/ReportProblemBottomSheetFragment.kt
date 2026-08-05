@@ -27,6 +27,8 @@ class ReportProblemBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        dialog?.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
         binding.btnSubmitReport.setOnClickListener {
             val description = binding.editDescription.text.toString().trim()
             if (description.isEmpty()) {

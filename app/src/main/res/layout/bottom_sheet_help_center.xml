@@ -29,11 +29,12 @@
         style="@style/TextAppearance.GupShup.Body"
         android:textColor="@color/onSurfaceVariant"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="16dp" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="280dp">
+        android:layout_height="320dp"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,53 +45,99 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🔒 How do Privacy settings work?"
+                android:text="How do Privacy settings work?"
                 style="@style/TextAppearance.GupShup.Title"
                 android:textSize="15sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="You can control who sees your online status, last seen, and profile picture in Settings ➔ Privacy."
+                android:text="Control who can see your online status, last seen, and profile picture in Settings ➔ Privacy."
                 style="@style/TextAppearance.GupShup.Body"
                 android:textColor="@color/onSurfaceVariant"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="14dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/outline"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="14dp" />
 
             <!-- FAQ Item 2 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📸 How do I change my Profile Picture or Bio?"
+                android:text="How do I change my Profile Picture or Bio?"
                 style="@style/TextAppearance.GupShup.Title"
                 android:textSize="15sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Go to the Profile tab or tap Profile in Settings to update your avatar, display name, and bio."
+                android:text="Go to the Profile tab or tap Profile in Settings to update your photo, display name, and bio."
                 style="@style/TextAppearance.GupShup.Body"
                 android:textColor="@color/onSurfaceVariant"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="14dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/outline"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="14dp" />
 
             <!-- FAQ Item 3 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🚫 How do I block or unblock contacts?"
+                android:text="How do Friend Requests work?"
+                style="@style/TextAppearance.GupShup.Title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Search for users by email/name in the Search tab and send a request. Once accepted, they will appear in your Chats list."
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginBottom="14dp" />
+
+            <!-- FAQ Item 4 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How do Status updates work?"
+                style="@style/TextAppearance.GupShup.Title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Share text or image updates on the Status screen. Status updates expire automatically after 24 hours."
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginBottom="14dp" />
+
+            <!-- FAQ Item 5 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How do I block or unblock contacts?"
                 style="@style/TextAppearance.GupShup.Title"
                 android:textSize="15sp" />
 
@@ -101,26 +148,72 @@
                 style="@style/TextAppearance.GupShup.Body"
                 android:textColor="@color/onSurfaceVariant"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="14dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/outline"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="14dp" />
 
-            <!-- FAQ Item 4 -->
+            <!-- FAQ Item 6 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="💬 How do I customize Chat Wallpaper &amp; Theme?"
+                android:text="How do I customize Chat Wallpaper &amp; Theme?"
                 style="@style/TextAppearance.GupShup.Title"
                 android:textSize="15sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Personalize app themes, font sizes, and chat wallpapers in Settings ➔ Chat section."
+                android:text="Personalize app themes (Light/Dark/System), font sizes, and chat wallpapers in Settings ➔ Chat section."
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginBottom="14dp" />
+
+            <!-- FAQ Item 7 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Is my chat data cached offline?"
+                style="@style/TextAppearance.GupShup.Title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Yes! GupShup caches messages and user profiles locally for instant loading offline and syncs with the cloud when connected."
+                style="@style/TextAppearance.GupShup.Body"
+                android:textColor="@color/onSurfaceVariant"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/outline"
+                android:layout_marginBottom="14dp" />
+
+            <!-- FAQ Item 8 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How do I permanently delete my account?"
+                style="@style/TextAppearance.GupShup.Title"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tap Delete Account at the bottom of Settings. This permanently purges your account, messages, statuses, and profile."
                 style="@style/TextAppearance.GupShup.Body"
                 android:textColor="@color/onSurfaceVariant"
                 android:layout_marginTop="4dp"

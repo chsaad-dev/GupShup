@@ -543,6 +543,7 @@
                     android:layout_marginStart="@dimen/spacing_lg" />
 
                 <TextView
+                    android:id="@+id/textMediaDownload"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Wi-Fi &amp; Mobile"
@@ -578,7 +579,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_fingerprint"
+                    android:src="@drawable/ic_info"
                     app:tint="@color/onSurfaceVariant" />
 
                 <TextView
@@ -593,7 +594,7 @@
                     android:id="@+id/textStorageUsage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="245 MB"
+                    android:text="Calculating..."
                     style="@style/TextAppearance.GupShup.Body"
                     android:textColor="@color/onSurfaceVariant"
                     android:layout_marginEnd="@dimen/spacing_xs" />

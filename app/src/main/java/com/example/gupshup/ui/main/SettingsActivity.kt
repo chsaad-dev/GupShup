@@ -71,6 +71,138 @@ class SettingsActivity : AppCompatActivity() {
 
         updateWallpaperText()
         updatePrivacyText()
+        updateMediaDownloadText()
+        updateStorageUsageText()
+    }
+
+    private fun updateMediaDownloadText() {
+        val mode = prefs.getString("pref_media_download", "wifi_mobile") ?: "wifi_mobile"
+        binding.textMediaDownload.text = when (mode) {
+            "wifi_only" -> "Wi-Fi only"
+            "never" -> "Never"
+            else -> "Wi-Fi & Mobile"
+        }
+    }
+
+    private fun calculateLocalStorageBytes(): Long {
+        var size = 0L
+        cacheDir?.let { size += getFolderSize(it) }
+        externalCacheDir?.let { size += getFolderSize(it) }
+        val dbFile = getDatabasePath("GupShup_database")
+        if (dbFile != null && dbFile.exists()) size += dbFile.length()
+        return size
+    }
+
+    private fun getFolderSize(dir: java.io.File): Long {
+        var size = 0L
+        val files = dir.listFiles() ?: return 0L
+        for (f in files) {
+            size += if (f.isDirectory) getFolderSize(f) else f.length()
+        }
+        return size
+    }
+
+    private fun formatBytes(bytes: Long): String {
+        val mb = bytes / (1024.0 * 1024.0)
+        return String.format(java.util.Locale.US, "%.1f MB", mb)
+    }
+
+    private fun updateStorageUsageText() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val bytes = calculateLocalStorageBytes()
+            val text = formatBytes(bytes)
+            withContext(Dispatchers.Main) {
+                binding.textStorageUsage.text = text
+            }
+        }
+    }
+
+    private fun showMediaDownloadDialog() {
+        val options = arrayOf("Wi-Fi & Mobile data", "Wi-Fi only", "Never (Save Data)")
+        val currentMode = prefs.getString("pref_media_download", "wifi_mobile")
+        val checkedItem = when (currentMode) {
+            "wifi_only" -> 1
+            "never" -> 2
+            else -> 0
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Media Auto-Download")
+            .setSingleChoiceItems(options, checkedItem) { dialog, which ->
+                val selectedKey = when (which) {
+                    1 -> "wifi_only"
+                    2 -> "never"
+                    else -> "wifi_mobile"
+                }
+                prefs.edit().putString("pref_media_download", selectedKey).apply()
+                updateMediaDownloadText()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showStorageUsageDialog() {
+        val uid = auth.currentUser?.uid ?: return
+
+        val progressDialog = android.app.ProgressDialog(this).apply {
+            setMessage("Calculating storage & Cloudinary usage...")
+            setCancelable(false)
+            show()
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val localBytes = calculateLocalStorageBytes()
+            val formattedLocal = formatBytes(localBytes)
+
+            var statusMediaCount = 0
+            try {
+                val statusQuery = Tasks.await(db.collection("statuses").whereEqualTo("userId", uid).get())
+                statusMediaCount = statusQuery.documents.count { !it.getString("mediaUrl").isNullOrEmpty() }
+            } catch (e: Exception) {
+                // Ignore query error if offline
+            }
+
+            withContext(Dispatchers.Main) {
+                progressDialog.dismiss()
+
+                val message = """
+                    Local Device Cache: $formattedLocal
+                    (Includes temporary image cache, Glide disk cache & local database)
+
+                    Cloud Media (Cloudinary):
+                    • Active Status Uploads: $statusMediaCount media files
+                """.trimIndent()
+
+                MaterialAlertDialogBuilder(this@SettingsActivity)
+                    .setTitle("Storage Usage")
+                    .setMessage(message)
+                    .setPositiveButton("Clear Local Cache") { _, _ ->
+                        clearLocalCache()
+                    }
+                    .setNegativeButton("Close", null)
+                    .show()
+            }
+        }
+    }
+
+    private fun clearLocalCache() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                cacheDir?.deleteRecursively()
+                externalCacheDir?.deleteRecursively()
+                com.bumptech.glide.Glide.get(applicationContext).clearDiskCache()
+            } catch (e: Exception) {
+                // Handle cache cleanup
+            }
+            val newBytes = calculateLocalStorageBytes()
+            val newFormatted = formatBytes(newBytes)
+
+            withContext(Dispatchers.Main) {
+                binding.textStorageUsage.text = newFormatted
+                Toast.makeText(this@SettingsActivity, "Local cache cleared successfully", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun updateWallpaperText() {
@@ -164,6 +296,14 @@ class SettingsActivity : AppCompatActivity() {
         binding.rowReportProblem.setOnClickListener {
             val reportSheet = ReportProblemBottomSheetFragment()
             reportSheet.show(supportFragmentManager, "ReportProblemBottomSheet")
+        }
+
+        binding.rowMediaDownload.setOnClickListener {
+            showMediaDownloadDialog()
+        }
+
+        binding.rowStorageUsage.setOnClickListener {
+            showStorageUsageDialog()
         }
 
         val copyAction = {

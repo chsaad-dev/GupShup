@@ -774,9 +774,10 @@
                     android:singleLine="true" />
 
                 <ImageView
+                    android:id="@+id/btnCopyUserId"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/ic_edit"
+                    android:src="@drawable/ic_copy"
                     app:tint="@color/onSurfaceVariant"
                     android:contentDescription="Copy User ID" />
             </LinearLayout>

@@ -13,6 +13,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
+import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.tasks.Tasks
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
@@ -150,13 +156,17 @@ class SettingsActivity : AppCompatActivity() {
             showFontSizeDialog()
         }
 
-        binding.rowUserId.setOnClickListener {
-            val uid = auth.currentUser?.uid ?: return@setOnClickListener
-            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("User ID", uid)
-            clipboard.setPrimaryClip(clip)
-            Toast.makeText(this, "User ID copied to clipboard", Toast.LENGTH_SHORT).show()
+        val copyAction = {
+            val uid = auth.currentUser?.uid ?: ""
+            if (uid.isNotEmpty()) {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                val clip = android.content.ClipData.newPlainText("User ID", uid)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "User ID copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
         }
+        binding.rowUserId.setOnClickListener { copyAction() }
+        binding.btnCopyUserId.setOnClickListener { copyAction() }
 
         binding.btnSettingsLogout.setOnClickListener {
             auth.signOut()
@@ -169,12 +179,88 @@ class SettingsActivity : AppCompatActivity() {
         binding.textDeleteAccount.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle("Delete Account")
-                .setMessage("Are you sure you want to delete your account? This action cannot be undone.")
-                .setPositiveButton("Delete") { _, _ ->
-                    Toast.makeText(this, "Account deletion requested", Toast.LENGTH_SHORT).show()
+                .setMessage("Are you sure you want to delete your account? All your profile data, messages, statuses, and friend links will be permanently deleted.")
+                .setPositiveButton("Delete Permanently") { _, _ ->
+                    deleteAccount()
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+        }
+    }
+
+    private fun deleteAccount() {
+        val user = auth.currentUser
+        val uid = user?.uid
+        if (uid.isNullOrEmpty() || user == null) {
+            Toast.makeText(this, "No active user session", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val progressDialog = android.app.ProgressDialog(this).apply {
+            setMessage("Deleting account and associated data...")
+            setCancelable(false)
+            show()
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // 1. Delete User document from Firestore
+                Tasks.await(db.collection("users").document(uid).delete())
+
+                // 2. Delete User's statuses
+                val statusQuery = Tasks.await(db.collection("statuses").whereEqualTo("userId", uid).get())
+                for (doc in statusQuery.documents) {
+                    Tasks.await(doc.reference.delete())
+                }
+
+                // 3. Delete Friend Requests
+                val sentReqs = Tasks.await(db.collection("friend_requests").whereEqualTo("fromUid", uid).get())
+                for (doc in sentReqs.documents) {
+                    Tasks.await(doc.reference.delete())
+                }
+                val recvReqs = Tasks.await(db.collection("friend_requests").whereEqualTo("toUid", uid).get())
+                for (doc in recvReqs.documents) {
+                    Tasks.await(doc.reference.delete())
+                }
+
+                // 4. Clear Local Database & Preferences
+                com.example.gupshup.data.local.AppDatabase.getInstance(applicationContext).clearAllTables()
+                prefs.edit().clear().apply()
+
+                // 5. Delete Firebase Auth User Account
+                Tasks.await(user.delete())
+
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    Toast.makeText(this@SettingsActivity, "Account deleted successfully", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    if (e is com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException) {
+                        Toast.makeText(
+                            this@SettingsActivity,
+                            "Please log in again to confirm account deletion for security",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        auth.signOut()
+                        val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this@SettingsActivity,
+                            "Failed to delete account: ${e.localizedMessage}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         }
     }
 

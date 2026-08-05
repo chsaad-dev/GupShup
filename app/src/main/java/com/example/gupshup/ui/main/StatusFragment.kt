@@ -213,6 +213,7 @@ class StatusFragment : Fragment() {
                 statusList.clear()
                 val statusEntities = mutableListOf<StatusEntity>()
                 snapshot?.documents?.forEach { doc ->
+                    android.util.Log.d("StatusFragment_DEBUG", "Status doc ${doc.id}: data=${doc.data}")
                     val status = doc.toObject(Status::class.java)
                     status?.let { st ->
                         statusList.add(st)

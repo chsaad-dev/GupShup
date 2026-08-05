@@ -218,6 +218,7 @@ class ChatActivity : AppCompatActivity() {
         val userRef = db.collection("users").document(receiverId)
         userStatusListener = userRef.addSnapshotListener { snapshot, _ ->
             if (snapshot != null && snapshot.exists()) {
+                android.util.Log.d("ChatActivity_DEBUG", "Receiver doc $receiverId: data=${snapshot.data}")
                 val name = snapshot.getString("name") ?: "Chat"
                 val isOnline = snapshot.getBoolean("isOnline") ?: false
                 val typingTo = snapshot.getString("typingTo")
@@ -234,7 +235,7 @@ class ChatActivity : AppCompatActivity() {
 
                 val canSeeOnline = (privacyOnline == "Everyone")
                 val canSeeLastSeen = (privacyLastSeen == "Everyone")
-                val canSeePhoto = (privacyPhoto == "Everyone")
+                val canSeePhoto = (privacyPhoto != "Nobody")
 
                 android.util.Log.d("ChatActivity", "Loading avatar for $name, url: '$photoUrl', privacyPhoto: $privacyPhoto, canSeePhoto: $canSeePhoto")
                 if (canSeePhoto) {

@@ -90,58 +90,37 @@ class HomeFragment : Fragment() {
     }
 
     private fun checkCacheAndLoad(currentUid: String, isForceRefresh: Boolean = false) {
-        if (isForceRefresh) {
-            android.util.Log.d("HomeFragment", "[CachePolicy] Force refresh requested -> Fetching from Firestore")
-            showShimmer()
-            loadAcceptedFriends(isForceRefresh = true)
-            return
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             val appDb = AppDatabase.getInstance(requireContext())
-            val requests = appDb.friendRequestDao().getAcceptedFlow(currentUid).firstOrNull() ?: emptyList()
-            val friendIds = requests.map { if (it.fromUid == currentUid) it.toUid else it.fromUid }
+            appDb.friendRequestDao().getAcceptedFlow(currentUid).collect { requests ->
+                if (_binding == null || !isAdded) return@collect
+                val friendIds = requests.map { if (it.fromUid == currentUid) it.toUid else it.fromUid }
 
-            if (friendIds.isNotEmpty()) {
-                val cachedUserEntities = appDb.userDao().getUsersByIds(friendIds).firstOrNull() ?: emptyList()
-
-                if (cachedUserEntities.isNotEmpty()) {
-                    users.clear()
-                    users.addAll(cachedUserEntities.map { entity ->
-                        User(
-                            uid = entity.uid,
-                            name = entity.name,
-                            email = entity.email,
-                            profileImageUrl = entity.profileImageUrl,
-                            bio = entity.bio,
-                            isOnline = entity.online
-                        )
-                    })
-                    users.forEach { observeUnreadMessages(it.uid) }
-                    adapter.notifyDataSetChanged()
-                    showContent()
-
-                    val maxRequestCachedAt = requests.maxOfOrNull { it.cachedAt } ?: 0L
-                    val maxUserCachedAt = cachedUserEntities.maxOfOrNull { it.cachedAt } ?: 0L
-                    val reqStale = (System.currentTimeMillis() - maxRequestCachedAt) > com.example.gupshup.data.local.CacheConfig.FRIEND_CACHE_STALENESS_MS
-                    val usersStale = (System.currentTimeMillis() - maxUserCachedAt) > com.example.gupshup.data.local.CacheConfig.FRIEND_CACHE_STALENESS_MS
-
-                    if (reqStale || usersStale) {
-                        android.util.Log.d("HomeFragment", "[CachePolicy] Room cache STALE -> Fetching from Firestore")
-                        loadAcceptedFriends(isForceRefresh = false)
-                    } else {
-                        android.util.Log.d("HomeFragment", "[CachePolicy] Room cache FRESH -> Skipping Firestore fetch")
-                        isDataLoaded = true
-                        _binding?.swipeRefreshLayout?.isRefreshing = false
+                if (friendIds.isNotEmpty()) {
+                    appDb.userDao().getUsersByIds(friendIds).collect { cachedUserEntities ->
+                        if (_binding == null || !isAdded) return@collect
+                        if (cachedUserEntities.isNotEmpty()) {
+                            users.clear()
+                            users.addAll(cachedUserEntities.map { entity ->
+                                User(
+                                    uid = entity.uid,
+                                    name = entity.name,
+                                    email = entity.email,
+                                    profileImageUrl = entity.profileImageUrl,
+                                    bio = entity.bio,
+                                    isOnline = entity.online,
+                                    privacyPhoto = entity.privacyPhoto
+                                )
+                            })
+                            users.forEach { observeUnreadMessages(it.uid) }
+                            adapter.notifyDataSetChanged()
+                            showContent()
+                        }
                     }
-                    return@launch
                 }
             }
-
-            android.util.Log.d("HomeFragment", "[CachePolicy] No Room cache found -> Fetching from Firestore")
-            showShimmer()
-            loadAcceptedFriends(isForceRefresh = false)
         }
+        loadAcceptedFriends(isForceRefresh = true)
     }
 
     private fun showShimmer() {
@@ -243,7 +222,21 @@ class HomeFragment : Fragment() {
                             val fetchedEntities = mutableListOf<com.example.gupshup.data.local.entity.UserEntity>()
 
                             for (doc in result) {
-                                val user = doc.toObject(User::class.java)
+                                android.util.Log.d("HomeFragment_DEBUG", "User doc ${doc.id}: data=${doc.data}")
+                                val user = doc.toObject(User::class.java) ?: User()
+                                if (user.uid.isEmpty()) {
+                                    user.uid = doc.id
+                                }
+                                val pUrl = doc.getString("profileImageUrl")
+                                    ?: doc.getString("photoUrl")
+                                    ?: doc.getString("photoUri")
+                                    ?: ""
+                                if (pUrl.isNotEmpty()) {
+                                    user.profileImageUrl = pUrl
+                                }
+                                val privacyPhoto = doc.getString("privacyPhoto") ?: "Everyone"
+                                user.privacyPhoto = privacyPhoto
+
                                 if (user.uid != currentUid) {
                                     users.add(user)
                                     fetchedUsers.add(user)
@@ -254,7 +247,8 @@ class HomeFragment : Fragment() {
                                             email = user.email,
                                             profileImageUrl = user.effectiveProfileImageUrl,
                                             bio = user.bio ?: "",
-                                            online = user.isOnline
+                                            online = user.isOnline,
+                                            privacyPhoto = privacyPhoto
                                         )
                                     )
                                     observeUnreadMessages(user.uid)

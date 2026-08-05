@@ -99,6 +99,28 @@ object ImageLoaderUtil {
                 .skipMemoryCache(false)
                 .placeholder(placeholderRes)
                 .error(placeholderRes)
+                .listener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                    override fun onLoadFailed(
+                        e: com.bumptech.glide.load.engine.GlideException?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        android.util.Log.e("ImageLoaderUtil", "❌ Glide load FAILED for URL: '$trimmed'", e)
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: android.graphics.drawable.Drawable,
+                        model: Any,
+                        target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
+                        dataSource: com.bumptech.glide.load.DataSource,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        android.util.Log.d("ImageLoaderUtil", "✅ Glide load SUCCESS for URL: '$trimmed'")
+                        return false
+                    }
+                })
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView)
         } else if (trimmed.startsWith("data:image")) {

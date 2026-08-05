@@ -229,7 +229,7 @@ class ChatActivity : AppCompatActivity() {
                 val photoUrl = snapshot.getString("profileImageUrl")
                     ?: snapshot.getString("photoUrl")
                     ?: snapshot.getString("photoUri")
-                val updatedAt = snapshot.getLong("updatedAt") ?: System.currentTimeMillis()
+                val updatedAt = snapshot.getLong("updatedAt") ?: 0L
 
                 binding.userNameText.text = name
 

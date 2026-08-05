@@ -16,7 +16,7 @@ data class User(
     val isEmailVerified: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val fcmToken: String = "",
-    var updatedAt: Long = System.currentTimeMillis(),
+    var updatedAt: Long = 0L,
     val blockedUsers: List<String> = emptyList(),
     var privacyOnline: String = "Everyone",
     var privacyLastSeen: String = "Everyone",

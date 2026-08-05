@@ -257,21 +257,46 @@ class FriendsFragment : Fragment() {
                 if (_binding == null || !isAdded) return@addOnSuccessListener
 
                 if (!snapshot.isEmpty) {
-                    val doc = snapshot.documents[0].reference
+                    val docRef = snapshot.documents[0].reference
+                    val docId = snapshot.documents[0].id
+
                     if (accept) {
-                        doc.update("status", "accepted")
+                        docRef.update("status", "accepted")
                             .addOnSuccessListener {
                                 if (_binding == null || !isAdded) return@addOnSuccessListener
                                 showToast("Friend request accepted")
-                                loadFriendRequests(isForceRefresh = true)
                             }
                     } else {
-                        doc.delete()
+                        docRef.delete()
                             .addOnSuccessListener {
                                 if (_binding == null || !isAdded) return@addOnSuccessListener
                                 showToast("Friend request rejected")
-                                loadFriendRequests(isForceRefresh = true)
                             }
+                    }
+
+                    // Immediately remove from in-memory list and refresh UI
+                    friendRequests.removeAll { it.uid == fromUid }
+                    adapter.notifyDataSetChanged()
+                    showContent()
+
+                    // Update local Room cache
+                    val appContext = context?.applicationContext
+                    if (appContext != null) {
+                        lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                            val dao = com.example.gupshup.data.local.AppDatabase.getInstance(appContext).friendRequestDao()
+                            if (accept) {
+                                dao.upsert(listOf(
+                                    com.example.gupshup.data.local.entity.FriendRequestEntity(
+                                        id = docId,
+                                        fromUid = fromUid,
+                                        toUid = currentUid ?: "",
+                                        status = "accepted"
+                                    )
+                                ))
+                            } else {
+                                dao.deleteById(docId)
+                            }
+                        }
                     }
                 }
             }

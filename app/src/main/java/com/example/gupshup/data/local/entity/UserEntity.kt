@@ -12,7 +12,7 @@ data class UserEntity(
     val bio: String = "",
     val online: Boolean = false,
     val lastSeen: Long = 0L,
-    val updatedAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = 0L,
     val cachedAt: Long = System.currentTimeMillis(),
     val privacyOnline: String = "Everyone",
     val privacyLastSeen: String = "Everyone",

@@ -244,12 +244,15 @@ class ChatActivity : AppCompatActivity() {
                     com.example.gupshup.util.ImageLoaderUtil.loadAvatar(binding.toolbarAvatar, null, updatedAt)
                 }
 
+                android.util.Log.d("ChatActivity_STATUS", "receiverId=$receiverId, typingTo='$typingTo', currentUid='$currentUid', isOnline=$isOnline, canSeeOnline=$canSeeOnline, lastSeen=$lastSeen, canSeeLastSeen=$canSeeLastSeen")
+
                 binding.userStatusText.text = when {
                     typingTo == currentUid -> "Typing..."
                     isOnline && canSeeOnline -> "Online"
                     canSeeLastSeen && lastSeen != null -> "Last seen: ${formatTimestamp(lastSeen)}"
                     else -> ""
                 }
+                android.util.Log.d("ChatActivity_STATUS", "Displayed status: '${binding.userStatusText.text}'")
             }
         }
     }

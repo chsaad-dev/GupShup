@@ -162,7 +162,11 @@ class MainNavigationActivity : AppCompatActivity() {
 
     private fun setUserOnline(status: Boolean) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        db.collection("users").document(uid)
-            .update("isOnline", status)
+        val updates = mutableMapOf<String, Any>("isOnline" to status)
+        if (!status) {
+            updates["lastSeen"] = com.google.firebase.Timestamp.now()
+            updates["typingTo"] = ""
+        }
+        db.collection("users").document(uid).update(updates)
     }
 }

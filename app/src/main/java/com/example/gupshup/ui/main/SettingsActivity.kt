@@ -354,61 +354,70 @@ class SettingsActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // 1. Delete User document from Firestore
-                Tasks.await(db.collection("users").document(uid).delete())
-
-                // 2. Delete User's statuses
-                val statusQuery = Tasks.await(db.collection("statuses").whereEqualTo("userId", uid).get())
-                for (doc in statusQuery.documents) {
-                    Tasks.await(doc.reference.delete())
-                }
-
-                // 3. Delete Friend Requests
-                val sentReqs = Tasks.await(db.collection("friend_requests").whereEqualTo("fromUid", uid).get())
-                for (doc in sentReqs.documents) {
-                    Tasks.await(doc.reference.delete())
-                }
-                val recvReqs = Tasks.await(db.collection("friend_requests").whereEqualTo("toUid", uid).get())
-                for (doc in recvReqs.documents) {
-                    Tasks.await(doc.reference.delete())
-                }
-
-                // 4. Clear Local Database & Preferences
-                com.example.gupshup.data.local.AppDatabase.getInstance(applicationContext).clearAllTables()
-                prefs.edit().clear().apply()
-
-                // 5. Delete Firebase Auth User Account
+                // 1. Delete Firebase Auth User Account FIRST
                 Tasks.await(user.delete())
+
+                // 2. Delete User document from Firestore
+                try { Tasks.await(db.collection("users").document(uid).delete()) } catch (_: Exception) {}
+
+                // 3. Delete User's status updates
+                try {
+                    val statusQuery = Tasks.await(db.collection("statuses").whereEqualTo("userId", uid).get())
+                    for (doc in statusQuery.documents) {
+                        Tasks.await(doc.reference.delete())
+                    }
+                } catch (_: Exception) {}
+
+                // 4. Delete Friend Requests
+                try {
+                    val sentReqs = Tasks.await(db.collection("friend_requests").whereEqualTo("fromUid", uid).get())
+                    for (doc in sentReqs.documents) {
+                        Tasks.await(doc.reference.delete())
+                    }
+                    val recvReqs = Tasks.await(db.collection("friend_requests").whereEqualTo("toUid", uid).get())
+                    for (doc in recvReqs.documents) {
+                        Tasks.await(doc.reference.delete())
+                    }
+                } catch (_: Exception) {}
+
+                // 5. Clear Local Database, Preferences & Sign Out
+                try { com.example.gupshup.data.local.AppDatabase.getInstance(applicationContext).clearAllTables() } catch (_: Exception) {}
+                prefs.edit().clear().apply()
+                auth.signOut()
 
                 withContext(Dispatchers.Main) {
                     progressDialog.dismiss()
-                    Toast.makeText(this@SettingsActivity, "Account deleted successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SettingsActivity, "Your account has been permanently deleted", Toast.LENGTH_LONG).show()
                     val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()
                 }
             } catch (e: Exception) {
+                // Clean up local session and sign out
+                try { com.example.gupshup.data.local.AppDatabase.getInstance(applicationContext).clearAllTables() } catch (_: Exception) {}
+                prefs.edit().clear().apply()
+                auth.signOut()
+
                 withContext(Dispatchers.Main) {
                     progressDialog.dismiss()
                     if (e is com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException) {
                         Toast.makeText(
                             this@SettingsActivity,
-                            "Please log in again to confirm account deletion for security",
+                            "Security step: Please log in again to confirm permanent account deletion",
                             Toast.LENGTH_LONG
                         ).show()
-                        auth.signOut()
-                        val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
                     } else {
                         Toast.makeText(
                             this@SettingsActivity,
-                            "Failed to delete account: ${e.localizedMessage}",
-                            Toast.LENGTH_SHORT
+                            "Account session ended. Details: ${e.localizedMessage}",
+                            Toast.LENGTH_LONG
                         ).show()
                     }
+                    val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
                 }
             }
         }

@@ -175,5 +175,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author & Contact
 
 - **Repository**: [GupShup GitHub Repository](https://github.com/chsaad-dev/GupShup)
-- **Developer**: Saad (`chsaad-dev`)
+- **Developer**: Muhammad Saad (`chsaad-dev`)
 - **Support Email**: `saaddevlabs@gmail.com`

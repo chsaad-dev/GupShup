@@ -16,8 +16,8 @@ object NotificationApiClient {
 
     private const val TAG = "NotificationApiClient"
 
-    // Default Cloudflare Worker URL (can be updated when worker is deployed)
-    var workerBaseUrl: String = "https://gupshup-notifications.saaddevlabs.workers.dev"
+    // Live Cloudflare Worker URL
+    var workerBaseUrl: String = "https://gupshup-notifications.giveeaseapp.workers.dev"
 
     /**
      * Notify about a new message

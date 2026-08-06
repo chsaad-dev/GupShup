@@ -2,6 +2,9 @@ export interface Env {
   PROJECT_ID: string;
   FIREBASE_CLIENT_EMAIL?: string;
   FIREBASE_PRIVATE_KEY?: string;
+  CLOUDINARY_CLOUD_NAME?: string;
+  CLOUDINARY_API_KEY?: string;
+  CLOUDINARY_API_SECRET?: string;
 }
 
 // In-memory cache for Google OAuth2 access token
@@ -544,6 +547,14 @@ export default {
         });
       }
 
+      if (url.pathname === "/admin/cleanup-status" && request.method === "POST") {
+        const accessToken = await getGoogleAccessToken(env);
+        const result = await cleanupExpiredStatuses(env, accessToken);
+        return new Response(JSON.stringify({ success: true, ...result }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       return new Response(JSON.stringify({ error: "Not Found" }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -556,4 +567,173 @@ export default {
       });
     }
   },
+
+  async scheduled(event: any, env: Env, ctx: any): Promise<void> {
+    console.log("[Scheduled Cron] Running status 24h cleanup at", new Date().toISOString());
+    ctx.waitUntil((async () => {
+      try {
+        const accessToken = await getGoogleAccessToken(env);
+        await cleanupExpiredStatuses(env, accessToken);
+      } catch (e) {
+        console.error("[Scheduled Cron Error]", e);
+      }
+    })());
+  },
 };
+
+/**
+ * SHA-1 Hex helper for Cloudinary Admin API signatures
+ */
+async function sha1Hex(str: string): Promise<string> {
+  const buffer = new TextEncoder().encode(str);
+  const hashBuffer = await crypto.subtle.digest("SHA-1", buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/**
+ * Destroys an image in Cloudinary via Admin API
+ */
+async function destroyCloudinaryImage(env: Env, publicId: string): Promise<boolean> {
+  const cloudName = env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = env.CLOUDINARY_API_KEY;
+  const apiSecret = env.CLOUDINARY_API_SECRET;
+
+  if (!cloudName || !apiKey || !apiSecret) {
+    console.warn("[Cloudinary Cleanup] Missing Cloudinary secrets, skipping image destroy for public_id:", publicId);
+    return false;
+  }
+
+  try {
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const sigStr = `public_id=${publicId}&timestamp=${timestamp}${apiSecret}`;
+    const signature = await sha1Hex(sigStr);
+
+    const formData = new URLSearchParams();
+    formData.append("public_id", publicId);
+    formData.append("timestamp", timestamp);
+    formData.append("api_key", apiKey);
+    formData.append("signature", signature);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: formData,
+    });
+
+    const resText = await res.text();
+    console.log(`[Cloudinary Cleanup] Destroy result for ${publicId}: ${res.status} ${resText}`);
+    return res.ok;
+  } catch (err) {
+    console.error(`[Cloudinary Cleanup] Error destroying image ${publicId}:`, err);
+    return false;
+  }
+}
+
+/**
+ * Extract Cloudinary public_id from URL if mediaPublicId was missing
+ */
+function extractPublicIdFromUrl(url: string): string | null {
+  if (!url || !url.includes("cloudinary.com")) return null;
+  try {
+    const uploadIndex = url.indexOf("/upload/");
+    if (uploadIndex === -1) return null;
+    let pathAfterUpload = url.substring(uploadIndex + 8);
+    pathAfterUpload = pathAfterUpload.replace(/^v\d+\//, "");
+    const dotIndex = pathAfterUpload.lastIndexOf(".");
+    if (dotIndex !== -1) {
+      pathAfterUpload = pathAfterUpload.substring(0, dotIndex);
+    }
+    return pathAfterUpload;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Queries and cleans up expired statuses from Firestore & Cloudinary
+ */
+async function cleanupExpiredStatuses(env: Env, accessToken: string): Promise<{ cleanedCount: number }> {
+  console.log("[Status Cleanup] Checking for expired status posts...");
+  const now = Date.now();
+  const listUrl = `https://firestore.googleapis.com/v1/projects/${env.PROJECT_ID}/databases/(default)/documents/status`;
+
+  const listRes = await fetch(listUrl, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!listRes.ok) {
+    console.error("[Status Cleanup] Failed to list status documents:", await listRes.text());
+    return { cleanedCount: 0 };
+  }
+
+  const listData = (await listRes.json()) as { documents?: any[] };
+  if (!listData.documents || listData.documents.length === 0) {
+    console.log("[Status Cleanup] No status documents found in Firestore.");
+    return { cleanedCount: 0 };
+  }
+
+  let cleanedCount = 0;
+
+  for (const doc of listData.documents) {
+    const docName = doc.name as string;
+    const statusId = docName.split("/").pop();
+    const fields = doc.fields || {};
+
+    const expiresAt = fields.expiresAt?.integerValue ? parseInt(fields.expiresAt.integerValue, 10) : 0;
+    const timestamp = fields.timestamp?.integerValue ? parseInt(fields.timestamp.integerValue, 10) : 0;
+    const cutoff = now - (24 * 60 * 60 * 1000);
+
+    const isExpired = (expiresAt > 0 && expiresAt < now) || (timestamp > 0 && timestamp < cutoff);
+
+    if (isExpired && statusId) {
+      console.log(`[Status Cleanup] Expired status detected: ${statusId}`);
+
+      let publicId = fields.mediaPublicId?.stringValue || null;
+      if (!publicId && fields.mediaUrl?.stringValue) {
+        publicId = extractPublicIdFromUrl(fields.mediaUrl.stringValue);
+      }
+
+      if (publicId) {
+        await destroyCloudinaryImage(env, publicId);
+      }
+
+      // Delete views subcollection documents
+      try {
+        const viewsUrl = `https://firestore.googleapis.com/v1/${docName}/views`;
+        const viewsRes = await fetch(viewsUrl, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (viewsRes.ok) {
+          const viewsData = (await viewsRes.json()) as { documents?: any[] };
+          if (viewsData.documents) {
+            for (const viewDoc of viewsData.documents) {
+              await fetch(`https://firestore.googleapis.com/v1/${viewDoc.name}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${accessToken}` },
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.warn(`[Status Cleanup] Subcollection views delete error for ${statusId}:`, err);
+      }
+
+      // Delete the status document itself
+      const delRes = await fetch(`https://firestore.googleapis.com/v1/${docName}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (delRes.ok) {
+        console.log(`[Status Cleanup] Deleted status document ${statusId}`);
+        cleanedCount++;
+      } else {
+        console.error(`[Status Cleanup] Failed to delete status document ${statusId}:`, await delRes.text());
+      }
+    }
+  }
+
+  return { cleanedCount };
+}

@@ -10,6 +10,7 @@
     <!-- Optional for older devices (Android < Q) -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".GupShupApp"
@@ -65,6 +66,15 @@
             android:name=".ui.main.BlockedContactsActivity"
             android:exported="false"
             android:theme="@style/Theme.GupShup" />
+
+        <!--  Firebase Cloud Messaging Service  -->
+        <service
+            android:name=".service.GupShupMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
     </application>
 

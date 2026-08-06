@@ -19,6 +19,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.gupshup.service.GupShupMessagingService
 
 class LoginActivity : AppCompatActivity() {
 
@@ -142,6 +143,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun navigateToMain() {
+        GupShupMessagingService.refreshAndSaveFcmToken()
         Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this, MainNavigationActivity::class.java))
         finish()

@@ -11,8 +11,10 @@ import com.example.gupshup.databinding.ActivityMainNavigationBinding
 import com.example.gupshup.ui.auth.LoginActivity
 import com.example.gupshup.util.NetworkObserver
 import com.example.gupshup.util.NetworkStatus
+import com.example.gupshup.util.NotificationPermissionHelper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.gupshup.service.GupShupMessagingService
 import kotlinx.coroutines.launch
 
 import androidx.activity.OnBackPressedCallback
@@ -22,6 +24,7 @@ class MainNavigationActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainNavigationBinding
     private val db = FirebaseFirestore.getInstance()
     private lateinit var networkObserver: NetworkObserver
+    private lateinit var notifPermHelper: NotificationPermissionHelper
 
     private val homeFragment by lazy { HomeFragment() }
     private val statusFragment by lazy { StatusFragment() }
@@ -43,6 +46,13 @@ class MainNavigationActivity : AppCompatActivity() {
 
         binding = ActivityMainNavigationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Refresh FCM token on app start for already-logged-in user
+        GupShupMessagingService.refreshAndSaveFcmToken()
+
+        // Request notification permission on Android 13+
+        notifPermHelper = NotificationPermissionHelper(this)
+        notifPermHelper.requestIfNeeded()
 
 
         networkObserver = NetworkObserver(this)

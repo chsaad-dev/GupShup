@@ -12,6 +12,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.example.gupshup.service.GupShupMessagingService
 
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.Tasks
@@ -319,6 +320,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.btnCopyUserId.setOnClickListener { copyAction() }
 
         binding.btnSettingsLogout.setOnClickListener {
+            GupShupMessagingService.clearFcmTokenFromFirestore()
             auth.signOut()
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

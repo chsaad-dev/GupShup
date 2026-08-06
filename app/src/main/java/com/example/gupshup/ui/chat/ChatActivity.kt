@@ -628,6 +628,11 @@ class ChatActivity : AppCompatActivity() {
             .document(chatId)
             .collection("messages")
             .add(message)
+            .addOnSuccessListener { docRef ->
+                lifecycleScope.launch {
+                    com.example.gupshup.util.NotificationApiClient.notifyMessage(chatId, docRef.id)
+                }
+            }
         updateChatMetadata(text)
     }
 
@@ -647,6 +652,11 @@ class ChatActivity : AppCompatActivity() {
             .document(chatId)
             .collection("messages")
             .add(message)
+            .addOnSuccessListener { docRef ->
+                lifecycleScope.launch {
+                    com.example.gupshup.util.NotificationApiClient.notifyMessage(chatId, docRef.id)
+                }
+            }
         updateChatMetadata("📷 Photo")
     }
 

@@ -18,5 +18,13 @@ google-services.json
 *.jks
 *.keystore
 .env
+.env.*
 secrets.properties
 .kotlin/
+
+# Node & Cloudflare Worker secrets & dependencies
+node_modules/
+.dev.vars
+.wrangler/
+service-account*.json
+*.pem

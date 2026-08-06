@@ -263,6 +263,9 @@ class FriendsFragment : Fragment() {
                     if (accept) {
                         docRef.update("status", "accepted")
                             .addOnSuccessListener {
+                                lifecycleScope.launch {
+                                    com.example.gupshup.util.NotificationApiClient.notifyFriendRequest(docId)
+                                }
                                 if (_binding == null || !isAdded) return@addOnSuccessListener
                                 showToast("Friend request accepted")
                             }

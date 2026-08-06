@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Cloudflare Wrangler local environment variables & state
+.dev.vars
+.wrangler/
+dist/
+lib/
+
+# Service account keys & certificates
+service-account*.json
+*.pem
+*.key
+.env
+.env.*

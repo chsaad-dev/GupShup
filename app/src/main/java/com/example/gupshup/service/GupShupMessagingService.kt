@@ -108,7 +108,7 @@ class GupShupMessagingService : FirebaseMessagingService() {
         val channelId = when (type) {
             "friend_request", "friend_request_accepted" -> CHANNEL_FRIEND_REQUESTS
             "status" -> CHANNEL_STATUS
-            else -> CHANNEL_MESSAGES
+            else -> com.example.gupshup.util.NotificationChannelManager.getCurrentMessageChannelId(this)
         }
 
         // Deep-linking PendingIntent & deterministic notification ID setup

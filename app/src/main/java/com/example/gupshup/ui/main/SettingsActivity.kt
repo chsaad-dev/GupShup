@@ -98,6 +98,9 @@ class SettingsActivity : AppCompatActivity() {
             .setSingleChoiceItems(options, checkedItem) { dialog, which ->
                 val selectedName = options[which]
                 val soundUri = when (which) {
+                    1 -> "chime"
+                    2 -> "classic"
+                    3 -> "whistle"
                     4 -> "silent"
                     else -> "default"
                 }
@@ -106,6 +109,7 @@ class SettingsActivity : AppCompatActivity() {
                     .putString("pref_notification_sound_uri", soundUri)
                     .apply()
                 updateNotificationSoundText()
+                com.example.gupshup.util.NotificationChannelManager.rebuildMessageChannel(this)
                 dialog.dismiss()
             }
             .setNegativeButton("Cancel", null)
@@ -319,6 +323,7 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.switchVibrate.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("pref_vibrate", isChecked).apply()
+            com.example.gupshup.util.NotificationChannelManager.rebuildMessageChannel(this)
         }
 
         binding.switchEnterSend.setOnCheckedChangeListener { _, isChecked ->

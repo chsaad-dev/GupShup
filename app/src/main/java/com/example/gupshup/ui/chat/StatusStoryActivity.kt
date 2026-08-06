@@ -95,6 +95,17 @@ class StatusStoryActivity : AppCompatActivity() {
         binding.userNameTextView.text = currentStatus?.userName ?: "Unknown"
         binding.timestampTextView.text = formatTime(currentStatus?.timestamp ?: 0L)
 
+        val currentUid = auth.currentUser?.uid
+        val targetStatusId = currentStatus?.statusId ?: ""
+        if (currentUid != null && targetStatusId.isNotEmpty() && currentUid != currentStatus?.userId) {
+            val viewData = mapOf("viewedAt" to System.currentTimeMillis())
+            db.collection("status")
+                .document(targetStatusId)
+                .collection("views")
+                .document(currentUid)
+                .set(viewData)
+        }
+
         // Show delete button only if this is the current user's status
         if (currentStatus?.userId == auth.currentUser?.uid) {
             binding.deleteStatusButton.visibility = android.view.View.VISIBLE

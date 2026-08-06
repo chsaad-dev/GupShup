@@ -40,12 +40,32 @@ class StatusAdapter(
         holder.statusUserName.text = status.userName
         holder.statusText.text = status.text
 
-        val sdf = SimpleDateFormat("hh:mm a, dd MMM", Locale.getDefault())
-        holder.statusTimestamp.text = sdf.format(Date(status.timestamp))
-
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-        holder.deleteIcon.visibility = if (status.userId == currentUserId) View.VISIBLE else View.GONE
+        val isOwner = status.userId == currentUserId
+        holder.deleteIcon.visibility = if (isOwner) View.VISIBLE else View.GONE
 
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        db.collection("status")
+            .document(status.statusId)
+            .collection("views")
+            .count()
+            .get(com.google.firebase.firestore.AggregateSource.SERVER)
+            .addOnSuccessListener { snapshot ->
+                holder.viewCount.text = snapshot.count.toString()
+            }
+
+        val openViewersAction = View.OnClickListener {
+            if (isOwner) {
+                val context = holder.itemView.context
+                if (context is androidx.fragment.app.FragmentActivity) {
+                    val sheet = com.example.gupshup.ui.main.StatusViewersBottomSheetFragment.newInstance(status.statusId)
+                    sheet.show(context.supportFragmentManager, "StatusViewersBottomSheet")
+                }
+            }
+        }
+
+        holder.viewIcon.setOnClickListener(openViewersAction)
+        holder.viewCount.setOnClickListener(openViewersAction)
 
         holder.itemView.setOnClickListener {
             if (holder.adapterPosition != RecyclerView.NO_POSITION) {
@@ -56,7 +76,6 @@ class StatusAdapter(
                 onStatusClick(status)
             }
         }
-
 
         holder.deleteIcon.setOnClickListener {
             if (holder.adapterPosition != RecyclerView.NO_POSITION) {

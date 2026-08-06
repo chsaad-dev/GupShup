@@ -32,7 +32,7 @@ object CloudinaryManager {
         context: Context,
         imageUri: Uri,
         folder: String = "gupshup/profiles",
-        onSuccess: (url: String) -> Unit,
+        onSuccess: (url: String, publicId: String?) -> Unit,
         onError: (errorMsg: String) -> Unit
     ) {
         init(context)
@@ -56,8 +56,9 @@ object CloudinaryManager {
                         val url = resultData["secure_url"] as? String
                             ?: resultData["url"] as? String
                             ?: ""
-                        Log.d(TAG, "Upload success: $url")
-                        onSuccess(url)
+                        val publicId = resultData["public_id"] as? String
+                        Log.d(TAG, "Upload success: $url, publicId: $publicId")
+                        onSuccess(url, publicId)
                     }
 
                     override fun onError(requestId: String, error: ErrorInfo) {

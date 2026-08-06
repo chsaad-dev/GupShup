@@ -78,9 +78,9 @@ class StatusStoryActivity : AppCompatActivity() {
 
     private fun setupUI() {
         val currentStatus = status
-        if (currentStatus != null && currentStatus.mediaUrl.isNotBlank()) {
+        if (currentStatus != null && !currentStatus.mediaUrl.isNullOrBlank()) {
             binding.statusImageView.visibility = android.view.View.VISIBLE
-            com.example.gupshup.util.ImageLoaderUtil.loadStatusMedia(binding.statusImageView, currentStatus.mediaUrl)
+            com.example.gupshup.util.ImageLoaderUtil.loadStatusMedia(binding.statusImageView, currentStatus.mediaUrl ?: "")
         } else {
             binding.statusImageView.visibility = android.view.View.GONE
         }

@@ -165,7 +165,7 @@ class ProfileFragment : Fragment() {
                 context = requireContext(),
                 imageUri = uriToUpload,
                 folder = "gupshup/profiles",
-                onSuccess = { uploadedUrl ->
+                onSuccess = { uploadedUrl, _ ->
                     updateFirestoreProfile(uid, name, bio, uploadedUrl)
                 },
                 onError = { errorMsg ->

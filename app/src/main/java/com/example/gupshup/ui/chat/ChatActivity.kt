@@ -69,7 +69,7 @@ class ChatActivity : AppCompatActivity() {
                 context = this,
                 imageUri = uri,
                 folder = "gupshup/chat_media",
-                onSuccess = { imageUrl ->
+                onSuccess = { imageUrl, _ ->
                     sendImageMessage(imageUrl)
                 },
                 onError = { errorMsg ->

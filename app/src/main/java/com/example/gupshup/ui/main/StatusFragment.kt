@@ -61,7 +61,7 @@ class StatusFragment : Fragment() {
         fetchStatuses()
 
         binding.postStatusButton.setOnClickListener {
-            postOrUpdateStatus(null, "text")
+            postOrUpdateStatus(mediaUrl = null, mediaPublicId = null, type = "text")
         }
 
         binding.addPhotoButton.setOnClickListener {
@@ -114,8 +114,8 @@ class StatusFragment : Fragment() {
             context = requireContext(),
             imageUri = uri,
             folder = "gupshup/status_media",
-            onSuccess = { mediaUrl ->
-                postOrUpdateStatus(mediaUrl, "image")
+            onSuccess = { mediaUrl, publicId ->
+                postOrUpdateStatus(mediaUrl, publicId, "image")
             },
             onError = { errorMsg ->
                 if (_binding != null && isAdded) {
@@ -125,7 +125,7 @@ class StatusFragment : Fragment() {
         )
     }
 
-    private fun postOrUpdateStatus(mediaUrl: String?, type: String) {
+    private fun postOrUpdateStatus(mediaUrl: String?, mediaPublicId: String? = null, type: String) {
         val text = binding.statusEditText.text.toString().trim()
         if (text.isEmpty() && mediaUrl.isNullOrBlank()) {
             Toast.makeText(context, "Please enter status text or pick a photo", Toast.LENGTH_SHORT).show()
@@ -133,24 +133,32 @@ class StatusFragment : Fragment() {
         }
 
         val currentUser = auth.currentUser ?: return
-        val statusId = currentUser.uid
+        val currentUid = currentUser.uid
 
-        db.collection("users").document(statusId).get().addOnSuccessListener { document ->
+        // Generate a new unique status document ID per post
+        val statusRef = db.collection("status").document()
+        val newStatusId = statusRef.id
+        val now = System.currentTimeMillis()
+        val expiresAt = now + (24 * 60 * 60 * 1000L)
+
+        db.collection("users").document(currentUid).get().addOnSuccessListener { document ->
             val userName = document.getString("name") ?: "Anonymous"
             val userProfileUrl = document.getString("profileImageUrl") ?: ""
 
             val status = Status(
-                statusId = statusId,
-                userId = statusId,
+                statusId = newStatusId,
+                userId = currentUid,
                 userName = userName,
                 userProfileUrl = userProfileUrl,
-                text = text,
-                mediaUrl = mediaUrl ?: "",
+                text = text.ifEmpty { null },
+                mediaUrl = mediaUrl,
+                mediaPublicId = mediaPublicId,
                 type = type,
-                timestamp = System.currentTimeMillis()
+                timestamp = now,
+                expiresAt = expiresAt
             )
 
-            db.collection("status").document(statusId)
+            statusRef
                 .set(status)
                 .addOnSuccessListener {
                     if (_binding != null && isAdded) {
@@ -171,23 +179,25 @@ class StatusFragment : Fragment() {
     }
 
     private fun loadCachedStatuses() {
-        val twentyFourHoursAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000)
+        val now = System.currentTimeMillis()
         val appDb = AppDatabase.getInstance(requireContext())
         viewLifecycleOwner.lifecycleScope.launch {
-            appDb.statusDao().getActiveStatusesFlow(twentyFourHoursAgo).collect { cachedEntities ->
+            appDb.statusDao().getActiveStatusesFlow(now).collect { cachedEntities ->
                 if (_binding == null || !isAdded) return@collect
                 if (cachedEntities.isNotEmpty() && statusList.isEmpty()) {
                     statusList.clear()
                     statusList.addAll(cachedEntities.map { entity ->
                         Status(
-                            statusId = entity.id,
+                            statusId = entity.statusId,
                             userId = entity.userId,
                             userName = entity.userName,
                             userProfileUrl = entity.userProfileUrl,
                             text = entity.text,
                             mediaUrl = entity.mediaUrl,
+                            mediaPublicId = entity.mediaPublicId,
                             type = entity.type,
-                            timestamp = entity.timestamp
+                            timestamp = entity.timestamp,
+                            expiresAt = entity.expiresAt
                         )
                     })
                     statusList.sortByDescending { it.timestamp }
@@ -233,15 +243,16 @@ class StatusFragment : Fragment() {
                         }
                         statusEntities.add(
                             StatusEntity(
-                                id = st.statusId,
+                                statusId = st.statusId,
                                 userId = st.userId,
                                 userName = st.userName,
                                 userProfileUrl = st.userProfileUrl,
                                 text = st.text,
                                 mediaUrl = st.mediaUrl,
+                                mediaPublicId = st.mediaPublicId,
                                 type = st.type,
                                 timestamp = st.timestamp,
-                                expiresAt = st.timestamp + (24 * 60 * 60 * 1000)
+                                expiresAt = if (st.expiresAt > 0) st.expiresAt else (st.timestamp + 24 * 60 * 60 * 1000L)
                             )
                         )
                     }

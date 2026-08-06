@@ -113,6 +113,13 @@ class GupShupMessagingService : FirebaseMessagingService() {
         val title = data["title"] ?: message.notification?.title ?: "GupShup"
         val body = data["body"] ?: message.notification?.body ?: ""
         val senderId = data["senderId"] ?: ""
+        val chatId = data["chatId"]
+
+        // Suppress foreground notification if the user currently has this exact chat open
+        if (type == "message" && chatId != null && chatId == com.example.gupshup.data.local.CacheConfig.activeChatId) {
+            Log.d(TAG, "Active chat $chatId is open in foreground, suppressing notification")
+            return
+        }
 
         // Pick the appropriate notification channel
         val channelId = when (type) {

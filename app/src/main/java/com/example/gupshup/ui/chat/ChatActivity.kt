@@ -717,6 +717,7 @@ class ChatActivity : AppCompatActivity() {
             mapOf(
                 "isOnline" to false,
                 "typingTo" to "",
+                "activeChatId" to "",
                 "lastSeen" to Timestamp.now()
             )
         )
@@ -725,7 +726,12 @@ class ChatActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val userRef = db.collection("users").document(currentUid)
-        userRef.update("isOnline", true)
+        userRef.update(
+            mapOf(
+                "isOnline" to true,
+                "activeChatId" to chatId
+            )
+        )
         applyWallpaper()
         setupEnterKeySend()
         if (::adapter.isInitialized) {
@@ -737,6 +743,10 @@ class ChatActivity : AppCompatActivity() {
         super.onDestroy()
         if (com.example.gupshup.data.local.CacheConfig.activeChatId == chatId) {
             com.example.gupshup.data.local.CacheConfig.activeChatId = null
+        }
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            db.collection("users").document(uid).update("activeChatId", "")
         }
         userStatusListener?.remove()
         newMessagesListener?.remove()

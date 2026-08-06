@@ -80,11 +80,37 @@ class MainNavigationActivity : AppCompatActivity() {
                 R.id.menu_home -> switchFragment(homeFragment, "home")
                 R.id.menu_status -> switchFragment(statusFragment, "status")
                 R.id.menu_search -> switchFragment(searchFragment, "search")
-                R.id.menu_friends -> switchFragment(friendsFragment, "friends")
+                R.id.menu_friends -> {
+                    switchFragment(friendsFragment, "friends")
+                    cancelNotification(GupShupMessagingService.FRIEND_REQUEST_NOTIFICATION_ID)
+                }
                 R.id.menu_profile -> switchFragment(profileFragment, "profile")
             }
             true
         }
+
+        handleNavigationIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleNavigationIntent(intent)
+    }
+
+    private fun handleNavigationIntent(intent: Intent?) {
+        if (intent == null) return
+        val targetTab = intent.getStringExtra("target_tab")
+        if (targetTab == "friends") {
+            binding.bottomNav.selectedItemId = R.id.menu_friends
+            switchFragment(friendsFragment, "friends")
+            cancelNotification(GupShupMessagingService.FRIEND_REQUEST_NOTIFICATION_ID)
+        }
+    }
+
+    private fun cancelNotification(notificationId: Int) {
+        val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+        notificationManager?.cancel(notificationId)
     }
 
     private fun setupFragmentNavigation(savedInstanceState: Bundle?) {

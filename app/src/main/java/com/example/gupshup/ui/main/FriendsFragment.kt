@@ -77,6 +77,12 @@ class FriendsFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val notificationManager = context?.getSystemService(android.content.Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+        notificationManager?.cancel(com.example.gupshup.service.GupShupMessagingService.FRIEND_REQUEST_NOTIFICATION_ID)
+    }
+
     private fun checkCacheAndLoad(uid: String, isForceRefresh: Boolean = false) {
         if (isForceRefresh) {
             android.util.Log.d("FriendsFragment", "[CachePolicy] Force refresh requested -> Fetching from Firestore")

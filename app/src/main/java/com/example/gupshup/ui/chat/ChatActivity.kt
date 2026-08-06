@@ -738,6 +738,11 @@ class ChatActivity : AppCompatActivity() {
                 "activeChatId" to chatId
             )
         )
+        // Clear system tray notification for this chat automatically
+        val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager
+        notificationManager?.cancel(chatId.hashCode())
+        notificationManager?.cancel(receiverId.hashCode())
+
         applyWallpaper()
         setupEnterKeySend()
         if (::adapter.isInitialized) {

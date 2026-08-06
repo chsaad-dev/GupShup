@@ -71,6 +71,35 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <!-- Image Preview Container (Hidden by default) -->
+                    <FrameLayout
+                        android:id="@+id/imagePreviewContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:visibility="gone"
+                        android:layout_marginBottom="@dimen/spacing_sm">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/imagePreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
+
+                        <!-- Remove Image Button -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/removeImageButton"
+                            style="@style/Widget.Material3.Button.IconButton"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_gravity="top|end"
+                            android:layout_margin="8dp"
+                            android:backgroundTint="#80000000"
+                            app:icon="@drawable/ic_delete"
+                            app:iconTint="@android:color/white"
+                            app:iconSize="18dp" />
+                    </FrameLayout>
+
                     <!-- Borderless Multi-line EditText -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"

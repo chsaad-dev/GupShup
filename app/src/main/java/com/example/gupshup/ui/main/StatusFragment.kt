@@ -37,10 +37,14 @@ class StatusFragment : Fragment() {
     private lateinit var bubbleAdapter: StatusBubbleAdapter
     private lateinit var verticalAdapter: StatusAdapter
     private var statusListener: ListenerRegistration? = null
+    private var selectedImageUri: Uri? = null
 
     private val photoPickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
-            uploadPhotoStatus(uri)
+            selectedImageUri = uri
+            binding.imagePreviewContainer.visibility = View.VISIBLE
+            binding.imagePreview.setImageURI(uri)
+            updatePostButtonState()
         }
     }
 
@@ -59,14 +63,46 @@ class StatusFragment : Fragment() {
         setupAdapters()
         loadCachedStatuses()
         fetchStatuses()
+        setupInputListeners()
 
         binding.postStatusButton.setOnClickListener {
-            postOrUpdateStatus(mediaUrl = null, mediaPublicId = null, type = "text")
+            val uri = selectedImageUri
+            if (uri != null) {
+                uploadAndPostPhotoStatus(uri)
+            } else {
+                postOrUpdateStatus(mediaUrl = null, mediaPublicId = null, type = "text")
+            }
         }
 
         binding.addPhotoButton.setOnClickListener {
             photoPickerLauncher.launch("image/*")
         }
+
+        binding.removeImageButton.setOnClickListener {
+            selectedImageUri = null
+            binding.imagePreviewContainer.visibility = View.GONE
+            binding.imagePreview.setImageDrawable(null)
+            updatePostButtonState()
+        }
+    }
+
+    private fun setupInputListeners() {
+        updatePostButtonState()
+        binding.statusEditText.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                updatePostButtonState()
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+    }
+
+    private fun updatePostButtonState() {
+        if (_binding == null) return
+        val text = binding.statusEditText.text.toString().trim()
+        val hasContent = text.isNotEmpty() || selectedImageUri != null
+        binding.postStatusButton.isEnabled = hasContent
+        binding.postStatusButton.alpha = if (hasContent) 1.0f else 0.5f
     }
 
     private fun setupToolbar() {
@@ -108,8 +144,11 @@ class StatusFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun uploadPhotoStatus(uri: Uri) {
+    private fun uploadAndPostPhotoStatus(uri: Uri) {
         Toast.makeText(context, "Uploading photo status...", Toast.LENGTH_SHORT).show()
+        binding.postStatusButton.isEnabled = false
+        binding.postStatusButton.alpha = 0.5f
+
         CloudinaryManager.uploadImage(
             context = requireContext(),
             imageUri = uri,
@@ -120,6 +159,7 @@ class StatusFragment : Fragment() {
             onError = { errorMsg ->
                 if (_binding != null && isAdded) {
                     Toast.makeText(context, "Failed to upload photo status: $errorMsg", Toast.LENGTH_LONG).show()
+                    updatePostButtonState()
                 }
             }
         )
@@ -164,11 +204,16 @@ class StatusFragment : Fragment() {
                     if (_binding != null && isAdded) {
                         Toast.makeText(context, "Status posted!", Toast.LENGTH_SHORT).show()
                         binding.statusEditText.setText("")
+                        selectedImageUri = null
+                        binding.imagePreviewContainer.visibility = View.GONE
+                        binding.imagePreview.setImageDrawable(null)
+                        updatePostButtonState()
                     }
                 }
                 .addOnFailureListener {
                     if (_binding != null && isAdded) {
                         Toast.makeText(context, "Failed to post status", Toast.LENGTH_SHORT).show()
+                        updatePostButtonState()
                     }
                 }
         }.addOnFailureListener {

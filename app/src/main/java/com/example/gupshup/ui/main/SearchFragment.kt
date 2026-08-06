@@ -174,9 +174,7 @@ class SearchFragment : Fragment() {
         db.collection("friend_requests")
             .add(request)
             .addOnSuccessListener { docRef ->
-                lifecycleScope.launch {
-                    com.example.gupshup.util.NotificationApiClient.notifyFriendRequest(docRef.id)
-                }
+                com.example.gupshup.util.NotificationApiClient.notifyFriendRequest(docRef.id)
                 if (_binding == null || !isAdded) return@addOnSuccessListener
                 context?.let { Toast.makeText(it, "✅ Friend request sent", Toast.LENGTH_SHORT).show() }
                 binding.searchInput.setText("")

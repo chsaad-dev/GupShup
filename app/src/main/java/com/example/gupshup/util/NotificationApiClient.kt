@@ -2,79 +2,122 @@ package com.example.gupshup.util
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
+import java.util.concurrent.TimeUnit
+
+object NetworkConfig {
+    const val WORKER_BASE_URL: String = "https://gupshup-notifications.giveeaseapp.workers.dev"
+}
 
 /**
- * Client helper to trigger push notifications via Cloudflare Worker endpoint
+ * Client helper to trigger push notifications via Cloudflare Worker endpoints.
+ * Fire-and-forget, non-blocking to UI.
+ * Handles Firebase Auth ID token caching & 401 token force-refresh retries.
  */
+@OptIn(DelicateCoroutinesApi::class)
 object NotificationApiClient {
 
     private const val TAG = "NotificationApiClient"
+    private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
 
-    // Live Cloudflare Worker URL
-    var workerBaseUrl: String = "https://gupshup-notifications.giveeaseapp.workers.dev"
-
-    /**
-     * Notify about a new message
-     */
-    suspend fun notifyMessage(chatId: String, messageId: String) {
-        val payload = JSONObject().apply {
-            put("chatId", chatId)
-            put("messageId", messageId)
-        }
-        sendPostRequest("$workerBaseUrl/notify/message", payload.toString())
+    private val httpClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build()
     }
 
     /**
-     * Notify about a friend request (created or accepted)
+     * Notify Cloudflare Worker about a new chat message.
      */
-    suspend fun notifyFriendRequest(requestId: String) {
-        val payload = JSONObject().apply {
-            put("requestId", requestId)
+    fun notifyMessage(chatId: String, messageId: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val json = JSONObject().apply {
+                put("chatId", chatId)
+                put("messageId", messageId)
+            }.toString()
+
+            executeWorkerPost("${NetworkConfig.WORKER_BASE_URL}/notify/message", json)
         }
-        sendPostRequest("$workerBaseUrl/notify/friend-request", payload.toString())
     }
 
-    private suspend fun sendPostRequest(endpointUrl: String, jsonBody: String) {
-        withContext(Dispatchers.IO) {
-            val user = FirebaseAuth.getInstance().currentUser ?: return@withContext
+    /**
+     * Notify Cloudflare Worker about a friend request (created or accepted).
+     */
+    fun notifyFriendRequest(requestId: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val json = JSONObject().apply {
+                put("requestId", requestId)
+            }.toString()
 
-            user.getIdToken(false)
-                .addOnSuccessListener { result ->
-                    val idToken = result.token ?: return@addOnSuccessListener
+            executeWorkerPost("${NetworkConfig.WORKER_BASE_URL}/notify/friend-request", json)
+        }
+    }
 
-                    Thread {
-                        try {
-                            val url = URL(endpointUrl)
-                            val conn = url.openConnection() as HttpURLConnection
-                            conn.requestMethod = "POST"
-                            conn.setRequestProperty("Content-Type", "application/json")
-                            conn.setRequestProperty("Authorization", "Bearer $idToken")
-                            conn.doOutput = true
-                            conn.connectTimeout = 10000
-                            conn.readTimeout = 10000
+    private suspend fun fetchIdToken(forceRefresh: Boolean): String? {
+        val user = FirebaseAuth.getInstance().currentUser ?: return null
+        return try {
+            val result = user.getIdToken(forceRefresh).await()
+            result.token
+        } catch (e: Exception) {
+            Log.w(TAG, "Error fetching Firebase ID token (forceRefresh=$forceRefresh): ${e.message}")
+            null
+        }
+    }
 
-                            OutputStreamWriter(conn.outputStream).use { writer ->
-                                writer.write(jsonBody)
-                                writer.flush()
-                            }
+    private suspend fun executeWorkerPost(endpointUrl: String, jsonBody: String) {
+        try {
+            // Step 1: Use cached Firebase ID token (forceRefresh = false)
+            var idToken = fetchIdToken(forceRefresh = false)
+            if (idToken == null) {
+                Log.w(TAG, "No authenticated user or ID token available. Skipping notification request.")
+                return
+            }
 
-                            val responseCode = conn.responseCode
-                            Log.d(TAG, "Notification API [$endpointUrl] responded with code: $responseCode")
-                            conn.disconnect()
-                        } catch (e: Exception) {
-                            Log.w(TAG, "Failed to send notification request to $endpointUrl: ${e.message}")
-                        }
-                    }.start()
+            var responseCode = performHttpCall(endpointUrl, jsonBody, idToken)
+
+            // Step 2: If 401 Unauthorized, force refresh token once and retry
+            if (responseCode == 401) {
+                Log.w(TAG, "Worker returned 401 Unauthorized. Force refreshing ID token and retrying once...")
+                idToken = fetchIdToken(forceRefresh = true)
+                if (idToken != null) {
+                    responseCode = performHttpCall(endpointUrl, jsonBody, idToken)
                 }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "Failed to obtain Firebase ID token for notification request: ${e.message}")
-                }
+            }
+
+            Log.d(TAG, "Worker endpoint [$endpointUrl] completed with status code: $responseCode")
+        } catch (e: Exception) {
+            Log.w(TAG, "Exception during notification request to $endpointUrl: ${e.message}")
+        }
+    }
+
+    private fun performHttpCall(url: String, jsonBody: String, idToken: String): Int {
+        return try {
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer $idToken")
+                .addHeader("Content-Type", "application/json")
+                .post(jsonBody.toRequestBody(JSON_MEDIA_TYPE))
+                .build()
+
+            httpClient.newCall(request).execute().use { response ->
+                val bodyStr = response.body?.string() ?: ""
+                Log.d(TAG, "Worker response [${response.code}]: $bodyStr")
+                response.code
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "HTTP execution error: ${e.message}")
+            -1
         }
     }
 }

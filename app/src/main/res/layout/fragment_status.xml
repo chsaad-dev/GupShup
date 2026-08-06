@@ -164,12 +164,12 @@
                 android:visibility="gone"
                 android:paddingVertical="@dimen/spacing_3xl">
 
-                <ImageView
-                    android:layout_width="@dimen/empty_state_illustration_size"
-                    android:layout_height="@dimen/empty_state_illustration_size"
-                    android:src="@drawable/ic_status"
-                    android:alpha="0.3"
-                    app:tint="@color/onSurfaceVariant" />
+                <com.example.gupshup.ui.view.ModernAnimatedEmptyView
+                    android:id="@+id/statusAnimatedEmptyView"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    app:iconSrc="@drawable/ic_status"
+                    app:pulseColor="@color/colorPrimary" />
 
                 <TextView
                     android:layout_width="wrap_content"

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ModernAnimatedEmptyView">
+        <attr name="iconSrc" format="reference" />
+        <attr name="pulseColor" format="color" />
+    </declare-styleable>
+</resources>

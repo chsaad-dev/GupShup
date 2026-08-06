@@ -64,13 +64,12 @@
                 android:gravity="center"
                 android:visibility="gone">
 
-                <!-- 120dp Illustration Placeholder (OnSurfaceVariant at 30% opacity) -->
-                <ImageView
-                    android:layout_width="@dimen/empty_state_illustration_size"
-                    android:layout_height="@dimen/empty_state_illustration_size"
-                    android:src="@drawable/ic_chat_empty"
-                    android:alpha="0.3"
-                    app:tint="@color/onSurfaceVariant" />
+                <com.example.gupshup.ui.view.ModernAnimatedEmptyView
+                    android:id="@+id/chatsAnimatedEmptyView"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    app:iconSrc="@drawable/ic_chat_empty"
+                    app:pulseColor="@color/colorPrimary" />
 
                 <!-- Title: Headline Style -->
                 <TextView

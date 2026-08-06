@@ -160,7 +160,7 @@ class ProfileFragment : Fragment() {
 
         val uriToUpload = selectedImageUri
         if (uriToUpload != null) {
-            Toast.makeText(requireContext(), "Uploading photo to Cloudinary...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Uploading photo...", Toast.LENGTH_SHORT).show()
             CloudinaryManager.uploadImage(
                 context = requireContext(),
                 imageUri = uriToUpload,
@@ -170,7 +170,7 @@ class ProfileFragment : Fragment() {
                 },
                 onError = { errorMsg ->
                     if (isAdded) {
-                        Toast.makeText(requireContext(), "❌ Photo upload failed: $errorMsg", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), "Photo upload failed: $errorMsg", Toast.LENGTH_LONG).show()
                         binding.editSaveButton.isEnabled = true
                         binding.editSaveButton.text = "Save"
                     }
@@ -197,7 +197,7 @@ class ProfileFragment : Fragment() {
             .set(updates, com.google.firebase.firestore.SetOptions.merge())
             .addOnSuccessListener {
                 if (isAdded) {
-                    Toast.makeText(requireContext(), "✅ Profile updated", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Profile updated", Toast.LENGTH_SHORT).show()
                     selectedImageUri = null
                     binding.editSaveButton.isEnabled = true
                     enableEditing(false)
@@ -205,7 +205,7 @@ class ProfileFragment : Fragment() {
             }
             .addOnFailureListener {
                 if (isAdded) {
-                    Toast.makeText(requireContext(), "❌ Profile update failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Profile update failed", Toast.LENGTH_SHORT).show()
                     binding.editSaveButton.isEnabled = true
                     binding.editSaveButton.text = "Save"
                 }

@@ -75,14 +75,12 @@
             android:gravity="center"
             android:padding="@dimen/spacing_3xl">
 
-            <!-- 120dp Magnifying Glass Illustration (Subtle Brand Tint at 40% Opacity) -->
-            <ImageView
-                android:id="@+id/searchEmptyIcon"
-                android:layout_width="@dimen/empty_state_illustration_size"
-                android:layout_height="@dimen/empty_state_illustration_size"
-                android:src="@drawable/ic_search"
-                android:alpha="0.4"
-                app:tint="@color/colorPrimary" />
+            <com.example.gupshup.ui.view.ModernAnimatedEmptyView
+                android:id="@+id/searchAnimatedEmptyView"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                app:iconSrc="@drawable/ic_search"
+                app:pulseColor="@color/colorPrimary" />
 
             <!-- Title: Headline Style -->
             <TextView

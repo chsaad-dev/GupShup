@@ -16,7 +16,6 @@ class GupShupApp : Application() {
 
         CloudinaryManager.init(this)
 
-        // Configure Firestore for offline persistence with a larger cache
         val settings = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
             .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
@@ -24,7 +23,6 @@ class GupShupApp : Application() {
 
         FirebaseFirestore.getInstance().firestoreSettings = settings
 
-        // Initialize versioned notification channels for Android 8.0+ (API 26+)
         com.example.gupshup.util.NotificationChannelManager.ensureChannelsInitialized(this)
     }
 }

@@ -72,8 +72,44 @@ class SettingsActivity : AppCompatActivity() {
 
         updateWallpaperText()
         updatePrivacyText()
+        updateNotificationSoundText()
         updateMediaDownloadText()
         updateStorageUsageText()
+    }
+
+    private fun updateNotificationSoundText() {
+        val soundName = prefs.getString("pref_notification_sound_name", "Default") ?: "Default"
+        binding.textNotificationSound.text = soundName
+    }
+
+    private fun showNotificationSoundDialog() {
+        val options = arrayOf("Default", "Chime", "Classic Bell", "Whistle", "Silent")
+        val currentName = prefs.getString("pref_notification_sound_name", "Default") ?: "Default"
+        val checkedItem = when (currentName) {
+            "Chime" -> 1
+            "Classic Bell" -> 2
+            "Whistle" -> 3
+            "Silent" -> 4
+            else -> 0
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Notification Sound")
+            .setSingleChoiceItems(options, checkedItem) { dialog, which ->
+                val selectedName = options[which]
+                val soundUri = when (which) {
+                    4 -> "silent"
+                    else -> "default"
+                }
+                prefs.edit()
+                    .putString("pref_notification_sound_name", selectedName)
+                    .putString("pref_notification_sound_uri", soundUri)
+                    .apply()
+                updateNotificationSoundText()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun updateMediaDownloadText() {
@@ -269,8 +305,16 @@ class SettingsActivity : AppCompatActivity() {
             wallpaperSheet.show(supportFragmentManager, "WallpaperBottomSheetFragment")
         }
 
+        binding.rowNotificationSound.setOnClickListener {
+            showNotificationSoundDialog()
+        }
+
         binding.switchMessageNotifications.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("pref_notifications", isChecked).apply()
+            val uid = auth.currentUser?.uid
+            if (uid != null) {
+                db.collection("users").document(uid).update("notificationsEnabled", isChecked)
+            }
         }
 
         binding.switchVibrate.setOnCheckedChangeListener { _, isChecked ->

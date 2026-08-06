@@ -162,8 +162,16 @@ class GupShupMessagingService : FirebaseMessagingService() {
             }
         }
 
+        val vibrateEnabled = prefs.getBoolean("pref_vibrate", true)
+        val soundUriString = prefs.getString("pref_notification_sound_uri", "default")
+
+        val soundUri = when (soundUriString) {
+            "silent" -> null
+            else -> android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+        }
+
         // Build notification
-        val notification = NotificationCompat.Builder(this, channelId)
+        val builder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_send)
             .setContentTitle(title)
             .setContentText(body)
@@ -176,7 +184,20 @@ class GupShupMessagingService : FirebaseMessagingService() {
                     else -> NotificationCompat.PRIORITY_HIGH
                 }
             )
-            .build()
+
+        if (vibrateEnabled) {
+            builder.setVibrate(longArrayOf(0, 250, 100, 250))
+        } else {
+            builder.setVibrate(longArrayOf(0))
+        }
+
+        if (soundUri != null) {
+            builder.setSound(soundUri)
+        } else {
+            builder.setSound(null)
+        }
+
+        val notification = builder.build()
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -1,5 +1,6 @@
 package com.example.gupshup.ui.chat
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -84,9 +85,28 @@ class ChatActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         currentUid = auth.currentUser?.uid ?: return
-        receiverId = intent.getStringExtra("receiverId") ?: return
+        val extras = intent.extras
+        val extractedReceiverId = intent.getStringExtra("receiverId")
+            ?: intent.getStringExtra("senderId")
+            ?: extras?.getString("receiverId")
+            ?: extras?.getString("senderId")
 
-        chatId = if (currentUid < receiverId) "${currentUid}${receiverId}" else "${receiverId}${currentUid}"
+        android.util.Log.d("ChatActivity", "[CHAT_ON_CREATE] extractedReceiverId=$extractedReceiverId, extrasKeys=${extras?.keySet()}")
+
+        if (extractedReceiverId.isNullOrEmpty()) {
+            finish()
+            return
+        }
+        receiverId = extractedReceiverId
+
+        val customChatId = intent.getStringExtra("chatId") ?: extras?.getString("chatId")
+        chatId = if (!customChatId.isNullOrEmpty()) {
+            customChatId
+        } else if (currentUid < receiverId) {
+            "${currentUid}${receiverId}"
+        } else {
+            "${receiverId}${currentUid}"
+        }
         com.example.gupshup.data.local.CacheConfig.activeChatId = chatId
 
         setupToolbar()
@@ -747,6 +767,34 @@ class ChatActivity : AppCompatActivity() {
         setupEnterKeySend()
         if (::adapter.isInitialized) {
             adapter.notifyDataSetChanged()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val extras = intent.extras
+        val newReceiverId = intent.getStringExtra("receiverId")
+            ?: intent.getStringExtra("senderId")
+            ?: extras?.getString("receiverId")
+            ?: extras?.getString("senderId")
+
+        android.util.Log.d("ChatActivity", "[CHAT_ON_NEW_INTENT] newReceiverId=$newReceiverId, keys=${extras?.keySet()}")
+
+        if (!newReceiverId.isNullOrEmpty() && newReceiverId != receiverId) {
+            receiverId = newReceiverId
+            val customChatId = intent.getStringExtra("chatId") ?: extras?.getString("chatId")
+            chatId = if (!customChatId.isNullOrEmpty()) {
+                customChatId
+            } else if (currentUid < receiverId) {
+                "${currentUid}${receiverId}"
+            } else {
+                "${receiverId}${currentUid}"
+            }
+            com.example.gupshup.data.local.CacheConfig.activeChatId = chatId
+            loadCachedMessages()
+            loadInitialMessages()
+            observeReceiverStatus()
         }
     }
 

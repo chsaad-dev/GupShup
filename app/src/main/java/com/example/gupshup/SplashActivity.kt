@@ -79,12 +79,41 @@ class SplashActivity : AppCompatActivity() {
         lifecycleScope.launch {
             delay(1800)
             val auth = FirebaseAuth.getInstance()
-            val destination = if (auth.currentUser != null) {
-                MainNavigationActivity::class.java
+            if (auth.currentUser != null) {
+                val extras = intent.extras
+                val targetTab = intent.getStringExtra("target_tab") ?: extras?.getString("target_tab")
+                val receiverId = intent.getStringExtra("receiverId")
+                    ?: intent.getStringExtra("senderId")
+                    ?: extras?.getString("receiverId")
+                    ?: extras?.getString("senderId")
+                val chatId = intent.getStringExtra("chatId") ?: extras?.getString("chatId")
+                val notifType = intent.getStringExtra("type")
+                    ?: intent.getStringExtra("notification_type")
+                    ?: extras?.getString("type")
+                    ?: extras?.getString("notification_type")
+
+                android.util.Log.d("SplashActivity", "[COLD_START] Intent extras: targetTab=$targetTab, receiverId=$receiverId, chatId=$chatId, notifType=$notifType")
+
+                if (!receiverId.isNullOrEmpty()) {
+                    val chatIntent = Intent(this@SplashActivity, com.example.gupshup.ui.chat.ChatActivity::class.java).apply {
+                        putExtra("receiverId", receiverId)
+                        if (!chatId.isNullOrEmpty()) putExtra("chatId", chatId)
+                    }
+                    val stackBuilder = androidx.core.app.TaskStackBuilder.create(this@SplashActivity)
+                    stackBuilder.addNextIntentWithParentStack(Intent(this@SplashActivity, MainNavigationActivity::class.java))
+                    stackBuilder.addNextIntent(chatIntent)
+                    stackBuilder.startActivities()
+                } else if (targetTab == "friends" || notifType == "friend_request" || notifType == "friend_request_accepted") {
+                    val mainIntent = Intent(this@SplashActivity, MainNavigationActivity::class.java).apply {
+                        putExtra("target_tab", "friends")
+                    }
+                    startActivity(mainIntent)
+                } else {
+                    startActivity(Intent(this@SplashActivity, MainNavigationActivity::class.java))
+                }
             } else {
-                LoginActivity::class.java
+                startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
             }
-            startActivity(Intent(this@SplashActivity, destination))
             finish()
         }
     }

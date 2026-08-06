@@ -116,6 +116,8 @@ class GupShupMessagingService : FirebaseMessagingService() {
             "message" -> {
                 val notifId = chatId?.hashCode() ?: senderId.hashCode()
                 val chatIntent = Intent(this, ChatActivity::class.java).apply {
+                    action = "com.example.gupshup.ACTION_CHAT_${chatId ?: senderId}"
+                    setData(android.net.Uri.parse("gupshup://chat/${chatId ?: senderId}"))
                     putExtra("receiverId", senderId)
                     if (chatId != null) putExtra("chatId", chatId)
                 }
@@ -132,6 +134,8 @@ class GupShupMessagingService : FirebaseMessagingService() {
             "friend_request", "friend_request_accepted" -> {
                 val notifId = FRIEND_REQUEST_NOTIFICATION_ID
                 val friendsIntent = Intent(this, MainNavigationActivity::class.java).apply {
+                    action = "com.example.gupshup.ACTION_FRIENDS"
+                    setData(android.net.Uri.parse("gupshup://friends"))
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     putExtra("target_tab", "friends")
                 }

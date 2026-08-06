@@ -100,8 +100,13 @@ class MainNavigationActivity : AppCompatActivity() {
 
     private fun handleNavigationIntent(intent: Intent?) {
         if (intent == null) return
-        val targetTab = intent.getStringExtra("target_tab")
-        if (targetTab == "friends") {
+        val extras = intent.extras
+        val targetTab = intent.getStringExtra("target_tab") ?: extras?.getString("target_tab")
+        val notifType = intent.getStringExtra("type") ?: intent.getStringExtra("notification_type") ?: extras?.getString("type") ?: extras?.getString("notification_type")
+
+        android.util.Log.d("MainNavigationActivity", "[NAV_INTENT] targetTab=$targetTab, notifType=$notifType, keys=${extras?.keySet()}")
+
+        if (targetTab == "friends" || notifType == "friend_request" || notifType == "friend_request_accepted") {
             binding.bottomNav.selectedItemId = R.id.menu_friends
             switchFragment(friendsFragment, "friends")
             cancelNotification(GupShupMessagingService.FRIEND_REQUEST_NOTIFICATION_ID)

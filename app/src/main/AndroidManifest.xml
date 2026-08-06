@@ -41,7 +41,9 @@
         <activity android:name=".ui.auth.EmailVerificationActivity"/>
 
         <!--  Chat Screens -->
-        <activity android:name=".ui.chat.ChatActivity" />
+        <activity
+            android:name=".ui.chat.ChatActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".ui.chat.StatusViewActivity" />
         <activity android:name=".ui.chat.StatusStoryActivity"/>
@@ -51,6 +53,7 @@
         <!--  Main Navigation Screen -->
         <activity
             android:name=".ui.main.MainNavigationActivity"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustPan"
             android:exported="false"
             android:theme="@style/Theme.GupShup" />

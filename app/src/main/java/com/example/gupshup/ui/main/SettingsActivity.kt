@@ -20,6 +20,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+import android.view.View
+import com.example.gupshup.R
+import com.example.gupshup.databinding.DialogDeleteAccountConfirmBinding
 import com.example.gupshup.util.finishWithFade
 import com.example.gupshup.util.startActivityWithFade
 
@@ -386,48 +389,134 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.textDeleteAccount.setOnClickListener {
-            MaterialAlertDialogBuilder(this)
-                .setTitle("Delete Account")
-                .setMessage("Are you sure you want to delete your account? All your profile data, messages, statuses, and friend links will be permanently deleted.")
-                .setPositiveButton("Delete Permanently") { _, _ ->
-                    deleteAccount()
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
+            showAccountDeletionVerificationDialog()
         }
     }
 
-    private fun deleteAccount() {
+    private fun showAccountDeletionVerificationDialog() {
         val user = auth.currentUser
         val uid = user?.uid
+        val email = user?.email
         if (uid.isNullOrEmpty() || user == null) {
             Toast.makeText(this, "No active user session", Toast.LENGTH_SHORT).show()
             return
         }
 
+        val isPasswordProvider = user.providerData.any { it.providerId == "password" }
+
+        val dialogBinding = DialogDeleteAccountConfirmBinding.inflate(layoutInflater)
+
+        if (isPasswordProvider) {
+            dialogBinding.dialogPromptText.text = "Please enter your password to confirm deletion:"
+            dialogBinding.confirmEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        } else {
+            dialogBinding.dialogPromptText.text = "Please type DELETE to confirm deletion:"
+            dialogBinding.confirmEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogBinding.root)
+            .setPositiveButton("Delete My Account", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.setOnShowListener {
+            val positiveBtn = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            positiveBtn.setTextColor(resources.getColor(R.color.error, null))
+            positiveBtn.setOnClickListener {
+                val input = dialogBinding.confirmEditText.text?.toString()?.trim() ?: ""
+                dialogBinding.dialogErrorText.visibility = View.GONE
+
+                if (isPasswordProvider) {
+                    if (input.isEmpty()) {
+                        dialogBinding.dialogErrorText.text = "Password is required to delete your account"
+                        dialogBinding.dialogErrorText.visibility = View.VISIBLE
+                        return@setOnClickListener
+                    }
+
+                    if (email.isNullOrEmpty()) {
+                        dialogBinding.dialogErrorText.text = "Account email not found"
+                        dialogBinding.dialogErrorText.visibility = View.VISIBLE
+                        return@setOnClickListener
+                    }
+
+                    val credential = com.google.firebase.auth.EmailAuthProvider.getCredential(email, input)
+                    user.reauthenticate(credential)
+                        .addOnSuccessListener {
+                            dialog.dismiss()
+                            performFullAccountDeletion(user)
+                        }
+                        .addOnFailureListener { e ->
+                            dialogBinding.dialogErrorText.text = "Incorrect password: ${e.localizedMessage}"
+                            dialogBinding.dialogErrorText.visibility = View.VISIBLE
+                        }
+                } else {
+                    if (input != "DELETE") {
+                        dialogBinding.dialogErrorText.text = "Please type DELETE exactly to confirm"
+                        dialogBinding.dialogErrorText.visibility = View.VISIBLE
+                        return@setOnClickListener
+                    }
+
+                    dialog.dismiss()
+                    performFullAccountDeletion(user)
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun performFullAccountDeletion(user: com.google.firebase.auth.FirebaseUser) {
+        val uid = user.uid
+        val email = user.email
+
         val progressDialog = android.app.ProgressDialog(this).apply {
-            setMessage("Deleting account and associated data...")
+            setMessage("Deleting all your account data, statuses, reports and links...")
             setCancelable(false)
             show()
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // 1. Delete Firebase Auth User Account FIRST
-                Tasks.await(user.delete())
-
-                // 2. Delete User document from Firestore
-                try { Tasks.await(db.collection("users").document(uid).delete()) } catch (_: Exception) {}
-
-                // 3. Delete User's status updates
+                // 1. Clear FCM Token from Firestore
                 try {
-                    val statusQuery = Tasks.await(db.collection("statuses").whereEqualTo("userId", uid).get())
-                    for (doc in statusQuery.documents) {
+                    GupShupMessagingService.clearFcmTokenFromFirestore()
+                } catch (_: Exception) {}
+
+                // 2. Delete User Document from Firestore
+                try {
+                    Tasks.await(db.collection("users").document(uid).delete())
+                } catch (_: Exception) {}
+
+                // 3. Delete User Reports
+                try {
+                    val reportsByUid = Tasks.await(db.collection("reports").whereEqualTo("userId", uid).get())
+                    for (doc in reportsByUid.documents) {
                         Tasks.await(doc.reference.delete())
+                    }
+                    if (!email.isNullOrEmpty()) {
+                        val reportsByEmail = Tasks.await(db.collection("reports").whereEqualTo("userEmail", email).get())
+                        for (doc in reportsByEmail.documents) {
+                            Tasks.await(doc.reference.delete())
+                        }
                     }
                 } catch (_: Exception) {}
 
-                // 4. Delete Friend Requests
+                // 4. Delete Status Updates (and view subcollections)
+                try {
+                    val statusQuery = Tasks.await(db.collection("status").whereEqualTo("userId", uid).get())
+                    for (statusDoc in statusQuery.documents) {
+                        try {
+                            val viewsQuery = Tasks.await(statusDoc.reference.collection("views").get())
+                            for (viewDoc in viewsQuery.documents) {
+                                Tasks.await(viewDoc.reference.delete())
+                            }
+                        } catch (_: Exception) {}
+                        Tasks.await(statusDoc.reference.delete())
+                    }
+                } catch (_: Exception) {}
+
+                // 5. Delete Friend Requests
                 try {
                     val sentReqs = Tasks.await(db.collection("friend_requests").whereEqualTo("fromUid", uid).get())
                     for (doc in sentReqs.documents) {
@@ -439,8 +528,17 @@ class SettingsActivity : AppCompatActivity() {
                     }
                 } catch (_: Exception) {}
 
-                // 5. Clear Local Database, Preferences & Sign Out
-                try { com.example.gupshup.data.local.AppDatabase.getInstance(applicationContext).clearAllTables() } catch (_: Exception) {}
+                // 6. Delete Firebase Auth User Account
+                try {
+                    Tasks.await(user.delete())
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsActivity", "Auth delete error", e)
+                }
+
+                // 7. Clear Local Database, Preferences & Sign Out
+                try {
+                    com.example.gupshup.data.local.AppDatabase.getInstance(applicationContext).clearAllTables()
+                } catch (_: Exception) {}
                 prefs.edit().clear().apply()
                 auth.signOut()
 
@@ -450,32 +548,21 @@ class SettingsActivity : AppCompatActivity() {
                     val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
+                    com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this@SettingsActivity)
                     finish()
                 }
             } catch (e: Exception) {
-                // Clean up local session and sign out
                 try { com.example.gupshup.data.local.AppDatabase.getInstance(applicationContext).clearAllTables() } catch (_: Exception) {}
                 prefs.edit().clear().apply()
                 auth.signOut()
 
                 withContext(Dispatchers.Main) {
                     progressDialog.dismiss()
-                    if (e is com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException) {
-                        Toast.makeText(
-                            this@SettingsActivity,
-                            "Security step: Please log in again to confirm permanent account deletion",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                            this@SettingsActivity,
-                            "Account session ended. Details: ${e.localizedMessage}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    Toast.makeText(this@SettingsActivity, "Account deletion completed", Toast.LENGTH_LONG).show()
                     val intent = Intent(this@SettingsActivity, LoginActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
+                    com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this@SettingsActivity)
                     finish()
                 }
             }

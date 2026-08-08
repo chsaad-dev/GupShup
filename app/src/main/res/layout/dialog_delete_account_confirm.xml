@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete Account"
+        style="@style/TextAppearance.GupShup.Headline"
+        android:textColor="@color/error" />
+
+    <TextView
+        android:id="@+id/dialogWarningText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        style="@style/TextAppearance.GupShup.Body"
+        android:textColor="?attr/colorOnSurface"
+        android:text="This action is permanent and cannot be undone. All your profile info, messages, statuses, friend requests, and reports will be permanently deleted." />
+
+    <TextView
+        android:id="@+id/dialogPromptText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        style="@style/TextAppearance.GupShup.Body"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnSurface"
+        android:text="Please enter your password to confirm:" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/confirmInputLayout"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:boxStrokeColor="@color/colorPrimary"
+        app:hintEnabled="false">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/confirmEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:paddingVertical="12dp"
+            style="@style/TextAppearance.GupShup.Body"
+            android:textColor="?attr/colorOnSurface" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/dialogErrorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        style="@style/TextAppearance.GupShup.Caption"
+        android:textColor="@color/error"
+        android:visibility="gone" />
+
+</LinearLayout>

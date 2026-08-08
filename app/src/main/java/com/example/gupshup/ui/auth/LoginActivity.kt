@@ -53,6 +53,7 @@ class LoginActivity : AppCompatActivity() {
         auth.currentUser?.let { user ->
             if (user.isEmailVerified) {
                 startActivity(Intent(this, MainNavigationActivity::class.java))
+                com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
                 finish()
                 return
             }
@@ -84,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding.goToRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
         }
 
         binding.forgotPassword.setOnClickListener {
@@ -146,6 +147,7 @@ class LoginActivity : AppCompatActivity() {
         GupShupMessagingService.refreshAndSaveFcmToken()
         Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this, MainNavigationActivity::class.java))
+        com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
         finish()
     }
 
@@ -177,6 +179,7 @@ class LoginActivity : AppCompatActivity() {
                                 val intent = Intent(this, EmailVerificationActivity::class.java)
                                 intent.putExtra("email", user.email)
                                 startActivity(intent)
+                                com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
                                 finish()
                             }
                         } else {

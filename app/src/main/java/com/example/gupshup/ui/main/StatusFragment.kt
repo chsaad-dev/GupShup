@@ -142,6 +142,7 @@ class StatusFragment : Fragment() {
         intent.putExtra("STATUS_TIMESTAMP", status.timestamp)
         intent.putExtra("STATUS_USER_ID", status.userId)
         startActivity(intent)
+        com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(requireContext())
     }
 
     private fun uploadAndPostPhotoStatus(uri: Uri) {

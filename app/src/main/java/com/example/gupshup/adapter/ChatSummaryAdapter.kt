@@ -43,6 +43,7 @@ class ChatSummaryAdapter(
                 val intent = Intent(context, ChatActivity::class.java)
                 intent.putExtra("receiverId", chat.otherUserId)
                 context.startActivity(intent)
+                com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(context)
             }
         }
     }

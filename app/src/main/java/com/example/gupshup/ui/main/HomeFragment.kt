@@ -62,7 +62,7 @@ class HomeFragment : Fragment() {
             val intent = Intent(requireContext(), ChatActivity::class.java)
             intent.putExtra("receiverId", user.uid)
             startActivity(intent)
-            activity?.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(requireContext())
         }
 
         binding.homeRecyclerView.layoutManager = LinearLayoutManager(requireContext())

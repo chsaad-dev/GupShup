@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.openRegisterButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+            com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
         }
     }
 }

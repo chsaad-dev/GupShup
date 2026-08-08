@@ -20,6 +20,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+import com.example.gupshup.util.finishWithFade
+import com.example.gupshup.util.startActivityWithFade
+
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
@@ -44,8 +47,13 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupToolbar() {
         binding.settingsToolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            finishWithFade()
         }
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()
+            }
+        })
     }
 
     private fun loadPreferences() {

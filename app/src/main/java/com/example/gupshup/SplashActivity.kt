@@ -107,11 +107,14 @@ class SplashActivity : AppCompatActivity() {
                         putExtra("target_tab", "friends")
                     }
                     startActivity(mainIntent)
+                    com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this@SplashActivity)
                 } else {
                     startActivity(Intent(this@SplashActivity, MainNavigationActivity::class.java))
+                    com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this@SplashActivity)
                 }
             } else {
                 startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this@SplashActivity)
             }
             finish()
         }

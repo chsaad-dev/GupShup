@@ -53,6 +53,7 @@ class RegisterActivity : AppCompatActivity() {
         auth.currentUser?.let { user ->
             if (user.isEmailVerified) {
                 startActivity(Intent(this, MainNavigationActivity::class.java))
+                com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
                 finish()
                 return
             }
@@ -76,6 +77,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun setupUI() {
         binding.backButton.setOnClickListener {
             finish()
+            com.example.gupshup.util.ActivityTransitionUtil.applyFadeCloseTransition(this)
         }
 
         binding.registerButton.setOnClickListener {
@@ -84,6 +86,7 @@ class RegisterActivity : AppCompatActivity() {
 
         binding.goToLogin.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
+            com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
             finish()
         }
 
@@ -140,6 +143,7 @@ class RegisterActivity : AppCompatActivity() {
         GupShupMessagingService.refreshAndSaveFcmToken()
         Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this, MainNavigationActivity::class.java))
+        com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
         finish()
     }
 
@@ -180,6 +184,7 @@ class RegisterActivity : AppCompatActivity() {
                                     val intent = Intent(this, EmailVerificationActivity::class.java)
                                     intent.putExtra("email", email)
                                     startActivity(intent)
+                                    com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
                                     finish()
                                 }
                                 .addOnFailureListener { e ->

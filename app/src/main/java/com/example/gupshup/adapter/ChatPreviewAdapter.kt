@@ -31,6 +31,7 @@ class ChatPreviewAdapter(
             val intent = Intent(context, ChatActivity::class.java)
             intent.putExtra("receiverId", item.user.uid)
             context.startActivity(intent)
+            com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(context)
         }
     }
 

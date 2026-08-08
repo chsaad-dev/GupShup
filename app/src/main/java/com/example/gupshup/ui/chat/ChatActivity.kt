@@ -20,6 +20,7 @@ import com.example.gupshup.adapter.ChatAdapter
 import com.example.gupshup.databinding.ActivityChatBinding
 import com.example.gupshup.model.Message
 import com.example.gupshup.model.User
+import com.example.gupshup.util.finishWithFade
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -231,8 +232,14 @@ class ChatActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = ""  // We now use custom toolbar views
         binding.chatToolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            finishWithFade()
         }
+
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()
+            }
+        })
     }
 
     private fun observeReceiverStatus() {

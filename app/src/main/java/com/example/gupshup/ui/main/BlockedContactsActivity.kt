@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
+import com.example.gupshup.util.finishWithFade
+
 class BlockedContactsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityBlockedContactsBinding
@@ -40,8 +42,13 @@ class BlockedContactsActivity : AppCompatActivity() {
 
     private fun setupToolbar() {
         binding.blockedToolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            finishWithFade()
         }
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()
+            }
+        })
     }
 
     private fun setupRecyclerView() {

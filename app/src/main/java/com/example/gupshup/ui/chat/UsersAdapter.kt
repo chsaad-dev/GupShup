@@ -141,6 +141,7 @@ class UsersAdapter(
                             val intent = Intent(context, ChatActivity::class.java)
                             intent.putExtra("receiverId", user.uid)
                             context.startActivity(intent)
+                            com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(context)
                         } else {
                             Toast.makeText(context, "Not friends yet!", Toast.LENGTH_SHORT).show()
                         }

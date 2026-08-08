@@ -73,6 +73,7 @@ class StatusAdapter(
                 val intent = Intent(context, StatusStoryActivity::class.java)
                 intent.putExtra("STATUS_DATA", status)
                 context.startActivity(intent)
+                com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(context)
                 onStatusClick(status)
             }
         }

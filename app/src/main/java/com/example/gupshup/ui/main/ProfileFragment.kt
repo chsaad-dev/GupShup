@@ -84,6 +84,7 @@ class ProfileFragment : Fragment() {
         binding.profileToolbar.setOnMenuItemClickListener { menuItem ->
             if (menuItem.itemId == R.id.action_settings) {
                 startActivity(Intent(requireContext(), SettingsActivity::class.java))
+                com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(requireContext())
                 true
             } else {
                 false
@@ -107,6 +108,7 @@ class ProfileFragment : Fragment() {
                     putExtra("STATUS_USER_ID", status.userId)
                 }
                 startActivity(intent)
+                com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(requireContext())
             } else {
                 imagePickerLauncher.launch("image/*")
             }

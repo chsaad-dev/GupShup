@@ -39,7 +39,9 @@ class MainNavigationActivity : AppCompatActivity() {
 
         val user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
-            startActivity(Intent(this, LoginActivity::class.java))
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
             finish()
             return
         }
@@ -144,17 +146,41 @@ class MainNavigationActivity : AppCompatActivity() {
     private fun switchFragment(targetFragment: Fragment, tag: String) {
         if (activeFragment == targetFragment) return
 
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.hide(activeFragment)
+        val currentView = activeFragment.view
+        val targetView = targetFragment.view
 
-        if (!targetFragment.isAdded) {
-            transaction.add(R.id.fragmentContainer, targetFragment, tag)
+        if (currentView != null && targetFragment.isAdded && targetView != null) {
+            currentView.animate()
+                .alpha(0f)
+                .setDuration(100)
+                .withEndAction {
+                    currentView.alpha = 1f
+                    val transaction = supportFragmentManager.beginTransaction()
+                    transaction.hide(activeFragment)
+                    transaction.show(targetFragment)
+                    transaction.commit()
+                    activeFragment = targetFragment
+
+                    targetView.alpha = 0f
+                    targetView.animate()
+                        .alpha(1f)
+                        .setDuration(100)
+                        .start()
+                }
+                .start()
         } else {
-            transaction.show(targetFragment)
-        }
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.hide(activeFragment)
 
-        transaction.commit()
-        activeFragment = targetFragment
+            if (!targetFragment.isAdded) {
+                transaction.add(R.id.fragmentContainer, targetFragment, tag)
+            } else {
+                transaction.show(targetFragment)
+            }
+
+            transaction.commit()
+            activeFragment = targetFragment
+        }
     }
 
     private fun observeNetwork() {

@@ -147,11 +147,13 @@ class EmailVerificationActivity : AppCompatActivity() {
 
     private fun redirectToLogin() {
         startActivity(Intent(this, LoginActivity::class.java))
+        com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
         finish()
     }
 
     private fun redirectToMain() {
         startActivity(Intent(this, MainNavigationActivity::class.java))
+        com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
         finish()
     }
 

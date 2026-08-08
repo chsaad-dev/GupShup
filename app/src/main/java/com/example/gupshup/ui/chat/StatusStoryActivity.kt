@@ -11,6 +11,7 @@ import com.example.gupshup.adapter.CommentAdapter
 import com.example.gupshup.databinding.ActivityStatusStoryBinding
 import com.example.gupshup.model.Comment
 import com.example.gupshup.model.Status
+import com.example.gupshup.util.finishWithFade
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -68,8 +69,14 @@ class StatusStoryActivity : AppCompatActivity() {
         }
 
         binding.backButton.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            finishWithFade()
         }
+
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithFade()
+            }
+        })
 
         binding.deleteStatusButton.setOnClickListener {
             showDeleteDialog()

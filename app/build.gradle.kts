@@ -72,6 +72,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
+    implementation("com.google.zxing:core:3.5.3")
+
     implementation("com.github.bumptech.glide:glide:4.15.1")
     implementation(libs.androidx.swiperefreshlayout)
     kapt("com.github.bumptech.glide:compiler:4.15.1")

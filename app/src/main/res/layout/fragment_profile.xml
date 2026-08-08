@@ -30,52 +30,133 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/spacing_3xl">
 
-            <!-- Header Stack: 110dp Vertical Gradient background block with overlapping 100dp Avatar (no pencil badge) -->
+            <!-- Header Stack: Gradient cover header with overlapping Avatar -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="160dp">
 
-                <!-- 110dp Gradient Visual Anchor Block (fading from Primary Container into Surface color) -->
                 <View
                     android:id="@+id/headerBlock"
                     android:layout_width="match_parent"
                     android:layout_height="110dp"
                     android:background="@drawable/bg_profile_header_gradient" />
 
-                <!-- Avatar Stack (100dp circular, 4dp Surface ring, center sitting ON 110dp boundary at top 60dp) -->
+                <!-- Avatar Stack (100dp circular avatar sitting ON 110dp boundary) -->
                 <FrameLayout
                     android:id="@+id/avatarContainer"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="60dp"
+                    android:layout_marginTop="58dp"
                     android:clickable="true"
                     android:focusable="true">
 
-                    <!-- 100dp Avatar with 4dp Surface ring -->
+                    <!-- Outer Status Ring Overlay (Visible when active status exists) -->
+                    <View
+                        android:id="@+id/statusRingView"
+                        android:layout_width="104dp"
+                        android:layout_height="104dp"
+                        android:background="@drawable/status_ring"
+                        android:visibility="gone" />
+
+                    <!-- 96dp Avatar with 4dp Surface ring -->
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/profileImageView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        android:layout_gravity="center"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_profile_placeholder"
                         app:shapeAppearanceOverlay="@style/CircleImage"
-                        app:strokeWidth="4dp"
+                        app:strokeWidth="3dp"
                         app:strokeColor="?attr/colorSurface" />
+
+                    <!-- Camera Edit Badge -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cameraBadge"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom|end"
+                        app:cardCornerRadius="15dp"
+                        app:cardBackgroundColor="@color/colorPrimary"
+                        app:cardElevation="4dp"
+                        app:strokeWidth="2dp"
+                        app:strokeColor="?attr/colorSurface">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_edit"
+                            app:tint="@color/white"
+                            android:contentDescription="Change Photo" />
+                    </com.google.android.material.card.MaterialCardView>
                 </FrameLayout>
             </RelativeLayout>
 
-            <!-- Name: Headline style (22sp SemiBold), centered, 12dp below avatar -->
+            <!-- Name: Headline style (22sp SemiBold), centered -->
             <TextView
                 android:id="@+id/profileNameHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 style="@style/TextAppearance.GupShup.Headline"
                 android:textColor="?attr/colorOnSurface"
                 android:textAlignment="center" />
+
+            <!-- Friends count + Member since stat row -->
+            <TextView
+                android:id="@+id/profileStatsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="4dp"
+                style="@style/TextAppearance.GupShup.Caption"
+                android:textColor="@color/onSurfaceVariant"
+                android:textAlignment="center"
+                android:text="0 friends · Member since..." />
+
+            <!-- Action Chips Row (QR code & Copy link) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/qrCodeChip"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="QR code"
+                    android:textAppearance="@style/TextAppearance.GupShup.Label"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@drawable/ic_logo"
+                    app:iconTint="?attr/colorOnSurface"
+                    app:iconSize="18dp"
+                    app:cornerRadius="20dp"
+                    app:strokeColor="@color/outline"
+                    app:strokeWidth="1dp"
+                    android:layout_marginEnd="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/copyLinkChip"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Copy link"
+                    android:textAppearance="@style/TextAppearance.GupShup.Label"
+                    android:textColor="?attr/colorOnSurface"
+                    app:icon="@drawable/ic_copy"
+                    app:iconTint="?attr/colorOnSurface"
+                    app:iconSize="18dp"
+                    app:cornerRadius="20dp"
+                    app:strokeColor="@color/outline"
+                    app:strokeWidth="1dp" />
+            </LinearLayout>
 
             <!-- Content Area: 16dp side margins -->
             <LinearLayout
@@ -84,7 +165,7 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp">
 
-                <!-- "ACCOUNT INFO" label: Label style, brand color (#128C7E), uppercase, left-aligned, 24dp top margin -->
+                <!-- "ACCOUNT INFO" label -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,7 +175,7 @@
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Plain Read-Style Row 1: Full Name -->
+                <!-- Row 1: Full Name (Inline Editing Support) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -119,21 +200,45 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Full Name"
+                            android:text="Full name"
                             style="@style/TextAppearance.GupShup.Caption"
                             android:textColor="@color/onSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/nameTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/TextAppearance.GupShup.Body"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp" />
 
                         <EditText
                             android:id="@+id/nameEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:padding="0dp"
+                            android:background="@drawable/bg_input_pill"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="8dp"
                             android:inputType="textPersonName"
                             style="@style/TextAppearance.GupShup.Body"
                             android:textColor="?attr/colorOnSurface"
-                            android:enabled="false" />
+                            android:visibility="gone"
+                            android:layout_marginTop="4dp" />
                     </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/editNameButton"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_edit"
+                        app:tint="@color/onSurfaceVariant"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="2dp"
+                        android:layout_marginStart="12dp"
+                        android:contentDescription="Edit Full Name" />
                 </LinearLayout>
 
                 <View
@@ -141,7 +246,7 @@
                     android:layout_height="1dp"
                     android:background="@color/outline" />
 
-                <!-- Plain Read-Style Row 2: Email -->
+                <!-- Row 2: Email (Display Only) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -170,16 +275,13 @@
                             style="@style/TextAppearance.GupShup.Caption"
                             android:textColor="@color/onSurfaceVariant" />
 
-                        <EditText
-                            android:id="@+id/emailEditText"
+                        <TextView
+                            android:id="@+id/emailTextView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:padding="0dp"
-                            android:inputType="textEmailAddress"
                             style="@style/TextAppearance.GupShup.Body"
                             android:textColor="?attr/colorOnSurface"
-                            android:enabled="false" />
+                            android:layout_marginTop="2dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -188,12 +290,12 @@
                     android:layout_height="1dp"
                     android:background="@color/outline" />
 
-                <!-- Plain Read-Style Row 3: Bio -->
+                <!-- Row 3: Bio (Inline Editing + Counter + Emoji) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
+                    android:gravity="top"
                     android:paddingVertical="12dp">
 
                     <ImageView
@@ -202,6 +304,7 @@
                         android:src="@drawable/ic_info"
                         app:tint="@color/onSurfaceVariant"
                         android:layout_marginEnd="16dp"
+                        android:layout_marginTop="2dp"
                         android:contentDescription="Bio Icon" />
 
                     <LinearLayout
@@ -217,18 +320,82 @@
                             style="@style/TextAppearance.GupShup.Caption"
                             android:textColor="@color/onSurfaceVariant" />
 
-                        <EditText
-                            android:id="@+id/bioEditText"
+                        <!-- Display mode text -->
+                        <TextView
+                            android:id="@+id/bioTextView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:padding="0dp"
-                            android:inputType="textMultiLine"
-                            android:maxLines="3"
                             style="@style/TextAppearance.GupShup.Body"
                             android:textColor="?attr/colorOnSurface"
-                            android:enabled="false" />
+                            android:layout_marginTop="2dp" />
+
+                        <!-- Inline Edit mode container -->
+                        <LinearLayout
+                            android:id="@+id/bioEditContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="gone"
+                            android:layout_marginTop="4dp">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <EditText
+                                    android:id="@+id/bioEditText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_input_pill"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="40dp"
+                                    android:paddingVertical="8dp"
+                                    android:inputType="textMultiLine"
+                                    android:maxLines="3"
+                                    style="@style/TextAppearance.GupShup.Body"
+                                    android:textColor="?attr/colorOnSurface" />
+
+                                <ImageView
+                                    android:id="@+id/bioEmojiButton"
+                                    android:layout_width="28dp"
+                                    android:layout_height="28dp"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginEnd="8dp"
+                                    android:padding="2dp"
+                                    android:src="@drawable/ic_send"
+                                    app:tint="@color/colorPrimary"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:contentDescription="Pick Emoji" />
+                            </RelativeLayout>
+
+                            <TextView
+                                android:id="@+id/bioCharCounterText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:text="0/150"
+                                style="@style/TextAppearance.GupShup.Caption"
+                                android:textColor="@color/onSurfaceVariant"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
                     </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/editBioButton"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_edit"
+                        app:tint="@color/onSurfaceVariant"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="2dp"
+                        android:layout_marginStart="12dp"
+                        android:contentDescription="Edit Bio" />
                 </LinearLayout>
 
                 <View
@@ -236,17 +403,42 @@
                     android:layout_height="1dp"
                     android:background="@color/outline" />
 
-                <!-- Edit Profile Button: Widget.GupShup.Button.Filled style, full width, 16dp side margins, 24dp top margin -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editSaveButton"
-                    style="@style/Widget.GupShup.Button.Filled"
+                <!-- Row 4: Invite friends to GupShup -->
+                <LinearLayout
+                    android:id="@+id/rowInviteFriends"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height"
-                    android:layout_marginTop="24dp"
-                    android:text="Edit Profile"
-                    app:icon="@drawable/ic_edit"
-                    app:iconGravity="textStart"
-                    app:iconTint="@color/white" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_friends"
+                        app:tint="@color/onSurfaceVariant"
+                        android:layout_marginEnd="16dp"
+                        android:contentDescription="Invite Friends Icon" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Invite friends to GupShup"
+                        style="@style/TextAppearance.GupShup.Body"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/onSurfaceVariant"
+                        android:contentDescription="Chevron" />
+                </LinearLayout>
 
             </LinearLayout>
 

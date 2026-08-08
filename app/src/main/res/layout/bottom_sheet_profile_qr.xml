@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="24dp"
+    android:background="?attr/colorSurface">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:background="@drawable/bg_rounded_gray"
+        android:layout_marginBottom="16dp" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/qrUserAvatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_profile_placeholder"
+        app:civ_border_width="2dp"
+        app:civ_border_color="@color/colorPrimary" />
+
+    <TextView
+        android:id="@+id/qrUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        style="@style/TextAppearance.GupShup.Headline"
+        android:textColor="?attr/colorOnSurface"
+        android:text="User Name" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        style="@style/TextAppearance.GupShup.Caption"
+        android:textColor="@color/onSurfaceVariant"
+        android:text="Scan to connect on GupShup" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="@color/white"
+        app:contentPadding="16dp">
+
+        <ImageView
+            android:id="@+id/qrCodeImageView"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:contentDescription="Profile QR Code" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/shareQrButton"
+        style="@style/Widget.GupShup.Button.Filled"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="24dp"
+        android:text="Share QR Code"
+        app:icon="@drawable/ic_send"
+        app:iconGravity="textStart"
+        app:iconTint="@color/white" />
+
+</LinearLayout>

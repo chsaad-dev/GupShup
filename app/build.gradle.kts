@@ -75,6 +75,7 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
 
     implementation("com.github.bumptech.glide:glide:4.15.1")
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
     implementation(libs.androidx.swiperefreshlayout)
     kapt("com.github.bumptech.glide:compiler:4.15.1")
 

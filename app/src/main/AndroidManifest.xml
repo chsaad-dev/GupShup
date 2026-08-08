@@ -47,6 +47,7 @@
         <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".ui.chat.StatusViewActivity" />
         <activity android:name=".ui.chat.StatusStoryActivity"/>
+        <activity android:name=".ui.chat.ImagePreviewActivity" android:exported="false" />
 
 
 

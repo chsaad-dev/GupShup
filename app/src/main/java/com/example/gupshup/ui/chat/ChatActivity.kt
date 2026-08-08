@@ -684,27 +684,13 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun showImagePreviewDialog(imageUrl: String) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_full_screen_image, null)
-        val dialog = AlertDialog.Builder(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
-            .setView(dialogView)
-            .create()
-
-        val fullScreenImageView = dialogView.findViewById<android.widget.ImageView>(R.id.fullScreenImageView)
-        val closeButton = dialogView.findViewById<android.view.View>(R.id.closeButton)
-
-        if (fullScreenImageView != null) {
-            com.example.gupshup.util.ImageLoaderUtil.loadChatImage(fullScreenImageView, imageUrl)
+        if (imageUrl.isBlank()) return
+        val intent = Intent(this, ImagePreviewActivity::class.java).apply {
+            putExtra(ImagePreviewActivity.EXTRA_IMAGE_URL, imageUrl)
+            putExtra(ImagePreviewActivity.EXTRA_TITLE, binding.userNameText.text.toString())
         }
-
-        fullScreenImageView?.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        closeButton?.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
+        startActivity(intent)
+        com.example.gupshup.util.ActivityTransitionUtil.applyFadeTransition(this)
     }
 
     private fun showReactionDialog(message: Message) {

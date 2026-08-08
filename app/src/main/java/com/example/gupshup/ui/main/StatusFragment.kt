@@ -184,7 +184,10 @@ class StatusFragment : Fragment() {
 
         db.collection("users").document(currentUid).get().addOnSuccessListener { document ->
             val userName = document.getString("name") ?: "Anonymous"
-            val userProfileUrl = document.getString("profileImageUrl") ?: ""
+            val userProfileUrl = document.getString("profileImageUrl")
+                ?: document.getString("photoUrl")
+                ?: document.getString("photoUri")
+                ?: ""
 
             val status = Status(
                 statusId = newStatusId,
@@ -276,7 +279,10 @@ class StatusFragment : Fragment() {
                         if (st.userProfileUrl.isEmpty()) {
                             db.collection("users").document(st.userId).get().addOnSuccessListener { uDoc ->
                                 if (_binding == null || !isAdded || uDoc == null || !uDoc.exists()) return@addOnSuccessListener
-                                val freshPhotoUrl = uDoc.getString("profileImageUrl") ?: ""
+                                val freshPhotoUrl = uDoc.getString("profileImageUrl")
+                                    ?: uDoc.getString("photoUrl")
+                                    ?: uDoc.getString("photoUri")
+                                    ?: ""
                                 if (freshPhotoUrl.isNotEmpty()) {
                                     val index = statusList.indexOfFirst { s -> s.statusId == st.statusId }
                                     if (index != -1) {

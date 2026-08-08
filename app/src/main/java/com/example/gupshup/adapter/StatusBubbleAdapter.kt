@@ -30,8 +30,25 @@ class StatusBubbleAdapter(
         val status = statusList[position]
         holder.userName.text = status.userName
 
-        android.util.Log.d("StatusBubbleAdapter", "Loading status avatar for user ${status.userName}, url: '${status.userProfileUrl}'")
-        com.example.gupshup.util.ImageLoaderUtil.loadAvatar(holder.profileImage, status.userProfileUrl)
+        val profileUrl = status.userProfileUrl
+        if (profileUrl.isNotEmpty()) {
+            com.example.gupshup.util.ImageLoaderUtil.loadAvatar(holder.profileImage, profileUrl)
+        } else {
+            com.example.gupshup.util.ImageLoaderUtil.loadAvatar(holder.profileImage, null)
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(status.userId)
+                .get()
+                .addOnSuccessListener { uDoc ->
+                    if (uDoc != null && uDoc.exists()) {
+                        val avatarUrl = uDoc.getString("profileImageUrl")
+                            ?: uDoc.getString("photoUrl")
+                            ?: uDoc.getString("photoUri")
+                        val updatedAt = uDoc.getLong("updatedAt") ?: 0L
+                        com.example.gupshup.util.ImageLoaderUtil.loadAvatar(holder.profileImage, avatarUrl, updatedAt)
+                    }
+                }
+        }
 
         holder.itemView.setOnClickListener {
             onStatusClick(status)

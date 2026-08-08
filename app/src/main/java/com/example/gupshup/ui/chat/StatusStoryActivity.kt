@@ -2,28 +2,29 @@ package com.example.gupshup.ui.chat
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.gupshup.adapter.CommentAdapter
+import com.example.gupshup.R
 import com.example.gupshup.databinding.ActivityStatusStoryBinding
-import com.example.gupshup.model.Comment
 import com.example.gupshup.model.Status
+import com.example.gupshup.ui.main.StatusViewersBottomSheetFragment
+import com.example.gupshup.util.ImageLoaderUtil
 import com.example.gupshup.util.finishWithFade
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 
 class StatusStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityStatusStoryBinding
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
-    private lateinit var commentAdapter: CommentAdapter
-    private val commentList = ArrayList<Comment>()
     private var status: Status? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,42 +32,41 @@ class StatusStoryActivity : AppCompatActivity() {
         binding = ActivityStatusStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val passedStatus = if (BuildUtils.isAtLeastTiramisu()) {
+            intent.getSerializableExtra("STATUS_DATA", Status::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getSerializableExtra("STATUS_DATA") as? Status
+        }
 
-        val statusId = intent.getStringExtra("STATUS_ID")
-        val userId = intent.getStringExtra("STATUS_USER_ID")
-        val userName = intent.getStringExtra("STATUS_USER_NAME")
-        val text = intent.getStringExtra("STATUS_TEXT")
-        val timestamp = intent.getLongExtra("STATUS_TIMESTAMP", 0L)
+        val statusId = passedStatus?.statusId ?: intent.getStringExtra("STATUS_ID")
+        val userId = passedStatus?.userId ?: intent.getStringExtra("STATUS_USER_ID")
+        val userName = passedStatus?.userName ?: intent.getStringExtra("STATUS_USER_NAME")
+        val text = passedStatus?.text ?: intent.getStringExtra("STATUS_TEXT")
+        val mediaUrl = passedStatus?.mediaUrl ?: intent.getStringExtra("STATUS_MEDIA_URL")
+        val type = passedStatus?.type ?: intent.getStringExtra("STATUS_TYPE") ?: "text"
+        val timestamp = if (passedStatus != null && passedStatus.timestamp > 0L) passedStatus.timestamp else intent.getLongExtra("STATUS_TIMESTAMP", System.currentTimeMillis())
 
-
-        if (statusId == null || userId == null) {
+        if (statusId.isNullOrEmpty() || userId.isNullOrEmpty()) {
             Toast.makeText(this, "Status not found", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        val mediaUrl = intent.getStringExtra("STATUS_MEDIA_URL") ?: ""
-        val type = intent.getStringExtra("STATUS_TYPE") ?: "text"
-
-
         status = Status(
             statusId = statusId,
             userId = userId,
             userName = userName ?: "Unknown",
-            userProfileUrl = "",
-            text = text ?: "",
+            userProfileUrl = passedStatus?.userProfileUrl ?: "",
+            text = text,
             mediaUrl = mediaUrl,
             type = type,
             timestamp = timestamp
         )
 
         setupUI()
-        setupRecyclerView()
-        loadComments()
-
-        binding.sendCommentButton.setOnClickListener {
-            sendComment()
-        }
+        setupSegmentedProgressBar(userId, statusId)
+        recordStatusView(statusId, userId)
 
         binding.backButton.setOnClickListener {
             finishWithFade()
@@ -84,125 +84,132 @@ class StatusStoryActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        val currentStatus = status
-        if (currentStatus != null && !currentStatus.mediaUrl.isNullOrBlank()) {
-            binding.statusImageView.visibility = android.view.View.VISIBLE
-            com.example.gupshup.util.ImageLoaderUtil.loadStatusMedia(binding.statusImageView, currentStatus.mediaUrl ?: "")
+        val currentStatus = status ?: return
+
+        // 1. Media & Text / Caption rendering
+        val hasMedia = !currentStatus.mediaUrl.isNullOrBlank()
+        if (hasMedia) {
+            binding.statusImageView.visibility = View.VISIBLE
+            binding.statusTextView.visibility = View.GONE
+            ImageLoaderUtil.loadStatusMedia(binding.statusImageView, currentStatus.mediaUrl)
+
+            if (!currentStatus.text.isNullOrBlank()) {
+                binding.statusCaptionTextView.visibility = View.VISIBLE
+                binding.statusCaptionTextView.text = currentStatus.text
+            } else {
+                binding.statusCaptionTextView.visibility = View.GONE
+            }
         } else {
-            binding.statusImageView.visibility = android.view.View.GONE
+            binding.statusImageView.visibility = View.GONE
+            binding.statusCaptionTextView.visibility = View.GONE
+            binding.statusTextView.visibility = View.VISIBLE
+            binding.statusTextView.text = currentStatus.text ?: ""
         }
 
-        if (currentStatus?.text.isNullOrBlank()) {
-            binding.statusTextView.visibility = android.view.View.GONE
-        } else {
-            binding.statusTextView.visibility = android.view.View.VISIBLE
-            binding.statusTextView.text = currentStatus?.text
-        }
+        // 2. User Info & Avatar
+        binding.userNameTextView.text = currentStatus.userName
+        binding.timestampTextView.text = formatRelativeTime(currentStatus.timestamp)
 
-        binding.userNameTextView.text = currentStatus?.userName ?: "Unknown"
-        binding.timestampTextView.text = formatTime(currentStatus?.timestamp ?: 0L)
+        loadUserAvatar(currentStatus.userId, currentStatus.userProfileUrl)
 
+        // 3. Owner Controls (Delete & Viewer Count)
         val currentUid = auth.currentUser?.uid
-        val targetStatusId = currentStatus?.statusId ?: ""
-        if (currentUid != null && targetStatusId.isNotEmpty() && currentUid != currentStatus?.userId) {
+        val isOwner = (currentUid != null && currentUid == currentStatus.userId)
+
+        if (isOwner) {
+            binding.deleteStatusButton.visibility = View.VISIBLE
+            binding.viewersCountContainer.visibility = View.VISIBLE
+            fetchViewersCount(currentStatus.statusId)
+
+            binding.viewersCountContainer.setOnClickListener {
+                val sheet = StatusViewersBottomSheetFragment.newInstance(currentStatus.statusId)
+                sheet.show(supportFragmentManager, "StatusViewersBottomSheet")
+            }
+        } else {
+            binding.deleteStatusButton.visibility = View.GONE
+            binding.viewersCountContainer.visibility = View.GONE
+        }
+    }
+
+    private fun loadUserAvatar(userId: String, fallbackUrl: String) {
+        if (fallbackUrl.isNotEmpty()) {
+            ImageLoaderUtil.loadAvatar(binding.headerAvatar, fallbackUrl)
+        }
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { doc ->
+                if (doc != null && doc.exists()) {
+                    val avatarUrl = doc.getString("profileImageUrl")
+                        ?: doc.getString("photoUrl")
+                        ?: doc.getString("photoUri")
+                        ?: fallbackUrl
+                    val updatedAt = doc.getLong("updatedAt") ?: 0L
+                    ImageLoaderUtil.loadAvatar(binding.headerAvatar, avatarUrl, updatedAt)
+                }
+            }
+    }
+
+    private fun fetchViewersCount(statusId: String) {
+        db.collection("status")
+            .document(statusId)
+            .collection("views")
+            .count()
+            .get(AggregateSource.SERVER)
+            .addOnSuccessListener { snapshot ->
+                binding.viewersCountText.text = snapshot.count.toString()
+            }
+    }
+
+    private fun recordStatusView(statusId: String, ownerUserId: String) {
+        val currentUid = auth.currentUser?.uid ?: return
+        if (currentUid != ownerUserId) {
             val viewData = mapOf("viewedAt" to System.currentTimeMillis())
             db.collection("status")
-                .document(targetStatusId)
+                .document(statusId)
                 .collection("views")
                 .document(currentUid)
                 .set(viewData)
         }
-
-        // Show delete button only if this is the current user's status
-        if (currentStatus?.userId == auth.currentUser?.uid) {
-            binding.deleteStatusButton.visibility = android.view.View.VISIBLE
-        } else {
-            binding.deleteStatusButton.visibility = android.view.View.GONE
-        }
     }
 
-    private fun setupRecyclerView() {
-        commentAdapter = CommentAdapter(commentList)
-        binding.commentsRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.commentsRecyclerView.adapter = commentAdapter
-    }
-
-    private fun loadComments() {
-        val statusId = status?.statusId ?: return
-
+    private fun setupSegmentedProgressBar(userId: String, currentStatusId: String) {
+        val now = System.currentTimeMillis()
         db.collection("status")
-            .document(statusId)
-            .collection("comments")
-            .orderBy("timestamp")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    Toast.makeText(this, "Failed to load comments", Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
-                }
-
-                commentList.clear()
-                snapshot?.documents?.forEach { doc ->
-                    val comment = doc.toObject(Comment::class.java)
-                    if (comment != null) {
-                        db.collection("users").document(comment.userId)
-                            .get()
-                            .addOnSuccessListener { userDoc ->
-                                comment.userName = userDoc.getString("name") ?: "Unknown"
-                                commentList.add(comment)
-                                commentAdapter.notifyDataSetChanged()
-                            }
-                    }
-                }
-            }
-    }
-
-    private fun sendComment() {
-        val commentText = binding.commentEditText.text.toString().trim()
-        if (commentText.isEmpty()) {
-            Toast.makeText(this, "Write something to comment", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val currentUser = auth.currentUser ?: return
-        db.collection("users").document(currentUser.uid)
+            .whereEqualTo("userId", userId)
+            .whereGreaterThan("expiresAt", now)
             .get()
-            .addOnSuccessListener { userDoc ->
-                val userName = userDoc.getString("name") ?: "Anonymous"
+            .addOnSuccessListener { snapshot ->
+                if (snapshot == null || snapshot.isEmpty) return@addOnSuccessListener
 
-                val comment = Comment(
-                    commentId = UUID.randomUUID().toString(),
-                    userId = currentUser.uid,
-                    userName = userName,
-                    text = commentText,
-                    timestamp = System.currentTimeMillis()
-                )
+                val statuses = snapshot.documents.mapNotNull { it.toObject(Status::class.java) }
+                    .sortedBy { it.timestamp }
 
-                db.collection("status")
-                    .document(status!!.statusId)
-                    .collection("comments")
-                    .document(comment.commentId)
-                    .set(comment)
-                    .addOnSuccessListener {
-                        binding.commentEditText.setText("")
-                        Toast.makeText(this, "Comment posted", Toast.LENGTH_SHORT).show()
+                binding.segmentedProgressBar.removeAllViews()
+                val total = statuses.size
+
+                for (i in 0 until total) {
+                    val segment = View(this).apply {
+                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f).apply {
+                            if (i < total - 1) marginEnd = 6
+                        }
+                        background = getDrawable(R.drawable.bg_rounded_gray)
+                        val isPastOrCurrent = statuses[i].statusId == currentStatusId ||
+                                statuses.indexOfFirst { it.statusId == currentStatusId } >= i
+                        alpha = if (isPastOrCurrent) 1.0f else 0.4f
                     }
-                    .addOnFailureListener {
-                        Toast.makeText(this, "Failed to send comment", Toast.LENGTH_SHORT).show()
-                    }
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to fetch user info", Toast.LENGTH_SHORT).show()
+                    binding.segmentedProgressBar.addView(segment)
+                }
             }
     }
 
     private fun showDeleteDialog() {
-        val dialogView = LayoutInflater.from(this).inflate(com.example.gupshup.R.layout.dialog_delete_status, null)
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_delete_status, null)
         val dialog = AlertDialog.Builder(this).create()
         dialog.setView(dialogView)
         dialog.setCancelable(true)
 
-        val cancelBtn = dialogView.findViewById<Button>(com.example.gupshup.R.id.cancelButton)
-        val confirmBtn = dialogView.findViewById<Button>(com.example.gupshup.R.id.confirmButton)
+        val cancelBtn = dialogView.findViewById<Button>(R.id.cancelButton)
+        val confirmBtn = dialogView.findViewById<Button>(R.id.confirmButton)
 
         cancelBtn.setOnClickListener { dialog.dismiss() }
 
@@ -213,7 +220,7 @@ class StatusStoryActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "Status deleted", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
-                    finish()
+                    finishWithFade()
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, "Failed to delete status", Toast.LENGTH_SHORT).show()
@@ -224,8 +231,23 @@ class StatusStoryActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun formatTime(time: Long): String {
-        val sdf = SimpleDateFormat("hh:mm a, dd MMM", Locale.getDefault())
-        return sdf.format(Date(time))
+    private fun formatRelativeTime(timestamp: Long): String {
+        if (timestamp <= 0L) return ""
+        val now = System.currentTimeMillis()
+        val diff = now - timestamp
+        val minutes = diff / (60 * 1000)
+        val hours = diff / (60 * 60 * 1000)
+        return when {
+            minutes < 1 -> "Just now"
+            minutes < 60 -> "${minutes}m ago"
+            hours < 24 -> "${hours}h ago"
+            else -> SimpleDateFormat("dd MMM, hh:mm a", java.util.Locale.getDefault()).format(Date(timestamp))
+        }
+    }
+}
+
+object BuildUtils {
+    fun isAtLeastTiramisu(): Boolean {
+        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
     }
 }

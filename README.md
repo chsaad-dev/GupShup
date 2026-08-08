@@ -2,6 +2,17 @@
 
 GupShup is an Android messaging application built using Kotlin, Material Design 3, Room local database, Firebase Firestore, Firebase Authentication, Cloudinary Media SDK, and Cloudflare Workers. It includes offline caching, real-time messaging, media status stories, friend request handling, push notifications, and customizable application settings.
 
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/Home.png" width="200" alt="Home Screen" />
+  <img src="screenshots/Chat.png" width="200" alt="Chat Screen" />
+  <img src="screenshots/Search.png" width="200" alt="Search Screen" />
+  <img src="screenshots/Friend_Requests.png" width="200" alt="Friend Requests Screen" />
+  <img src="screenshots/Profile.png" width="200" alt="Profile Screen" />
+  <img src="screenshots/Settings.png" width="200" alt="Settings Screen" />
+</p>
+
 ## Core Features
 
 ### Real-Time Chat List and Message History

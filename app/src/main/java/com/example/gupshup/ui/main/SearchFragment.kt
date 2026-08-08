@@ -150,7 +150,7 @@ class SearchFragment : Fragment() {
             }
             .addOnFailureListener { e ->
                 if (_binding != null && isAdded) {
-                    context?.let { Toast.makeText(it, "❌ Error loading users: ${e.message}", Toast.LENGTH_LONG).show() }
+                    context?.let { Toast.makeText(it, "Error loading users: ${e.message}", Toast.LENGTH_LONG).show() }
                 }
             }
     }
@@ -160,7 +160,7 @@ class SearchFragment : Fragment() {
         val toUid = user.uid
 
         if (fromUid.isNullOrEmpty() || toUid.isNullOrEmpty()) {
-            context?.let { Toast.makeText(it, "❌ Invalid user info", Toast.LENGTH_SHORT).show() }
+            context?.let { Toast.makeText(it, "Invalid user info", Toast.LENGTH_SHORT).show() }
             return
         }
 
@@ -176,7 +176,7 @@ class SearchFragment : Fragment() {
             .addOnSuccessListener { docRef ->
                 com.example.gupshup.util.NotificationApiClient.notifyFriendRequest(docRef.id)
                 if (_binding == null || !isAdded) return@addOnSuccessListener
-                context?.let { Toast.makeText(it, "✅ Friend request sent", Toast.LENGTH_SHORT).show() }
+                context?.let { Toast.makeText(it, "Friend request sent", Toast.LENGTH_SHORT).show() }
                 binding.searchInput.setText("")
                 allUsers.clear()
                 adapter.notifyDataSetChanged()
@@ -184,7 +184,7 @@ class SearchFragment : Fragment() {
             }
             .addOnFailureListener { e ->
                 if (_binding != null && isAdded) {
-                    context?.let { Toast.makeText(it, "❌ Failed to send request: ${e.message}", Toast.LENGTH_LONG).show() }
+                    context?.let { Toast.makeText(it, "Failed to send request: ${e.message}", Toast.LENGTH_LONG).show() }
                 }
             }
     }
